@@ -66,7 +66,8 @@ INC_FOLDERS=\
 						src/ext/x64asm \
 						src/ext/gtest-1.7.0/include \
 						src/ext/z3/src/api \
-						src/ext/cvc4-1.4-build/include
+						src/ext/cvc4-1.4-build/include \
+						./../../../Install/boost_1_65_1
 
 INC=$(addprefix -I./, $(INC_FOLDERS))
 
@@ -76,8 +77,7 @@ DEPS=\
 LIB=\
 	src/ext/x64asm/lib/libx64asm.a\
 	-pthread\
-	-lboost_thread -lboost_system\
-	-lboost_regex -lboost_filesystem\
+	-L /home/sdasgup3/Install/boost_1_65_1/stage/lib -lboost_thread -lboost_system -lboost_regex -lboost_filesystem\
 	-lcln \
 	-liml -lgmp \
 	-L src/ext/cvc4-1.4-build/lib -lcvc4 \
