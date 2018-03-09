@@ -165,6 +165,7 @@ int main(int argc, char** argv) {
     } else if (specgen_is_system(op)) {
       sys++;
       is_goal = false;
+
     } else if (specgen_is_float(op)) {
       x87++;
       is_goal = false;
@@ -185,6 +186,7 @@ int main(int argc, char** argv) {
     if (is_goal && specgen_is_sandbox_unsupported(op)) {
       unsupported++;
       is_goal = false;
+
     }
     bool may_be_goal = is_goal;
     auto is_mm = false;
@@ -215,7 +217,16 @@ int main(int argc, char** argv) {
         Instruction our = get_instruction(op);
         if (validator.is_supported(our)) {
           validator_support++;
+        } 
+        /*
+        else {
+      std::string str;
+    std::stringstream ss(str);
+    opcode_write_text(ss, op);
+    std::cout << ss.str() << "\n";
+
         }
+        */
       } else if (only_imm_arg) {
         if (is_imm8) {
           counter += 1;

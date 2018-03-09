@@ -731,6 +731,24 @@ public:
       return f(b);
     }, 32, 32, true, true);
 
+    /* Extend BaseSet
+    add_opcode("absb", [] (SymBitVector a, SymBitVector b) {
+      SymFunction f("absb", 8, {8});
+      return f(b);
+    }, 8, 8, true, true);
+
+    add_opcode("absd", [] (SymBitVector a, SymBitVector b) {
+      SymFunction f("absd", 16, {16});
+      return f(b);
+    }, 16, 16, true, true);
+
+    add_opcode("absw", [] (SymBitVector a, SymBitVector b) {
+      SymFunction f("absw", 32, {32});
+      return f(b);
+    }, 32, 32, true, true);
+    */
+
+
     add_opcode("subpd", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("sub_double", 64, {64, 64});
       return f(a, b);

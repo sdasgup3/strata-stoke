@@ -66,6 +66,7 @@ bool BoundedValidator::verify_pair(const Cfg& target, const Cfg& rewrite, const 
 
 bool BoundedValidator::verify(const Cfg& init_target, const Cfg& init_rewrite) {
 
+#define DEBUG_VALIDATOR
 #ifdef DEBUG_VALIDATOR
   std::cout << "Enter the dragon!" << std::endl;
 #endif
@@ -89,12 +90,12 @@ bool BoundedValidator::verify(const Cfg& init_target, const Cfg& init_rewrite) {
 
     // Step 1: get all the paths from the enumerator
     for (auto path : CfgPaths::enumerate_paths(target, bound_)) {
-      //cout << "adding TP: " << path << endl;
+      cout << "adding TP: " << path << endl;
       target_paths.push_back(path);
     }
     //cout << "REWRITE: " << endl << rewrite.get_code() << endl;
     for (auto path : CfgPaths::enumerate_paths(rewrite, bound_)) {
-      //cout << "adding RP: " << path << endl;
+      cout << "adding RP: " << path << endl;
       rewrite_paths.push_back(path);
     }
 

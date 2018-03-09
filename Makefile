@@ -206,6 +206,7 @@ BIN=\
 	bin/stoke_search \
 	bin/stoke_testcase \
 	\
+	bin/stoke_support_list \
 	bin/stoke_debug_cfg \
 	bin/stoke_debug_circuit \
 	bin/stoke_debug_cost \

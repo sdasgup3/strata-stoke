@@ -78,14 +78,14 @@ int main(int argc, char** argv) {
   ofilterstream<Column> os(Console::msg());
   os.filter().padding(3);
 
-  os << "Target" << endl;
-  os << endl;
-  os << target_arg.value().get_code() << endl;
+  cout << "Target" << endl;
+  cout << endl;
+  cout << target_arg.value().get_code() << endl;
   os.filter().next();
 
-  os << "Rewrite" << endl;
-  os << endl;
-  os << rewrite_arg.value().get_code() << endl;
+  cout << "Rewrite" << endl;
+  cout << endl;
+  cout << rewrite_arg.value().get_code() << endl;
   os.filter().done();
 
   Console::msg() << endl;
