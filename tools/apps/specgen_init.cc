@@ -217,13 +217,13 @@ int main(int argc, char** argv) {
         Instruction our = get_instruction(op);
         if (validator.is_supported(our)) {
           validator_support++;
-        } 
+        }
         /*
         else {
-      std::string str;
-    std::stringstream ss(str);
-    opcode_write_text(ss, op);
-    std::cout << ss.str() << "\n";
+        std::string str;
+        std::stringstream ss(str);
+        opcode_write_text(ss, op);
+        std::cout << ss.str() << "\n";
 
         }
         */
