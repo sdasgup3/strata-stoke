@@ -378,6 +378,171 @@ public:
       return a + b;
     }, 32);
 
+    // Extend Base (Concrete Functions)
+    
+    // vpsllvq_ymm_ymm_ymm
+    add_opcode("vpsllvq", [] (SymBitVector a, SymBitVector b) {
+      auto const_ = SymBitVector::constant(64, 63);
+      auto cond = b > const_;
+      auto result1 =  SymBitVector::constant(64, 0);
+      auto result2 =  a << b;
+      return cond.ite(result1, result2);
+    }, 64, 64);
+
+    // vpsllvd_ymm_ymm_ymm
+    add_opcode("vpsllvd", [] (SymBitVector a, SymBitVector b) {
+      auto const_ = SymBitVector::constant(32, 31);
+      auto cond = b > const_;
+      auto result1 =  SymBitVector::constant(32, 0);
+      auto result2 =  a << b;
+      return cond.ite(result1, result2);
+    }, 32, 32);
+
+    // vpsravd_ymm_ymm_ymm
+    add_opcode("vpsravd", [] (SymBitVector a, SymBitVector b) {
+      auto const_ = SymBitVector::constant(32, 31);
+      auto cond = b > const_;
+      auto result1 =  SymBitVector::constant(32, 0);
+      auto result2 =  a.s_shr(b);
+      return cond.ite(result1, result2);
+    }, 32, 32);
+
+    // vpsrlvd_ymm_ymm_ymm
+    add_opcode("vpsrlvd", [] (SymBitVector a, SymBitVector b) {
+      auto const_ = SymBitVector::constant(32, 31);
+      auto cond = b > const_;
+      auto result1 =  SymBitVector::constant(32, 0);
+      auto result2 =  a >> b;
+      return cond.ite(result1, result2);
+    }, 32, 32);
+
+    // vpsrlvq_ymm_ymm_ymm
+    add_opcode("vpsllvq", [] (SymBitVector a, SymBitVector b) {
+      auto const_ = SymBitVector::constant(64, 63);
+      auto cond = b > const_;
+      auto result1 =  SymBitVector::constant(64, 0);
+      auto result2 =  a >> b;
+      return cond.ite(result1, result2);
+    }, 64, 64);
+
+    // psllq/d/w
+    add_opcode("psllq", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(64, 63);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =      (a[127][64] << bb) 
+                      ||  (a[63][0]   << bb) ;
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+    add_opcode("pslld", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(32, 31);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =    (a[127][96] << bb) 
+                    ||  (a[95][64]  << bb) 
+                    ||  (a[63][32]  << bb) 
+                    ||  (a[31][0]   << bb);
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+    add_opcode("psllw", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(16, 15);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =      (a[127][112]  << bb) 
+                      ||  (a[111][96]   << bb) 
+                      ||  (a[95][80]    << bb) 
+                      ||  (a[79][64]    << bb)
+                      ||  (a[63][48]    << bb)
+                      ||  (a[47][32]    << bb)
+                      ||  (a[31][16]    << bb)
+                      ||  (a[15][0]     << bb);
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+
+    // psrlq/d/w
+    add_opcode("psrlq", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(64, 63);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =      (a[127][64] >> bb) 
+                      ||  (a[63][0]   >> bb) ;
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+    add_opcode("psrld", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(32, 31);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =    (a[127][96] >> bb) 
+                    ||  (a[95][64]  >> bb) 
+                    ||  (a[63][32]  >> bb) 
+                    ||  (a[31][0]   >> bb);
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+    add_opcode("psrlw", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(16, 15);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =      (a[127][112] >> bb) 
+                      ||  (a[111][96]  >> bb) 
+                      ||  (a[95][80]   >> bb) 
+                      ||  (a[79][64]   >> bb)
+                      ||  (a[63][48]   >> bb)
+                      ||  (a[47][32]   >> bb)
+                      ||  (a[31][16]   >> bb)
+                      ||  (a[15][0]    >> bb);
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+
+    // psrad/w
+    add_opcode("psrad", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(32, 31);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =    a[127][96].s_shr(bb) 
+                    ||   a[95][64].s_shr(bb) 
+                    ||   a[63][32].s_shr(bb) 
+                    ||    a[31][0].s_shr(bb);
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+    add_opcode("psraw", [] (SymBitVector a, SymBitVector b) {
+      auto bb = b[63][0]; 
+      auto const_ = SymBitVector::constant(16, 15);
+      auto cond = bb > const_;
+      auto result1 =  SymBitVector::constant(128, 0);
+      auto result2 =      a[127][112].s_shr(bb) 
+                      ||   a[111][96].s_shr(bb) 
+                      ||    a[95][80].s_shr(bb) 
+                      ||    a[79][64].s_shr(bb)
+                      ||    a[63][48].s_shr(bb)
+                      ||    a[47][32].s_shr(bb)
+                      ||    a[31][16].s_shr(bb)
+                      ||     a[15][0].s_shr(bb);
+
+      return cond.ite(result1, result2);
+
+    }, 0);
+
     add_opcode("paddq", [] (SymBitVector a, SymBitVector b) {
       return a + b;
     }, 64);
@@ -731,7 +896,7 @@ public:
       return f(b);
     }, 32, 32, true, true);
 
-    /* Extend BaseSet: an alternative  is already supprted by stoke.
+    /* Extend Base: an alternative  is already supprted by stoke.
     add_opcode("absb", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("absb", 8, {8});
       return f(b);
@@ -792,7 +957,6 @@ public:
     add_opcode("xorps", [] (SymBitVector a, SymBitVector b) {
       return a ^ b;
     }, 0);
-
 
   }
 
