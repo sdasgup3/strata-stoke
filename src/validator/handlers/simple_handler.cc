@@ -430,22 +430,22 @@ void SimpleHandler::add_all() {
     auto temp2 = (!aa) & bb;
     auto zero = SymBitVector::constant(1, 0);
 
-    ss.set(eflags_zf, (temp1[31][31] == zero)   & 
-                      (temp1[63][63] == zero)   & 
-                      (temp1[95][95] == zero)   & 
-                      (temp1[127][127] == zero) & 
-                      (temp1[160][160] == zero) & 
-                      (temp1[191][191] == zero) & 
-                      (temp1[224][224] == zero) & 
-                      (temp1[255][255] == zero));
-    ss.set(eflags_cf, (temp2[31][31] == zero)   & 
-                      (temp2[63][63] == zero)   & 
-                      (temp2[95][95] == zero)   & 
-                      (temp2[127][127] == zero) & 
-                      (temp2[160][160] == zero) & 
-                      (temp2[191][191] == zero) & 
-                      (temp2[224][224] == zero) & 
-                      (temp2[255][255] == zero));
+    ss.set(eflags_zf, (temp1[31][31] == zero)   &
+           (temp1[63][63] == zero)   &
+           (temp1[95][95] == zero)   &
+           (temp1[127][127] == zero) &
+           (temp1[160][160] == zero) &
+           (temp1[191][191] == zero) &
+           (temp1[224][224] == zero) &
+           (temp1[255][255] == zero));
+    ss.set(eflags_cf, (temp2[31][31] == zero)   &
+           (temp2[63][63] == zero)   &
+           (temp2[95][95] == zero)   &
+           (temp2[127][127] == zero) &
+           (temp2[160][160] == zero) &
+           (temp2[191][191] == zero) &
+           (temp2[224][224] == zero) &
+           (temp2[255][255] == zero));
 
 
     ss.set(eflags_af, SymBool::_false());
