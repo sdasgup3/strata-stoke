@@ -731,7 +731,7 @@ public:
       return f(b);
     }, 32, 32, true, true);
 
-    /* Extend BaseSet
+    /* Extend BaseSet: an alternative  is already supprted by stoke.
     add_opcode("absb", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("absb", 8, {8});
       return f(b);

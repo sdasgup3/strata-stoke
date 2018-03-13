@@ -388,6 +388,23 @@ void SimpleHandler::add_all() {
 
   });
 
+  // Extendng Base
+  add_opcode_str({"vptest"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto aa = a[255][0];
+    auto bb = b[255][0];
+    auto temp1 =  aa ^ bb;
+    auto temp2 = !aa ^ bb;
+    auto zero = SymBitVector::constant(dst.size(), 0);
+
+    ss.set(eflags_zf, temp1 == zero);
+    ss.set(eflags_cf, temp2 == zero);
+    ss.set(eflags_af, SymBool::_false());
+    ss.set(eflags_of, SymBool::_false());
+    ss.set(eflags_pf, SymBool::_false());
+    ss.set(eflags_sf, SymBool::_false());
+  });
+
   // for min/max|ss/sd: can't be done with packed handler because the upper 96/64 bits are from src1, not dest in the v variant
 
   add_opcode_str({"minsd"},
