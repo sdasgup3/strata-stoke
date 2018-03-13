@@ -4011,15 +4011,15 @@ vector<Opcode> instr_cat_base_ = {
 // , VPABSB_XMM_M128 // VPABSB xmm, m128
 // , VPABSB_XMM_XMM // VPABSB xmm, xmm
 // , VPABSB_YMM_M256 // VPABSB ymm, m256
-// , VPABSB_YMM_YMM // VPABSB ymm, ymm
+  , VPABSB_YMM_YMM // VPABSB ymm, ymm
 // , VPABSD_XMM_M128 // VPABSD xmm, m128
 // , VPABSD_XMM_XMM // VPABSD xmm, xmm
 // , VPABSD_YMM_M256 // VPABSD ymm, m256
-// , VPABSD_YMM_YMM // VPABSD ymm, ymm
+  , VPABSD_YMM_YMM // VPABSD ymm, ymm
 // , VPABSW_XMM_M128 // VPABSW xmm, m128
 // , VPABSW_XMM_XMM // VPABSW xmm, xmm
 // , VPABSW_YMM_M256 // VPABSW ymm, m256
-// , VPABSW_YMM_YMM // VPABSW ymm, ymm
+  , VPABSW_YMM_YMM // VPABSW ymm, ymm
 // , VPACKSSDW_XMM_XMM_M128 // VPACKSSDW xmm, xmm, m128
 // , VPACKSSDW_XMM_XMM_XMM // VPACKSSDW xmm, xmm, xmm
 // , VPACKSSDW_YMM_YMM_M256 // VPACKSSDW ymm, ymm, m256
@@ -4516,7 +4516,7 @@ vector<Opcode> instr_cat_base_ = {
 // , VPTEST_XMM_M128 // VPTEST xmm, m128
 // , VPTEST_XMM_XMM // VPTEST xmm, xmm
 // , VPTEST_YMM_M256 // VPTEST ymm, m256
-// , VPTEST_YMM_YMM // VPTEST ymm, ymm
+  , VPTEST_YMM_YMM // VPTEST ymm, ymm
 // , VPUNPCKHBW_XMM_XMM_M128 // VPUNPCKHBW xmm, xmm, m128
 // , VPUNPCKHBW_XMM_XMM_XMM // VPUNPCKHBW xmm, xmm, xmm
 // , VPUNPCKHBW_YMM_YMM_M256 // VPUNPCKHBW ymm, ymm, m256
@@ -4613,11 +4613,11 @@ vector<Opcode> instr_cat_base_ = {
 // , VTESTPD_XMM_M128 // VTESTPD xmm, m128
 // , VTESTPD_XMM_XMM // VTESTPD xmm, xmm
 // , VTESTPD_YMM_M256 // VTESTPD ymm, m256
-// , VTESTPD_YMM_YMM // VTESTPD ymm, ymm
+ , VTESTPD_YMM_YMM // VTESTPD ymm, ymm
 // , VTESTPS_XMM_M128 // VTESTPS xmm, m128
 // , VTESTPS_XMM_XMM // VTESTPS xmm, xmm
 // , VTESTPS_YMM_M256 // VTESTPS ymm, m256
-// , VTESTPS_YMM_YMM // VTESTPS ymm, ymm
+ , VTESTPS_YMM_YMM // VTESTPS ymm, ymm
 // , VUCOMISD_XMM_M64 // VUCOMISD xmm, m64
 // , VUCOMISD_XMM_XMM // VUCOMISD xmm, xmm
 // , VUCOMISS_XMM_M32 // VUCOMISS xmm, m32

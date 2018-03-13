@@ -393,12 +393,61 @@ void SimpleHandler::add_all() {
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     auto aa = a[255][0];
     auto bb = b[255][0];
-    auto temp1 =  aa ^ bb;
-    auto temp2 = !aa ^ bb;
+    auto temp1 =  aa & bb;
+    auto temp2 = (!aa) & bb;
     auto zero = SymBitVector::constant(dst.size(), 0);
 
     ss.set(eflags_zf, temp1 == zero);
     ss.set(eflags_cf, temp2 == zero);
+    ss.set(eflags_af, SymBool::_false());
+    ss.set(eflags_of, SymBool::_false());
+    ss.set(eflags_pf, SymBool::_false());
+    ss.set(eflags_sf, SymBool::_false());
+  });
+
+  add_opcode_str({"vtestpd"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto aa = a[255][0];
+    auto bb = b[255][0];
+    auto temp1 =  aa & bb;
+    auto temp2 = (!aa) & bb;
+    auto zero = SymBitVector::constant(1, 0);
+
+    ss.set(eflags_zf, (temp1[63][63] == zero) & (temp1[127][127] == zero) & (temp1[191][191] == zero) & (temp1[255][255] == zero));
+    ss.set(eflags_cf, (temp2[63][63] == zero) & (temp2[127][127] == zero) & (temp2[191][191] == zero) & (temp2[255][255] == zero));
+
+    ss.set(eflags_af, SymBool::_false());
+    ss.set(eflags_of, SymBool::_false());
+    ss.set(eflags_pf, SymBool::_false());
+    ss.set(eflags_sf, SymBool::_false());
+  });
+
+  add_opcode_str({"vtestps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto aa = a[255][0];
+    auto bb = b[255][0];
+    auto temp1 =  aa & bb;
+    auto temp2 = (!aa) & bb;
+    auto zero = SymBitVector::constant(1, 0);
+
+    ss.set(eflags_zf, (temp1[31][31] == zero)   & 
+                      (temp1[63][63] == zero)   & 
+                      (temp1[95][95] == zero)   & 
+                      (temp1[127][127] == zero) & 
+                      (temp1[160][160] == zero) & 
+                      (temp1[191][191] == zero) & 
+                      (temp1[224][224] == zero) & 
+                      (temp1[255][255] == zero));
+    ss.set(eflags_cf, (temp2[31][31] == zero)   & 
+                      (temp2[63][63] == zero)   & 
+                      (temp2[95][95] == zero)   & 
+                      (temp2[127][127] == zero) & 
+                      (temp2[160][160] == zero) & 
+                      (temp2[191][191] == zero) & 
+                      (temp2[224][224] == zero) & 
+                      (temp2[255][255] == zero));
+
+
     ss.set(eflags_af, SymBool::_false());
     ss.set(eflags_of, SymBool::_false());
     ss.set(eflags_pf, SymBool::_false());
