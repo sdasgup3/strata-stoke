@@ -2759,51 +2759,51 @@ vector<Opcode> instr_cat_base_ = {
 // , PSLLD_MM_MM // PSLLD mm, mm
 // , PSLLD_XMM_IMM8 // PSLLD xmm, imm8
 // , PSLLD_XMM_M128 // PSLLD xmm, m128
- , PSLLD_XMM_XMM // PSLLD xmm, xmm
+  , PSLLD_XMM_XMM // PSLLD xmm, xmm
 // , PSLLDQ_XMM_IMM8 // PSLLDQ xmm, imm8
 // , PSLLQ_MM_IMM8 // PSLLQ mm, imm8
 // , PSLLQ_MM_M64 // PSLLQ mm, m64
 // , PSLLQ_MM_MM // PSLLQ mm, mm
 // , PSLLQ_XMM_IMM8 // PSLLQ xmm, imm8
 // , PSLLQ_XMM_M128 // PSLLQ xmm, m128
- , PSLLQ_XMM_XMM // PSLLQ xmm, xmm
+  , PSLLQ_XMM_XMM // PSLLQ xmm, xmm
 // , PSLLW_MM_IMM8 // PSLLW mm, imm8
 // , PSLLW_MM_M64 // PSLLW mm, m64
 // , PSLLW_MM_MM // PSLLW mm, mm
 // , PSLLW_XMM_IMM8 // PSLLW xmm, imm8
 // , PSLLW_XMM_M128 // PSLLW xmm, m128
- , PSLLW_XMM_XMM // PSLLW xmm, xmm
+  , PSLLW_XMM_XMM // PSLLW xmm, xmm
 // , PSRAD_MM_IMM8 // PSRAD mm, imm8
 // , PSRAD_MM_M64 // PSRAD mm, m64
 // , PSRAD_MM_MM // PSRAD mm, mm
 // , PSRAD_XMM_IMM8 // PSRAD xmm, imm8
 // , PSRAD_XMM_M128 // PSRAD xmm, m128
- , PSRAD_XMM_XMM // PSRAD xmm, xmm
+  , PSRAD_XMM_XMM // PSRAD xmm, xmm
 // , PSRAW_MM_IMM8 // PSRAW mm, imm8
 // , PSRAW_MM_M64 // PSRAW mm, m64
 // , PSRAW_MM_MM // PSRAW mm, mm
 // , PSRAW_XMM_IMM8 // PSRAW xmm, imm8
 // , PSRAW_XMM_M128 // PSRAW xmm, m128
- , PSRAW_XMM_XMM // PSRAW xmm, xmm
+  , PSRAW_XMM_XMM // PSRAW xmm, xmm
 // , PSRLD_MM_IMM8 // PSRLD mm, imm8
 // , PSRLD_MM_M64 // PSRLD mm, m64
 // , PSRLD_MM_MM // PSRLD mm, mm
 // , PSRLD_XMM_IMM8 // PSRLD xmm, imm8
 // , PSRLD_XMM_M128 // PSRLD xmm, m128
- , PSRLD_XMM_XMM // PSRLD xmm, xmm
+  , PSRLD_XMM_XMM // PSRLD xmm, xmm
 // , PSRLDQ_XMM_IMM8 // PSRLDQ xmm, imm8
 // , PSRLQ_MM_IMM8 // PSRLQ mm, imm8
 // , PSRLQ_MM_M64 // PSRLQ mm, m64
 // , PSRLQ_MM_MM // PSRLQ mm, mm
 // , PSRLQ_XMM_IMM8 // PSRLQ xmm, imm8
 // , PSRLQ_XMM_M128 // PSRLQ xmm, m128
- , PSRLQ_XMM_XMM // PSRLQ xmm, xmm
+  , PSRLQ_XMM_XMM // PSRLQ xmm, xmm
 // , PSRLW_MM_IMM8 // PSRLW mm, imm8
 // , PSRLW_MM_M64 // PSRLW mm, m64
 // , PSRLW_MM_MM // PSRLW mm, mm
 // , PSRLW_XMM_IMM8 // PSRLW xmm, imm8
 // , PSRLW_XMM_M128 // PSRLW xmm, m128
- , PSRLW_XMM_XMM // PSRLW xmm, xmm
+  , PSRLW_XMM_XMM // PSRLW xmm, xmm
 // , PSUBB_MM_M64 // PSUBB mm, m64
 // , PSUBB_MM_MM // PSUBB mm, mm
 // , PSUBB_XMM_M128 // PSUBB xmm, m128
@@ -4411,7 +4411,7 @@ vector<Opcode> instr_cat_base_ = {
 // , VPSIGNW_XMM_XMM_XMM // VPSIGNW xmm, xmm, xmm
 // , VPSLLD_XMM_XMM_IMM8 // VPSLLD xmm, xmm, imm8
 // , VPSLLD_XMM_XMM_M128 // VPSLLD xmm, xmm, m128
- , VPSLLD_XMM_XMM_XMM // VPSLLD xmm, xmm, xmm
+  , VPSLLD_XMM_XMM_XMM // VPSLLD xmm, xmm, xmm
 // , VPSLLD_YMM_YMM_IMM8 // VPSLLD ymm, ymm, imm8
 // , VPSLLD_YMM_YMM_M128 // VPSLLD ymm, ymm, m128
 // , VPSLLD_YMM_YMM_XMM // VPSLLD ymm, ymm, xmm
@@ -4419,43 +4419,43 @@ vector<Opcode> instr_cat_base_ = {
 // , VPSLLDQ_YMM_YMM_IMM8 // VPSLLDQ ymm, ymm, imm8
 // , VPSLLQ_XMM_XMM_IMM8 // VPSLLQ xmm, xmm, imm8
 // , VPSLLQ_XMM_XMM_M128 // VPSLLQ xmm, xmm, m128
- , VPSLLQ_XMM_XMM_XMM // VPSLLQ xmm, xmm, xmm
+  , VPSLLQ_XMM_XMM_XMM // VPSLLQ xmm, xmm, xmm
 // , VPSLLQ_YMM_YMM_IMM8 // VPSLLQ ymm, ymm, imm8
 // , VPSLLQ_YMM_YMM_M128 // VPSLLQ ymm, ymm, m128
 // , VPSLLQ_YMM_YMM_XMM // VPSLLQ ymm, ymm, xmm
 // , VPSLLVD_XMM_XMM_M128 // VPSLLVD xmm, xmm, m128
 // , VPSLLVD_XMM_XMM_XMM // VPSLLVD xmm, xmm, xmm
 // , VPSLLVD_YMM_YMM_M256 // VPSLLVD ymm, ymm, m256
- , VPSLLVD_YMM_YMM_YMM // VPSLLVD ymm, ymm, ymm
+  , VPSLLVD_YMM_YMM_YMM // VPSLLVD ymm, ymm, ymm
 // , VPSLLVQ_XMM_XMM_M128 // VPSLLVQ xmm, xmm, m128
 // , VPSLLVQ_XMM_XMM_XMM // VPSLLVQ xmm, xmm, xmm
 // , VPSLLVQ_YMM_YMM_M256 // VPSLLVQ ymm, ymm, m256
- , VPSLLVQ_YMM_YMM_YMM // VPSLLVQ ymm, ymm, ymm
+  , VPSLLVQ_YMM_YMM_YMM // VPSLLVQ ymm, ymm, ymm
 // , VPSLLW_XMM_XMM_IMM8 // VPSLLW xmm, xmm, imm8
 // , VPSLLW_XMM_XMM_M128 // VPSLLW xmm, xmm, m128
- , VPSLLW_XMM_XMM_XMM // VPSLLW xmm, xmm, xmm
+  , VPSLLW_XMM_XMM_XMM // VPSLLW xmm, xmm, xmm
 // , VPSLLW_YMM_YMM_IMM8 // VPSLLW ymm, ymm, imm8
 // , VPSLLW_YMM_YMM_M128 // VPSLLW ymm, ymm, m128
 // , VPSLLW_YMM_YMM_XMM // VPSLLW ymm, ymm, xmm
 // , VPSRAD_XMM_XMM_IMM8 // VPSRAD xmm, xmm, imm8
 // , VPSRAD_XMM_XMM_M128 // VPSRAD xmm, xmm, m128
- , VPSRAD_XMM_XMM_XMM // VPSRAD xmm, xmm, xmm
+  , VPSRAD_XMM_XMM_XMM // VPSRAD xmm, xmm, xmm
 // , VPSRAD_YMM_YMM_IMM8 // VPSRAD ymm, ymm, imm8
 // , VPSRAD_YMM_YMM_M128 // VPSRAD ymm, ymm, m128
 // , VPSRAD_YMM_YMM_XMM // VPSRAD ymm, ymm, xmm
 // , VPSRAVD_XMM_XMM_M128 // VPSRAVD xmm, xmm, m128
 // , VPSRAVD_XMM_XMM_XMM // VPSRAVD xmm, xmm, xmm
 // , VPSRAVD_YMM_YMM_M256 // VPSRAVD ymm, ymm, m256
- , VPSRAVD_YMM_YMM_YMM // VPSRAVD ymm, ymm, ymm
+  , VPSRAVD_YMM_YMM_YMM // VPSRAVD ymm, ymm, ymm
 // , VPSRAW_XMM_XMM_IMM8 // VPSRAW xmm, xmm, imm8
 // , VPSRAW_XMM_XMM_M128 // VPSRAW xmm, xmm, m128
- , VPSRAW_XMM_XMM_XMM // VPSRAW xmm, xmm, xmm
+  , VPSRAW_XMM_XMM_XMM // VPSRAW xmm, xmm, xmm
 // , VPSRAW_YMM_YMM_IMM8 // VPSRAW ymm, ymm, imm8
 // , VPSRAW_YMM_YMM_M128 // VPSRAW ymm, ymm, m128
 // , VPSRAW_YMM_YMM_XMM // VPSRAW ymm, ymm, xmm
 // , VPSRLD_XMM_XMM_IMM8 // VPSRLD xmm, xmm, imm8
 // , VPSRLD_XMM_XMM_M128 // VPSRLD xmm, xmm, m128
- , VPSRLD_XMM_XMM_XMM // VPSRLD xmm, xmm, xmm
+  , VPSRLD_XMM_XMM_XMM // VPSRLD xmm, xmm, xmm
 // , VPSRLD_YMM_YMM_IMM8 // VPSRLD ymm, ymm, imm8
 // , VPSRLD_YMM_YMM_M128 // VPSRLD ymm, ymm, m128
 // , VPSRLD_YMM_YMM_XMM // VPSRLD ymm, ymm, xmm
@@ -4463,21 +4463,21 @@ vector<Opcode> instr_cat_base_ = {
 // , VPSRLDQ_YMM_YMM_IMM8 // VPSRLDQ ymm, ymm, imm8
 // , VPSRLQ_XMM_XMM_IMM8 // VPSRLQ xmm, xmm, imm8
 // , VPSRLQ_XMM_XMM_M128 // VPSRLQ xmm, xmm, m128
- , VPSRLQ_XMM_XMM_XMM // VPSRLQ xmm, xmm, xmm
+  , VPSRLQ_XMM_XMM_XMM // VPSRLQ xmm, xmm, xmm
 // , VPSRLQ_YMM_YMM_IMM8 // VPSRLQ ymm, ymm, imm8
 // , VPSRLQ_YMM_YMM_M128 // VPSRLQ ymm, ymm, m128
 // , VPSRLQ_YMM_YMM_XMM // VPSRLQ ymm, ymm, xmm
 // , VPSRLVD_XMM_XMM_M128 // VPSRLVD xmm, xmm, m128
 // , VPSRLVD_XMM_XMM_XMM // VPSRLVD xmm, xmm, xmm
 // , VPSRLVD_YMM_YMM_M256 // VPSRLVD ymm, ymm, m256
- , VPSRLVD_YMM_YMM_YMM // VPSRLVD ymm, ymm, ymm
+  , VPSRLVD_YMM_YMM_YMM // VPSRLVD ymm, ymm, ymm
 // , VPSRLVQ_XMM_XMM_M128 // VPSRLVQ xmm, xmm, m128
 // , VPSRLVQ_XMM_XMM_XMM // VPSRLVQ xmm, xmm, xmm
 // , VPSRLVQ_YMM_YMM_M256 // VPSRLVQ ymm, ymm, m256
- , VPSRLVQ_YMM_YMM_YMM // VPSRLVQ ymm, ymm, ymm
+  , VPSRLVQ_YMM_YMM_YMM // VPSRLVQ ymm, ymm, ymm
 // , VPSRLW_XMM_XMM_IMM8 // VPSRLW xmm, xmm, imm8
 // , VPSRLW_XMM_XMM_M128 // VPSRLW xmm, xmm, m128
- , VPSRLW_XMM_XMM_XMM // VPSRLW xmm, xmm, xmm
+  , VPSRLW_XMM_XMM_XMM // VPSRLW xmm, xmm, xmm
 // , VPSRLW_YMM_YMM_IMM8 // VPSRLW ymm, ymm, imm8
 // , VPSRLW_YMM_YMM_M128 // VPSRLW ymm, ymm, m128
 // , VPSRLW_YMM_YMM_XMM // VPSRLW ymm, ymm, xmm
