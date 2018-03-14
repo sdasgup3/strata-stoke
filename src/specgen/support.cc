@@ -1571,9 +1571,9 @@ vector<Opcode> instr_cat_base_ = {
 // , CMPXCHG16B_M128 // CMPXCHG16B m128
 // , CMPXCHG8B_M64 // CMPXCHG8B m64
 // , COMISD_XMM_M64 // COMISD xmm, m64
-// , COMISD_XMM_XMM // COMISD xmm, xmm
+ , COMISD_XMM_XMM // COMISD xmm, xmm
 // , COMISS_XMM_M32 // COMISS xmm, m32
-// , COMISS_XMM_XMM // COMISS xmm, xmm
+ , COMISS_XMM_XMM // COMISS xmm, xmm
 // , CPUID // CPUID
 // , CQO // CQO
 // , CRC32_R32_M16 // CRC32 r32, m16
@@ -2450,17 +2450,17 @@ vector<Opcode> instr_cat_base_ = {
 // , PACKSSDW_MM_M64 // PACKSSDW mm, m64
 // , PACKSSDW_MM_MM // PACKSSDW mm, mm
 // , PACKSSDW_XMM_M128 // PACKSSDW xmm, m128
-// , PACKSSDW_XMM_XMM // PACKSSDW xmm, xmm
+ , PACKSSDW_XMM_XMM // PACKSSDW xmm, xmm
 // , PACKSSWB_MM_M64 // PACKSSWB mm, m64
 // , PACKSSWB_MM_MM // PACKSSWB mm, mm
 // , PACKSSWB_XMM_M128 // PACKSSWB xmm, m128
-// , PACKSSWB_XMM_XMM // PACKSSWB xmm, xmm
+ , PACKSSWB_XMM_XMM // PACKSSWB xmm, xmm
 // , PACKUSDW_XMM_M128 // PACKUSDW xmm, m128
-// , PACKUSDW_XMM_XMM // PACKUSDW xmm, xmm
+ , PACKUSDW_XMM_XMM // PACKUSDW xmm, xmm
 // , PACKUSWB_MM_M64 // PACKUSWB mm, m64
 // , PACKUSWB_MM_MM // PACKUSWB mm, mm
 // , PACKUSWB_XMM_M128 // PACKUSWB xmm, m128
-// , PACKUSWB_XMM_XMM // PACKUSWB xmm, xmm
+ , PACKUSWB_XMM_XMM // PACKUSWB xmm, xmm
 // , PADDB_MM_M64 // PADDB mm, m64
 // , PADDB_MM_MM // PADDB mm, mm
 // , PADDB_XMM_M128 // PADDB xmm, m128
@@ -3540,9 +3540,9 @@ vector<Opcode> instr_cat_base_ = {
 // , VCMPSS_XMM_XMM_M32_IMM8 // VCMPSS xmm, xmm, m32, imm8
 // , VCMPSS_XMM_XMM_XMM_IMM8 // VCMPSS xmm, xmm, xmm, imm8
 // , VCOMISD_XMM_M64 // VCOMISD xmm, m64
-// , VCOMISD_XMM_XMM // VCOMISD xmm, xmm
+ , VCOMISD_XMM_XMM // VCOMISD xmm, xmm
 // , VCOMISS_XMM_M32 // VCOMISS xmm, m32
-// , VCOMISS_XMM_XMM // VCOMISS xmm, xmm
+ , VCOMISS_XMM_XMM // VCOMISS xmm, xmm
 // , VCVTDQ2PD_XMM_M64 // VCVTDQ2PD xmm, m64
 // , VCVTDQ2PD_XMM_XMM // VCVTDQ2PD xmm, xmm
 // , VCVTDQ2PD_YMM_M128 // VCVTDQ2PD ymm, m128
@@ -4021,19 +4021,19 @@ vector<Opcode> instr_cat_base_ = {
 // , VPABSW_YMM_M256 // VPABSW ymm, m256
   , VPABSW_YMM_YMM // VPABSW ymm, ymm
 // , VPACKSSDW_XMM_XMM_M128 // VPACKSSDW xmm, xmm, m128
-// , VPACKSSDW_XMM_XMM_XMM // VPACKSSDW xmm, xmm, xmm
+ , VPACKSSDW_XMM_XMM_XMM // VPACKSSDW xmm, xmm, xmm
 // , VPACKSSDW_YMM_YMM_M256 // VPACKSSDW ymm, ymm, m256
 // , VPACKSSDW_YMM_YMM_YMM // VPACKSSDW ymm, ymm, ymm
 // , VPACKSSWB_XMM_XMM_M128 // VPACKSSWB xmm, xmm, m128
-// , VPACKSSWB_XMM_XMM_XMM // VPACKSSWB xmm, xmm, xmm
+ , VPACKSSWB_XMM_XMM_XMM // VPACKSSWB xmm, xmm, xmm
 // , VPACKSSWB_YMM_YMM_M256 // VPACKSSWB ymm, ymm, m256
 // , VPACKSSWB_YMM_YMM_YMM // VPACKSSWB ymm, ymm, ymm
 // , VPACKUSDW_XMM_XMM_M128 // VPACKUSDW xmm, xmm, m128
-// , VPACKUSDW_XMM_XMM_XMM // VPACKUSDW xmm, xmm, xmm
+ , VPACKUSDW_XMM_XMM_XMM // VPACKUSDW xmm, xmm, xmm
 // , VPACKUSDW_YMM_YMM_M256 // VPACKUSDW ymm, ymm, m256
 // , VPACKUSDW_YMM_YMM_YMM // VPACKUSDW ymm, ymm, ymm
 // , VPACKUSWB_XMM_XMM_M128 // VPACKUSWB xmm, xmm, m128
-// , VPACKUSWB_XMM_XMM_XMM // VPACKUSWB xmm, xmm, xmm
+ , VPACKUSWB_XMM_XMM_XMM // VPACKUSWB xmm, xmm, xmm
 // , VPACKUSWB_YMM_YMM_M256 // VPACKUSWB ymm, ymm, m256
 // , VPACKUSWB_YMM_YMM_YMM // VPACKUSWB ymm, ymm, ymm
 // , VPADDB_XMM_XMM_M128 // VPADDB xmm, xmm, m128
