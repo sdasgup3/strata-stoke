@@ -382,65 +382,65 @@ public:
     // packsswb_xmm_xmm
     add_opcode("packsswb", [this] (SymBitVector a, SymBitVector b) {
       return  signedSaturate  (   a[15][0], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  a[31][16], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  a[47][32], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  a[63][48], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  a[79][64], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  a[95][80], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate ( a[111][96], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (a[127][112], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (   b[15][0], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  b[31][16], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  b[47][32], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  b[63][48], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  b[79][64], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (  b[95][80], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate ( b[111][96], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-            || signedSaturate (b[127][112], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7);
+              || signedSaturate (  a[31][16], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  a[47][32], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  a[63][48], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  a[79][64], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  a[95][80], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate ( a[111][96], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (a[127][112], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (   b[15][0], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  b[31][16], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  b[47][32], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  b[63][48], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  b[79][64], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (  b[95][80], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate ( b[111][96], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
+              || signedSaturate (b[127][112], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7);
     }, 0);
 
     // packssdw_xmm_xmm
     add_opcode("packsswd", [this] (SymBitVector a, SymBitVector b) {
       return  signedSaturate  (  a[31][0], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate ( a[63][32], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate ( a[95][64], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate (a[127][96], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate (  b[31][0], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate ( b[63][32], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate ( b[95][64], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-            || signedSaturate (b[127][96], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16);
+              || signedSaturate ( a[63][32], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
+              || signedSaturate ( a[95][64], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
+              || signedSaturate (a[127][96], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
+              || signedSaturate (  b[31][0], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
+              || signedSaturate ( b[63][32], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
+              || signedSaturate ( b[95][64], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
+              || signedSaturate (b[127][96], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16);
     }, 0);
 
     // packuswb_xmm_xmm
     add_opcode("packuswb", [this] (SymBitVector a, SymBitVector b) {
       return  unSignedSaturate  (   a[15][0], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  a[31][16], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  a[47][32], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  a[63][48], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  a[79][64], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  a[95][80], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate ( a[111][96], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (a[127][112], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (   b[15][0], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  b[31][16], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  b[47][32], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  b[63][48], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  b[79][64], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (  b[95][80], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate ( b[111][96], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-            || unSignedSaturate (b[127][112], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7);
+              || unSignedSaturate (  a[31][16], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  a[47][32], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  a[63][48], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  a[79][64], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  a[95][80], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate ( a[111][96], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (a[127][112], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (   b[15][0], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  b[31][16], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  b[47][32], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  b[63][48], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  b[79][64], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (  b[95][80], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate ( b[111][96], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
+              || unSignedSaturate (b[127][112], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7);
     }, 0);
 
     // packusdw_xmm_xmm
     add_opcode("packuswd", [this] (SymBitVector a, SymBitVector b) {
       return  unSignedSaturate  (  a[31][0], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate ( a[63][32], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate ( a[95][64], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate (a[127][96], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate (  b[31][0], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate ( b[63][32], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate ( b[95][64], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-            || unSignedSaturate (b[127][96], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16);
+              || unSignedSaturate ( a[63][32], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
+              || unSignedSaturate ( a[95][64], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
+              || unSignedSaturate (a[127][96], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
+              || unSignedSaturate (  b[31][0], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
+              || unSignedSaturate ( b[63][32], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
+              || unSignedSaturate ( b[95][64], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
+              || unSignedSaturate (b[127][96], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16);
     }, 0);
     // vpsllvq_ymm_ymm_ymm
     add_opcode("vpsllvq", [] (SymBitVector a, SymBitVector b) {
@@ -1236,14 +1236,14 @@ private:
   };
 
   /** Helper functions for signed/unsigned saturation  */
-  SymBitVector signedSaturate(SymBitVector a,  SymBitVector max, 
-      SymBitVector min, uint16_t dest_width) {
-    return a.s_gt(max).ite( max, a.s_lt(min).ite(min, a[dest_width - 1][0])); 
+  SymBitVector signedSaturate(SymBitVector a,  SymBitVector max,
+                              SymBitVector min, uint16_t dest_width) {
+    return a.s_gt(max).ite( max, a.s_lt(min).ite(min, a[dest_width - 1][0]));
   }
 
-  SymBitVector unSignedSaturate(SymBitVector a,  SymBitVector max, 
-      SymBitVector min, uint16_t dest_width) {
-    return (a > max).ite( max, (a < min).ite(min, a[dest_width - 1][0])); 
+  SymBitVector unSignedSaturate(SymBitVector a,  SymBitVector max,
+                                SymBitVector min, uint16_t dest_width) {
+    return (a > max).ite( max, (a < min).ite(min, a[dest_width - 1][0]));
   }
 
   /** Adds an opcode to our internal maps */
