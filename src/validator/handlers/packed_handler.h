@@ -441,12 +441,13 @@ public:
 
       auto result = signedSaturate  (   a[15][0], src_width, dest_width);
 
-      for (size_t k = 0; k < a_width; k += 128) {
-        for (size_t i = 1; i < 8; ++i) {
+      size_t i = 1;
+      for (size_t k = 0; k < a_width; k += 128, i = 0) {
+        for (; i < 8; ++i) {
           result = signedSaturate  (a[15 + 16*i + k][16*i + k], src_width, dest_width) || result;
         }
 
-        for (size_t i = 0; i < 8; ++i) {
+        for (i = 0; i < 8; ++i) {
           result = signedSaturate  (b[15 + 16*i + k][16*i + k], src_width, dest_width) || result;
         }
       }
@@ -463,12 +464,13 @@ public:
 
       auto result = signedSaturate  (   a[31][0], src_width, dest_width);
 
-      for (size_t k = 0; k < a_width; k += 128) {
-        for (size_t i = 1; i < 4; ++i) {
+      size_t i = 1;
+      for (size_t k = 0; k < a_width; k += 128, i = 0) {
+        for (; i < 4; ++i) {
           result = signedSaturate  (a[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
         }
 
-        for (size_t i = 0; i < 4; ++i) {
+        for (i = 0; i < 4; ++i) {
           result = signedSaturate  (b[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
         }
       }
@@ -485,12 +487,13 @@ public:
 
       auto result = unSignedSaturate  (   a[15][0], src_width, dest_width);
 
-      for (size_t k = 0; k < a_width; k += 128) {
-        for (size_t i = 1; i < 8; ++i) {
+      size_t i = 1;
+      for (size_t k = 0; k < a_width; k += 128, i = 0) {
+        for (; i < 8; ++i) {
           result = unSignedSaturate  (a[15 + 16*i + k][16*i + k],  src_width, dest_width) || result;
         }
 
-        for (size_t i = 0; i < 8; ++i) {
+        for (i = 0; i < 8; ++i) {
           result = unSignedSaturate  (b[15 + 16*i + k][16*i + k],  src_width, dest_width) || result;
         }
       }
@@ -507,12 +510,13 @@ public:
 
       auto result = unSignedSaturate  (   a[31][0], src_width, dest_width);
 
-      for (size_t k = 0; k < a_width; k += 128) {
-        for (size_t i = 1; i < a_width/32 ; ++i) {
+      size_t i = 1;
+      for (size_t k = 0; k < a_width; k += 128, i = 0) {
+        for (; i < 4 ; ++i) {
           result = unSignedSaturate  (a[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
         }
 
-        for (size_t i = 0; i < b_width/32 ; ++i) {
+        for (i = 0; i < 4 ; ++i) {
           result = unSignedSaturate  (b[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
         }
       }
