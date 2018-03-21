@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
     reference_out_.push_back(*i);
   }
 
-  // Obtain the instruction 
+  // Obtain the instruction
   auto instr = target.get_code()[1];
   auto opcode = instr.get_opcode();
 
@@ -163,7 +163,7 @@ int main(int argc, char** argv) {
     // Create a formula with initial state as the test input
     SymState sym_validator(cs);
     ch.build_circuit(instr, sym_validator);
-    if(ch.has_error()) {
+    if (ch.has_error()) {
       cout << "Error building a circuit: " << ch.error() << endl;
       return 0;
     }
@@ -191,8 +191,8 @@ int main(int argc, char** argv) {
 
 
     i++;
-    if(i%1000 == 0 ) {
-      cout << "Completed " <<i << "cases" <<  endl; 
+    if (i%1000 == 0 ) {
+      cout << "Completed " <<i << "cases" <<  endl;
     }
   }
 

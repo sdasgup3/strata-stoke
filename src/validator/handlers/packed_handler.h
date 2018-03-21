@@ -378,70 +378,148 @@ public:
       return a + b;
     }, 32);
 
-    // Extend Base (Concrete Functions)
-    // packsswb_xmm_xmm
+    // Extend Base
+
+    // phaddsw
+    add_opcode("phaddsw", [this] (SymBitVector a, SymBitVector b) {
+      auto val2 = SymBitVector::constant(1, 0) || a[31][16];
+      auto val1 = SymBitVector::constant(1, 0) || a[15][0];
+      auto sum = signedSaturate(val1 + val2, 17, 16);
+
+      for (size_t i = 2; i <= 7; i=i+2) {
+        auto val1 = SymBitVector::constant(1, 0) || a[16*i+15][16*i];
+        auto val2 = SymBitVector::constant(1, 0) || a[16*(i+1)+15][16*(i+1)];
+        sum = signedSaturate(val2 + val1, 17, 16) || sum;
+      }
+      for (size_t i = 0; i <= 7; i=i+2) {
+        auto val1 = SymBitVector::constant(1, 0) || b[16*i+15][16*i];
+        auto val2 = SymBitVector::constant(1, 0) || b[16*(i+1)+15][16*(i+1)];
+        sum = signedSaturate(val2 + val1, 17, 16) || sum;
+      }
+
+      return sum;
+
+    }, 0);
+
+    // paddsb
+    add_opcode("paddsb", [this] (SymBitVector a, SymBitVector b) {
+      auto val1 = SymBitVector::constant(1, 0) || a;
+      auto val2 = SymBitVector::constant(1, 0) || b;
+      return signedSaturate(val1 + val2, 9, 8);
+    }, 8, 8);
+
+    // paddsw
+    add_opcode("paddsw", [this] (SymBitVector a, SymBitVector b) {
+      auto val1 = SymBitVector::constant(1, 0) || a;
+      auto val2 = SymBitVector::constant(1, 0) || b;
+      return signedSaturate(val1 + val2, 17, 16);
+    }, 16, 16);
+
+    // psadbw
+    add_opcode("psadbw", [this] (SymBitVector a, SymBitVector b) {
+      auto sum1 = SymBitVector::constant(16, 0);
+      auto sum2 = SymBitVector::constant(16, 0);
+
+      for (size_t i = 0; i <= 7; ++i) {
+        sum1 = sum1 + absolute(a[7 + 8*i][8*i]   - b[7 + 8*i][8*i]);
+      }
+
+      for (size_t i = 8; i <= 15; ++i) {
+        sum2 = sum2 + absolute(a[7 + 8*i][8*i]   - b[7 + 8*i][8*i]);
+      }
+
+      return SymBitVector::constant(48, 0) || sum2 || SymBitVector::constant(48, 0) || sum1;
+
+    }, 0);
+
+    // Extend Strata Base: packsswb
     add_opcode("packsswb", [this] (SymBitVector a, SymBitVector b) {
-      return  signedSaturate  (   a[15][0], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  a[31][16], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  a[47][32], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  a[63][48], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  a[79][64], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  a[95][80], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate ( a[111][96], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (a[127][112], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (   b[15][0], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  b[31][16], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  b[47][32], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  b[63][48], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  b[79][64], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (  b[95][80], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate ( b[111][96], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7)
-              || signedSaturate (b[127][112], SymBitVector::constant(7, 0x7f), SymBitVector::constant(7, 0xff), 7);
+      auto a_width = a.width();
+      auto b_width = b.width();
+      uint16_t src_width = 16;
+      uint16_t dest_width = 8;
+
+      auto result = signedSaturate  (   a[15][0], src_width, dest_width);
+
+      for (size_t k = 0; k < a_width; k += 128) {
+        for (size_t i = 1; i < 8; ++i) {
+          result = signedSaturate  (a[15 + 16*i + k][16*i + k], src_width, dest_width) || result;
+        }
+
+        for (size_t i = 0; i < 8; ++i) {
+          result = signedSaturate  (b[15 + 16*i + k][16*i + k], src_width, dest_width) || result;
+        }
+      }
+
+      return result;
     }, 0);
 
-    // packssdw_xmm_xmm
-    add_opcode("packsswd", [this] (SymBitVector a, SymBitVector b) {
-      return  signedSaturate  (  a[31][0], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate ( a[63][32], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate ( a[95][64], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate (a[127][96], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate (  b[31][0], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate ( b[63][32], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate ( b[95][64], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16)
-              || signedSaturate (b[127][96], SymBitVector::constant(16, 0x7fff), SymBitVector::constant(16, 0xffff), 16);
+    // Extend Strata Base: packssdw
+    add_opcode("packssdw", [this] (SymBitVector a, SymBitVector b) {
+      auto a_width = a.width();
+      auto b_width = b.width();
+      uint16_t src_width = 32;
+      uint16_t dest_width = 16;
+
+      auto result = signedSaturate  (   a[31][0], src_width, dest_width);
+
+      for (size_t k = 0; k < a_width; k += 128) {
+        for (size_t i = 1; i < 4; ++i) {
+          result = signedSaturate  (a[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
+        }
+
+        for (size_t i = 0; i < 4; ++i) {
+          result = signedSaturate  (b[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
+        }
+      }
+
+      return result;
     }, 0);
 
-    // packuswb_xmm_xmm
+    // Extend Strata Base: packuswb
     add_opcode("packuswb", [this] (SymBitVector a, SymBitVector b) {
-      return  unSignedSaturate  (   a[15][0], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  a[31][16], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  a[47][32], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  a[63][48], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  a[79][64], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  a[95][80], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate ( a[111][96], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (a[127][112], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (   b[15][0], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  b[31][16], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  b[47][32], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  b[63][48], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  b[79][64], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (  b[95][80], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate ( b[111][96], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7)
-              || unSignedSaturate (b[127][112], SymBitVector::constant(7, 0xff), SymBitVector::constant(7, 0x0), 7);
+      auto a_width = a.width();
+      auto b_width = b.width();
+      uint16_t src_width = 16;
+      uint16_t dest_width = 8;
+
+      auto result = unSignedSaturate  (   a[15][0], src_width, dest_width);
+
+      for (size_t k = 0; k < a_width; k += 128) {
+        for (size_t i = 1; i < 8; ++i) {
+          result = unSignedSaturate  (a[15 + 16*i + k][16*i + k],  src_width, dest_width) || result;
+        }
+
+        for (size_t i = 0; i < 8; ++i) {
+          result = unSignedSaturate  (b[15 + 16*i + k][16*i + k],  src_width, dest_width) || result;
+        }
+      }
+
+      return result;
     }, 0);
 
-    // packusdw_xmm_xmm
-    add_opcode("packuswd", [this] (SymBitVector a, SymBitVector b) {
-      return  unSignedSaturate  (  a[31][0], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate ( a[63][32], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate ( a[95][64], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate (a[127][96], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate (  b[31][0], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate ( b[63][32], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate ( b[95][64], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16)
-              || unSignedSaturate (b[127][96], SymBitVector::constant(16, 0xffff), SymBitVector::constant(16, 0x0), 16);
+    // Extend Strata Base: packusdw
+    add_opcode("packusdw", [this] (SymBitVector a, SymBitVector b) {
+      auto a_width = a.width();
+      auto b_width = b.width();
+      uint16_t src_width = 32;
+      uint16_t dest_width = 16;
+
+      auto result = unSignedSaturate  (   a[31][0], src_width, dest_width);
+
+      for (size_t k = 0; k < a_width; k += 128) {
+        for (size_t i = 1; i < a_width/32 ; ++i) {
+          result = unSignedSaturate  (a[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
+        }
+
+        for (size_t i = 0; i < b_width/32 ; ++i) {
+          result = unSignedSaturate  (b[31 + 32*i + k][32*i + k], src_width, dest_width) || result;
+        }
+      }
+
+      return result;
     }, 0);
+
     // vpsllvq_ymm_ymm_ymm
     add_opcode("vpsllvq", [] (SymBitVector a, SymBitVector b) {
       auto const_ = SymBitVector::constant(64, 63);
@@ -1060,6 +1138,8 @@ private:
   /** Represents the operation done in parallel on the bitvectors */
   typedef std::function<SymBitVector (SymBitVector, SymBitVector)> BinaryOperator;
   /** Represents the operation done in parallel on the bitvectors */
+  typedef std::function<SymBitVector (SymBitVector, SymBitVector, SymBitVector)> TernaryOperator;
+  /** Represents the operation done in parallel on the bitvectors */
   typedef std::function<SymBitVector (SymBitVector, SymBitVector, SymBitVector, uint16_t)> BinaryOperatorWithConstant;
 
   std::vector<std::string> opcode_names_;
@@ -1142,6 +1222,11 @@ private:
       init();
     }
 
+    PackedOpcode(std::string opcode, TernaryOperator ternaryop) :
+      opcode_(opcode), ternaryop_(ternaryop), has_constant_(false) {
+      init();
+    }
+
     PackedOpcode(std::string opcode, BinaryOperatorWithConstant binop) :
       opcode_(opcode), binop_with_constant_(binop), has_constant_(true) {
       init();
@@ -1179,6 +1264,11 @@ private:
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, SymState& ss) {
       assert(!has_constant_);
       return binop_(bv1, bv2);
+    }
+
+    SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, x64asm::Operand arg3, SymBitVector bv3, SymState& ss) {
+      assert(!has_constant_);
+      return ternaryop_(bv1, bv2, bv3);
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, SymState& ss, SymBitVector imm, uint16_t k) {
@@ -1223,6 +1313,7 @@ private:
     std::string opcode_;
 
     BinaryOperator binop_;
+    TernaryOperator ternaryop_;
     BinaryOperatorWithConstant binop_with_constant_;
     bool has_constant_;
 
@@ -1236,14 +1327,32 @@ private:
   };
 
   /** Helper functions for signed/unsigned saturation  */
-  SymBitVector signedSaturate(SymBitVector a,  SymBitVector max,
-                              SymBitVector min, uint16_t dest_width) {
-    return a.s_gt(max).ite( max, a.s_lt(min).ite(min, a[dest_width - 1][0]));
+  SymBitVector signedSaturate(SymBitVector a,  uint16_t src_width, uint16_t dest_width) {
+    int64_t maxIntVal = int64_t(pow(2, dest_width-1)) - 1;
+    int64_t minIntVal = -1*(int64_t(pow(2, dest_width-1)));
+    auto maxBvVal_src_width = SymBitVector::constant(src_width, maxIntVal);
+    auto maxBvVal_dest_width = SymBitVector::constant(dest_width, maxIntVal);
+    auto minBvVal_src_width = SymBitVector::constant(src_width, minIntVal);
+    auto minBvVal_dest_width = SymBitVector::constant(dest_width, minIntVal);
+
+    return a.s_gt(maxBvVal_src_width).ite( maxBvVal_dest_width,
+                                           a.s_lt(minBvVal_src_width).ite(minBvVal_dest_width, a[dest_width - 1][0]));
   }
 
-  SymBitVector unSignedSaturate(SymBitVector a,  SymBitVector max,
-                                SymBitVector min, uint16_t dest_width) {
-    return (a > max).ite( max, (a < min).ite(min, a[dest_width - 1][0]));
+  SymBitVector unSignedSaturate(SymBitVector a,  uint16_t src_width, uint16_t dest_width) {
+    int64_t maxIntVal = int64_t(pow(2, dest_width)) -1;
+    int64_t minIntVal = 0;
+    auto maxBvVal_src_width = SymBitVector::constant(src_width, maxIntVal);
+    auto maxBvVal_dest_width = SymBitVector::constant(dest_width, maxIntVal);
+    auto minBvVal_src_width = SymBitVector::constant(src_width, minIntVal);
+    auto minBvVal_dest_width = SymBitVector::constant(dest_width, minIntVal);
+
+    return a.s_gt(maxBvVal_src_width).ite( maxBvVal_dest_width,
+                                           a.s_lt(minBvVal_src_width).ite(minBvVal_dest_width, a[dest_width - 1][0]));
+  }
+
+  SymBitVector absolute(SymBitVector a) {
+    return a.s_lt(SymBitVector::constant(a.width(), 0)).ite(-a, a);
   }
 
   /** Adds an opcode to our internal maps */

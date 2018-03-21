@@ -478,7 +478,7 @@ void SimpleHandler::add_all() {
   // (v)comiss
   add_opcode_str({"comiss", "vcomiss"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    SymFunction f("comisd", 2, {32, 32});
+    SymFunction f("comiss", 2, {32, 32});
     auto aa = a[31][0];
     auto bb = b[31][0];
     auto result = f (aa, bb);
@@ -513,6 +513,52 @@ void SimpleHandler::add_all() {
       ss.set(dst, mask);
 
   });
+
+  // pblendvb
+  add_opcode_str({"pblendvb"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+
+    size_t src_size = src1.size();
+    auto result = (c[7][7] == SymBitVector::constant(1, 1)).ite(b[7][0], a[7][0]);
+    for (size_t i = 1; i < src_size/8; ++i) {
+      result =  (c[8*i+7][8*i+7] == SymBitVector::constant(1, 1)).ite(b[8*i+7][8*i], a[8*i+7][8*i]) || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  // vpblendvb
+  add_opcode_str({"vpblendvb"},
+                 [this] (Operand dst, Operand src1, Operand src2, Operand src3, SymBitVector a, SymBitVector b, SymBitVector c,
+  SymBitVector d, SymState& ss) {
+
+    size_t src_size = src1.size();
+    auto result = (d[7][7] == SymBitVector::constant(1, 1)).ite(c[7][0], b[7][0]);
+    for (size_t i = 1; i < src_size/8; ++i) {
+      result =  (d[8*i+7][8*i+7] == SymBitVector::constant(1, 1)).ite(c[8*i+7][8*i], b[8*i+7][8*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+
+  });
+
+  /* vpshufb
+  add_opcode_str({"vpshufb"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    size_t dest_size = dst.size();
+
+    auto index = c[3][0];
+    auto shufResult = b[index*8+7][index*8];
+    auto result = (c[7][7] ==  SymBitVector::constant(1, 1)).ite(SymBitVector::constant(8, 0), shufResult);
+    for (size_t i = 1; i <= 15; ++i) {
+      auto index = c[(i*8)+3][i*8];
+      result =  (c[(i * 8)+7][(i * 8)+7] ==  SymBitVector::constant(1, 1)).ite(SymBitVector::constant(8, 0), shufResult) || result;
+    }
+
+    ss.set(dst, result, true);
+
+  });
+  */
 
   // for min/max|ss/sd: can't be done with packed handler because the upper 96/64 bits are from src1, not dest in the v variant
 

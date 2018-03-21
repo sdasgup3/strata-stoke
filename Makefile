@@ -206,6 +206,7 @@ BIN=\
 	bin/stoke_search \
 	bin/stoke_testcase \
 	\
+	bin/stoke_check_circuit \
 	bin/stoke_support_list \
 	bin/stoke_debug_cfg \
 	bin/stoke_debug_circuit \
@@ -404,7 +405,7 @@ tests/%.o: tests/%.cc tests/%.h
 	$(CXX) $(TARGET) $(OPT) $(INC) -c $< -o $@ $(TEST_LIBS)
 
 bin/stoke_test: tools/apps/stoke_test.cc $(DEPS) $(SRC_OBJ) $(TEST_OBJ) $(TOOL_NON_ARG_OBJ) $(wildcard src/*/*.h) $(wildcard tests/*.h) $(wildcard tests/*/*.h) $(wildcard tests/*/*/*.h) tests/validator/handlers.h
-	$(CXX) $(TARGET) $(OPT) $(INC) $< -o $@ $(SRC_OBJ) $(TEST_OBJ) $(TOOL_NON_ARG_OBJ) $(LIB) $(TEST_LIBS)
+	$(CXX) $(TARGET) $(OPT) $(INC) -I /home/sdasgup3/Install $< -o $@ $(SRC_OBJ) $(TEST_OBJ) $(TOOL_NON_ARG_OBJ) $(LIB) $(TEST_LIBS)
 
 ## MISC
 
