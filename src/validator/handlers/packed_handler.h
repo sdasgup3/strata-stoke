@@ -382,25 +382,25 @@ public:
 
     // Extend Strata Base: pmulhrsw
     add_opcode("pmulhrsw", [this] (SymBitVector a, SymBitVector b) {
-        auto n = a.width();
-        auto aa = a.extend(2*n);
-        auto bb = b.extend(2*n);
-        return (((aa*bb) >> SymBitVector::constant(2*n, 14)) + SymBitVector::constant(2*n, 1))[16][1];
+      auto n = a.width();
+      auto aa = a.extend(2*n);
+      auto bb = b.extend(2*n);
+      return (((aa*bb) >> SymBitVector::constant(2*n, 14)) + SymBitVector::constant(2*n, 1))[16][1];
     }, 16, 16);
 
     // Extend Strata Base: pmulhuw
     add_opcode("pmulhuw", [this] (SymBitVector a, SymBitVector b) {
-        auto n = a.width();
-        auto aa = SymBitVector::constant(n, 0) || a;
-        auto bb = SymBitVector::constant(n, 0) || b;
-        return (aa * bb)[31][16];
+      auto n = a.width();
+      auto aa = SymBitVector::constant(n, 0) || a;
+      auto bb = SymBitVector::constant(n, 0) || b;
+      return (aa * bb)[31][16];
     }, 16, 16);
 
     // Extend Strata Base: pmuludq
     add_opcode("pmuludq", [this] (SymBitVector a, SymBitVector b) {
-        auto aa = SymBitVector::constant(32, 0) || a[31][0];
-        auto bb = SymBitVector::constant(32, 0) || b[31][0];
-        return (aa * bb);
+      auto aa = SymBitVector::constant(32, 0) || a[31][0];
+      auto bb = SymBitVector::constant(32, 0) || b[31][0];
+      return (aa * bb);
     }, 64, 64);
 
     // Extend Strata Base: pmaddwd
