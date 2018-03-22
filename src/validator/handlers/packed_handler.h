@@ -382,19 +382,25 @@ public:
 
     // phaddsw
     add_opcode("phaddsw", [this] (SymBitVector a, SymBitVector b) {
-      auto val2 = SymBitVector::constant(1, 0) || a[31][16];
-      auto val1 = SymBitVector::constant(1, 0) || a[15][0];
-      auto sum = signedSaturate(val1 + val2, 17, 16);
+      auto dest_width = a.width();
 
-      for (size_t i = 2; i <= 7; i=i+2) {
-        auto val1 = SymBitVector::constant(1, 0) || a[16*i+15][16*i];
-        auto val2 = SymBitVector::constant(1, 0) || a[16*(i+1)+15][16*(i+1)];
-        sum = signedSaturate(val2 + val1, 17, 16) || sum;
-      }
-      for (size_t i = 0; i <= 7; i=i+2) {
-        auto val1 = SymBitVector::constant(1, 0) || b[16*i+15][16*i];
-        auto val2 = SymBitVector::constant(1, 0) || b[16*(i+1)+15][16*(i+1)];
-        sum = signedSaturate(val2 + val1, 17, 16) || sum;
+      auto val1 = a[15][0].extend(32);
+      auto val2 = a[31][16].extend(32);
+      auto sum = signedSaturate(val1 + val2, 32, 16)[15][0];
+
+      size_t i = 2;
+      for (size_t k = 0; k < dest_width/128; k++, i = 0) {
+        for (; i < 8; i=i+2) {
+          auto val1 = a[16*i+15 + 128*k][16*i + 128*k].extend(32);
+          auto val2 = a[16*(i+1)+15 + 128*k][16*(i+1) + 128*k].extend(32);
+          sum = signedSaturate(val2 + val1, 32, 16)[15][0] || sum;
+        }
+
+        for (size_t j = 0; j < 8; j = j + 2) {
+          auto val1 = b[16*j+15 + 128*k][16*j + 128*k].extend(32);
+          auto val2 = b[16*(j+1)+15 + 128*k][16*(j+1) + 128*k].extend(32);
+          sum = signedSaturate(val2 + val1, 32, 16)[15][0] || sum;
+        }
       }
 
       return sum;
