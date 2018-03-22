@@ -389,10 +389,81 @@ void SimpleHandler::add_all() {
   });
 
   // Extendng Base
-  add_opcode_str({"vptest"},
+
+  // Extend Strata Base: psrad
+  add_opcode_str({"psrad"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto aa = a[255][0];
-    auto bb = b[255][0];
+    auto shift_count1 = SymBitVector::constant(32, 32);
+    auto shift_count2 = b[31][0];
+    auto bb = b[63][0];
+    auto const_ = SymBitVector::constant(64, 31);
+    auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
+
+    auto result = a[31][0].s_shr(shift_count);
+
+    for(uint16_t i = 1 ; i < a.width()/32; i++) {
+      result = a[31 + i*32][i*32].s_shr(shift_count) || result;
+    }
+    ss.set(dst, result);
+  });
+
+  // Extend Strata Base: vpsrad
+  add_opcode_str({"vpsrad"},
+  [] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto shift_count1 = SymBitVector::constant(32, 32);
+    auto shift_count2 = b[31][0];
+    auto bb = b[63][0];
+    auto const_ = SymBitVector::constant(64, 31);
+    auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
+
+    auto result = a[31][0].s_shr(shift_count);
+
+    for(uint16_t i = 1 ; i < a.width()/32; i++) {
+      result = a[31 + i*32][i*32].s_shr(shift_count) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: psraw
+  add_opcode_str({"psraw"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto shift_count1 = SymBitVector::constant(16, 16);
+    auto shift_count2 = b[15][0];
+    auto bb = b[63][0];
+    auto const_ = SymBitVector::constant(64, 15);
+    auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
+
+    auto result = a[15][0].s_shr(shift_count);
+
+    for(uint16_t i = 1 ; i < a.width()/16; i++) {
+      result = a[15 + i*16][i*16].s_shr(shift_count) || result;
+    }
+    ss.set(dst, result);
+  });
+
+
+  // Extend Strata Base: vpsraw
+  add_opcode_str({"vpsraw"},
+  [] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto shift_count1 = SymBitVector::constant(16, 16);
+    auto shift_count2 = b[15][0];
+    auto bb = b[63][0];
+    auto const_ = SymBitVector::constant(64, 15);
+    auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
+
+    auto result = a[15][0].s_shr(shift_count);
+
+    for(uint16_t i = 1 ; i < a.width()/16; i++) {
+      result = a[15 + i*16][i*16].s_shr(shift_count) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: (v)ptest
+  add_opcode_str({"ptest", "vptest"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto aa = a[dst.size()-1][0];
+    auto bb = b[dst.size()-1][0];
     auto temp1 =  aa & bb;
     auto temp2 = (!aa) & bb;
     auto zero = SymBitVector::constant(dst.size(), 0);
@@ -405,49 +476,48 @@ void SimpleHandler::add_all() {
     ss.set(eflags_sf, SymBool::_false());
   });
 
+  // Extend Strata Base: vtestpd
   add_opcode_str({"vtestpd"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto aa = a[255][0];
-    auto bb = b[255][0];
+    auto aa = a[dst.size()-1][0];
+    auto bb = b[dst.size()-1][0];
     auto temp1 =  aa & bb;
     auto temp2 = (!aa) & bb;
     auto zero = SymBitVector::constant(1, 0);
 
-    ss.set(eflags_zf, (temp1[63][63] == zero) & (temp1[127][127] == zero) & (temp1[191][191] == zero) & (temp1[255][255] == zero));
-    ss.set(eflags_cf, (temp2[63][63] == zero) & (temp2[127][127] == zero) & (temp2[191][191] == zero) & (temp2[255][255] == zero));
+    auto cond1_ = (temp1[63][63] == zero);
+    auto cond2_ = (temp2[63][63] == zero);
+    for(size_t i = 2; i <= dst.size()/64; i++) {
+      cond1_ = cond1_ & (temp1[i*64-1][i*64-1] == zero);
+      cond2_ = cond2_ & (temp2[i*64-1][i*64-1] == zero);
+    }
 
+    ss.set(eflags_zf, cond1_);
+    ss.set(eflags_cf, cond2_);
     ss.set(eflags_af, SymBool::_false());
     ss.set(eflags_of, SymBool::_false());
     ss.set(eflags_pf, SymBool::_false());
     ss.set(eflags_sf, SymBool::_false());
   });
 
+  // Extend Strata Base: vtestps
   add_opcode_str({"vtestps"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto aa = a[255][0];
-    auto bb = b[255][0];
+    auto aa = a[dst.size()-1][0];
+    auto bb = b[dst.size()-1][0];
     auto temp1 =  aa & bb;
     auto temp2 = (!aa) & bb;
     auto zero = SymBitVector::constant(1, 0);
 
-    ss.set(eflags_zf, (temp1[31][31] == zero)   &
-           (temp1[63][63] == zero)   &
-           (temp1[95][95] == zero)   &
-           (temp1[127][127] == zero) &
-           (temp1[160][160] == zero) &
-           (temp1[191][191] == zero) &
-           (temp1[224][224] == zero) &
-           (temp1[255][255] == zero));
-    ss.set(eflags_cf, (temp2[31][31] == zero)   &
-           (temp2[63][63] == zero)   &
-           (temp2[95][95] == zero)   &
-           (temp2[127][127] == zero) &
-           (temp2[160][160] == zero) &
-           (temp2[191][191] == zero) &
-           (temp2[224][224] == zero) &
-           (temp2[255][255] == zero));
-
-
+    auto cond1_ = (temp1[31][31] == zero);
+    auto cond2_ = (temp2[31][31] == zero);
+    for(size_t i = 2; i <= dst.size()/32; i++) {
+      cond1_ = cond1_ & (temp1[i*32-1][i*32-1] == zero);
+      cond2_ = cond2_ & (temp2[i*32-1][i*32-1] == zero);
+    }
+    
+    ss.set(eflags_zf, cond1_);
+    ss.set(eflags_cf, cond2_);
     ss.set(eflags_af, SymBool::_false());
     ss.set(eflags_of, SymBool::_false());
     ss.set(eflags_pf, SymBool::_false());

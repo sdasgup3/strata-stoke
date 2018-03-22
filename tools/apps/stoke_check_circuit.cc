@@ -108,13 +108,15 @@ int main(int argc, char** argv) {
   cout << "Build Handler\n";
   ComboHandler ch;
   if (ch.get_support(instr) == Handler::SupportLevel::NONE) {
-    cout<< "Not supported" << endl;
+    cout << "\033[1;31mNot supported\033[0m\n";
     exit(4);
   }
 
   // check equivalence of two symbolic states for a given register
   auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation) {
     SymBool eq = a == b;
+    //cout << a << "\n";
+    //cout << b << "\n";
     bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
