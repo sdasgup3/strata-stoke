@@ -415,20 +415,29 @@ public:
       return signedSaturate(val1 + val2, 17, 16);
     }, 16, 16);
 
-    // psadbw
+    // Extend Strata Base: psadbw
     add_opcode("psadbw", [this] (SymBitVector a, SymBitVector b) {
-      auto sum1 = SymBitVector::constant(16, 0);
-      auto sum2 = SymBitVector::constant(16, 0);
+      auto dest_width = a.width();
+      auto auxsum = SymBitVector::constant(16, 0);
 
       for (size_t i = 0; i <= 7; ++i) {
-        sum1 = sum1 + absolute(a[7 + 8*i][8*i]   - b[7 + 8*i][8*i]);
+        auxsum = (SymBitVector::constant(8, 0) || absolute(a[7 + 8*i][8*i]   , b[7 + 8*i][8*i])) + auxsum;
       }
 
-      for (size_t i = 8; i <= 15; ++i) {
-        sum2 = sum2 + absolute(a[7 + 8*i][8*i]   - b[7 + 8*i][8*i]);
+      auto sum = SymBitVector::constant(48, 0) || auxsum;
+
+
+      for (size_t k = 1 ; k < dest_width/64; k++) {
+        auxsum = SymBitVector::constant(16, 0);
+
+        for (size_t i = 0; i <= 7; ++i) {
+          auxsum = (SymBitVector::constant(8, 0) ||  absolute(a[7 + 8*i + 64*k][8*i + 64*k]   , b[7 + 8*i + 64*k][8*i + 64*k])) + auxsum;
+        }
+
+        sum = (SymBitVector::constant(48, 0) || auxsum) || sum;
       }
 
-      return SymBitVector::constant(48, 0) || sum2 || SymBitVector::constant(48, 0) || sum1;
+      return sum;
 
     }, 0);
 
@@ -1209,8 +1218,9 @@ private:
                                            a.s_lt(minBvVal_src_width).ite(minBvVal_dest_width, a[dest_width - 1][0]));
   }
 
-  SymBitVector absolute(SymBitVector a) {
-    return a.s_lt(SymBitVector::constant(a.width(), 0)).ite(-a, a);
+  SymBitVector absolute(SymBitVector a, SymBitVector b) {
+    //return (a-b).s_lt(SymBitVector::constant(a.width(), 0)).ite(b-a, a-b);
+    return (a>b).ite(a-b, b-a); 
   }
 
   /** Adds an opcode to our internal maps */
