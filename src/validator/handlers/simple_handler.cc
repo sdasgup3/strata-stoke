@@ -524,7 +524,7 @@ void SimpleHandler::add_all() {
     ss.set(eflags_sf, SymBool::_false());
   });
 
-  // (v)comisd
+  // Extend Strata Base: (v)comisd
   add_opcode_str({"comisd", "vcomisd", "ucomisd", "vucomisd"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     SymFunction f("comisd", 2, {64, 64});
@@ -545,7 +545,7 @@ void SimpleHandler::add_all() {
     ss.set(eflags_sf, SymBool::_false());
   });
 
-  // (v)comiss
+  // Extend Strata Base: (v)comiss
   add_opcode_str({"comiss", "vcomiss", "ucomiss", "vucomiss"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     SymFunction f("comiss", 2, {32, 32});
@@ -584,32 +584,89 @@ void SimpleHandler::add_all() {
 
   });
 
-  // pblendvb
+  // Extend Strata Base: pblendvb
   add_opcode_str({"pblendvb"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
 
-    size_t src_size = src1.size();
+    size_t dest_size = dst.size();
     auto result = (c[7][7] == SymBitVector::constant(1, 1)).ite(b[7][0], a[7][0]);
-    for (size_t i = 1; i < src_size/8; ++i) {
+    for (size_t i = 1; i < dest_size/8; ++i) {
       result =  (c[8*i+7][8*i+7] == SymBitVector::constant(1, 1)).ite(b[8*i+7][8*i], a[8*i+7][8*i]) || result;
     }
 
     ss.set(dst, result);
   });
 
-  // vpblendvb
+  // Extend Strata Base: vpblendvb
   add_opcode_str({"vpblendvb"},
                  [this] (Operand dst, Operand src1, Operand src2, Operand src3, SymBitVector a, SymBitVector b, SymBitVector c,
   SymBitVector d, SymState& ss) {
 
-    size_t src_size = src1.size();
+    size_t dest_size = dst.size();
     auto result = (d[7][7] == SymBitVector::constant(1, 1)).ite(c[7][0], b[7][0]);
-    for (size_t i = 1; i < src_size/8; ++i) {
+    for (size_t i = 1; i < dest_size/8; ++i) {
       result =  (d[8*i+7][8*i+7] == SymBitVector::constant(1, 1)).ite(c[8*i+7][8*i], b[8*i+7][8*i]) || result;
     }
 
     ss.set(dst, result, true);
+  });
 
+  // Extend Strata Base: blendvpd
+  add_opcode_str({"blendvpd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+
+    size_t dest_size = dst.size();
+    auto mask = c;
+
+    auto result = (mask[63][63] == SymBitVector::constant(1, 0)).ite(a[63][0], b[63][0]);
+    for (size_t i = 1; i < dest_size/64; ++i) {
+      result =  (c[64*i+63][64*i+63] == SymBitVector::constant(1, 0)).ite(a[64*i+63][64*i], b[64*i+63][64*i]) || result;
+    }
+    ss.set(dst, result);
+  });
+
+  // Extend Strata Base: vblendvpd
+  add_opcode_str({"vblendvpd"},
+                 [this] (Operand dst, Operand src1, Operand src2, Operand src3, SymBitVector d, SymBitVector a, SymBitVector b,
+  SymBitVector c, SymState& ss) {
+
+    size_t dest_size = dst.size();
+    auto mask = c;
+
+    auto result = (mask[63][63] == SymBitVector::constant(1, 0)).ite(a[63][0], b[63][0]);
+    for (size_t i = 1; i < dest_size/64; ++i) {
+      result =  (c[64*i+63][64*i+63] == SymBitVector::constant(1, 0)).ite(a[64*i+63][64*i], b[64*i+63][64*i]) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: blendvps
+  add_opcode_str({"blendvps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+
+    size_t dest_size = dst.size();
+    auto mask = c;
+
+    auto result = (mask[31][31] == SymBitVector::constant(1, 0)).ite(a[31][0], b[31][0]);
+    for (size_t i = 1; i < dest_size/32; ++i) {
+      result =  (c[32*i+31][32*i+31] == SymBitVector::constant(1, 0)).ite(a[32*i+31][32*i], b[32*i+31][32*i]) || result;
+    }
+    ss.set(dst, result);
+  });
+
+  // Extend Strata Base: vblendvps
+  add_opcode_str({"vblendvps"},
+                 [this] (Operand dst, Operand src1, Operand src2, Operand src3, SymBitVector d, SymBitVector a, SymBitVector b,
+  SymBitVector c, SymState& ss) {
+
+    size_t dest_size = dst.size();
+    auto mask = c;
+
+    auto result = (mask[31][31] == SymBitVector::constant(1, 0)).ite(a[31][0], b[31][0]);
+    for (size_t i = 1; i < dest_size/32; ++i) {
+      result =  (c[32*i+31][32*i+31] == SymBitVector::constant(1, 0)).ite(a[32*i+31][32*i], b[32*i+31][32*i]) || result;
+    }
+    ss.set(dst, result, true);
   });
 
   /* vpshufb

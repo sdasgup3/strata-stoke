@@ -380,7 +380,44 @@ public:
 
     // Extend Base
 
-    // phaddsw
+    // Extend Strata Base: pmulhrsw
+    add_opcode("pmulhrsw", [this] (SymBitVector a, SymBitVector b) {
+        auto n = a.width();
+        auto aa = a.extend(2*n);
+        auto bb = b.extend(2*n);
+        return (((aa*bb) >> SymBitVector::constant(2*n, 14)) + SymBitVector::constant(2*n, 1))[16][1];
+    }, 16, 16);
+
+    // Extend Strata Base: pmulhuw
+    add_opcode("pmulhuw", [this] (SymBitVector a, SymBitVector b) {
+        auto n = a.width();
+        auto aa = SymBitVector::constant(n, 0) || a;
+        auto bb = SymBitVector::constant(n, 0) || b;
+        return (aa * bb)[31][16];
+    }, 16, 16);
+
+    // Extend Strata Base: pmuludq
+    add_opcode("pmuludq", [this] (SymBitVector a, SymBitVector b) {
+        auto aa = SymBitVector::constant(32, 0) || a[31][0];
+        auto bb = SymBitVector::constant(32, 0) || b[31][0];
+        return (aa * bb);
+    }, 64, 64);
+
+    // Extend Strata Base: pmaddwd
+    add_opcode("pmaddwd", [this] (SymBitVector a, SymBitVector b) {
+      auto val1 = (b[15][0].extend(32)  * a[15][0].extend(32));
+      auto val2 = (b[31][16].extend(32) * a[31][16].extend(32));
+      return val1 + val2;
+    }, 32, 32);
+
+    // Extend Strata Base: pmaddubsw
+    add_opcode("pmaddubsw", [this] (SymBitVector a, SymBitVector b) {
+      auto val1 = (b[7][0].extend(16)   * (SymBitVector::constant(8, 0) || a[7][0])  ).extend(32);
+      auto val2 = (b[15][8].extend(16)  * (SymBitVector::constant(8, 0) || a[15][8]) ).extend(32);
+      return signedSaturate(val1 + val2, 32, 16);
+    }, 16, 16);
+
+    // Extend Strata Base: phaddsw
     add_opcode("phaddsw", [this] (SymBitVector a, SymBitVector b) {
       auto dest_width = a.width();
 
