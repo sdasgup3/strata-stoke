@@ -401,7 +401,7 @@ void SimpleHandler::add_all() {
 
     auto result = a[31][0].s_shr(shift_count);
 
-    for(uint16_t i = 1 ; i < a.width()/32; i++) {
+    for (uint16_t i = 1 ; i < a.width()/32; i++) {
       result = a[31 + i*32][i*32].s_shr(shift_count) || result;
     }
     ss.set(dst, result);
@@ -418,7 +418,7 @@ void SimpleHandler::add_all() {
 
     auto result = a[31][0].s_shr(shift_count);
 
-    for(uint16_t i = 1 ; i < a.width()/32; i++) {
+    for (uint16_t i = 1 ; i < a.width()/32; i++) {
       result = a[31 + i*32][i*32].s_shr(shift_count) || result;
     }
     ss.set(dst, result, true);
@@ -435,7 +435,7 @@ void SimpleHandler::add_all() {
 
     auto result = a[15][0].s_shr(shift_count);
 
-    for(uint16_t i = 1 ; i < a.width()/16; i++) {
+    for (uint16_t i = 1 ; i < a.width()/16; i++) {
       result = a[15 + i*16][i*16].s_shr(shift_count) || result;
     }
     ss.set(dst, result);
@@ -453,7 +453,7 @@ void SimpleHandler::add_all() {
 
     auto result = a[15][0].s_shr(shift_count);
 
-    for(uint16_t i = 1 ; i < a.width()/16; i++) {
+    for (uint16_t i = 1 ; i < a.width()/16; i++) {
       result = a[15 + i*16][i*16].s_shr(shift_count) || result;
     }
     ss.set(dst, result, true);
@@ -487,7 +487,7 @@ void SimpleHandler::add_all() {
 
     auto cond1_ = (temp1[63][63] == zero);
     auto cond2_ = (temp2[63][63] == zero);
-    for(size_t i = 2; i <= dst.size()/64; i++) {
+    for (size_t i = 2; i <= dst.size()/64; i++) {
       cond1_ = cond1_ & (temp1[i*64-1][i*64-1] == zero);
       cond2_ = cond2_ & (temp2[i*64-1][i*64-1] == zero);
     }
@@ -511,11 +511,11 @@ void SimpleHandler::add_all() {
 
     auto cond1_ = (temp1[31][31] == zero);
     auto cond2_ = (temp2[31][31] == zero);
-    for(size_t i = 2; i <= dst.size()/32; i++) {
+    for (size_t i = 2; i <= dst.size()/32; i++) {
       cond1_ = cond1_ & (temp1[i*32-1][i*32-1] == zero);
       cond2_ = cond2_ & (temp2[i*32-1][i*32-1] == zero);
     }
-    
+
     ss.set(eflags_zf, cond1_);
     ss.set(eflags_cf, cond2_);
     ss.set(eflags_af, SymBool::_false());

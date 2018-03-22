@@ -530,7 +530,7 @@ public:
       auto index = dest_width/32 - 1;
 
       auto result = a[31][0].s_shr(b[31][0]);
-      for(uint16_t i = 1 ; i <= index; i++) {
+      for (uint16_t i = 1 ; i <= index; i++) {
         result = a[31 + i*32][i*32].s_shr(b[31 + i*32][i*32]) || result;
       }
       // Intel manual bug
@@ -538,7 +538,7 @@ public:
       return result;
     }, 0);
 
-    
+
     // End Extend Strata Base
 
     add_opcode("paddq", [] (SymBitVector a, SymBitVector b) {
