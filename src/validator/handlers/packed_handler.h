@@ -421,7 +421,7 @@ public:
       auto auxsum = SymBitVector::constant(16, 0);
 
       for (size_t i = 0; i <= 7; ++i) {
-        auxsum = (SymBitVector::constant(8, 0) || absolute(a[7 + 8*i][8*i]   , b[7 + 8*i][8*i])) + auxsum;
+        auxsum = (SymBitVector::constant(8, 0) || absolute(a[7 + 8*i][8*i], b[7 + 8*i][8*i])) + auxsum;
       }
 
       auto sum = SymBitVector::constant(48, 0) || auxsum;
@@ -431,7 +431,7 @@ public:
         auxsum = SymBitVector::constant(16, 0);
 
         for (size_t i = 0; i <= 7; ++i) {
-          auxsum = (SymBitVector::constant(8, 0) ||  absolute(a[7 + 8*i + 64*k][8*i + 64*k]   , b[7 + 8*i + 64*k][8*i + 64*k])) + auxsum;
+          auxsum = (SymBitVector::constant(8, 0) ||  absolute(a[7 + 8*i + 64*k][8*i + 64*k], b[7 + 8*i + 64*k][8*i + 64*k])) + auxsum;
         }
 
         sum = (SymBitVector::constant(48, 0) || auxsum) || sum;
@@ -1220,7 +1220,7 @@ private:
 
   SymBitVector absolute(SymBitVector a, SymBitVector b) {
     //return (a-b).s_lt(SymBitVector::constant(a.width(), 0)).ite(b-a, a-b);
-    return (a>b).ite(a-b, b-a); 
+    return (a>b).ite(a-b, b-a);
   }
 
   /** Adds an opcode to our internal maps */
