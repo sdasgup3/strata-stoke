@@ -525,16 +525,16 @@ void SimpleHandler::add_all() {
   });
 
   // (v)comisd
-  add_opcode_str({"comisd", "vcomisd"},
+  add_opcode_str({"comisd", "vcomisd", "ucomisd", "vucomisd"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     SymFunction f("comisd", 2, {64, 64});
     auto aa = a[63][0];
     auto bb = b[63][0];
     auto result = f (aa, bb);
 
-    auto cond1Forzf = ((result == SymBitVector::constant(2, 0)) & (result == SymBitVector::constant(2, 3)));
+    auto cond1Forzf = ((result == SymBitVector::constant(2, 0)) | (result == SymBitVector::constant(2, 3)));
     auto cond1Forpf = (result == SymBitVector::constant(2, 0));
-    auto cond1Forcf = ((result == SymBitVector::constant(2, 0)) & (result == SymBitVector::constant(2, 2)));
+    auto cond1Forcf = ((result == SymBitVector::constant(2, 0)) | (result == SymBitVector::constant(2, 2)));
 
     ss.set(eflags_zf, cond1Forzf);
     ss.set(eflags_pf, cond1Forpf);
@@ -546,16 +546,16 @@ void SimpleHandler::add_all() {
   });
 
   // (v)comiss
-  add_opcode_str({"comiss", "vcomiss"},
+  add_opcode_str({"comiss", "vcomiss", "ucomiss", "vucomiss"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     SymFunction f("comiss", 2, {32, 32});
     auto aa = a[31][0];
     auto bb = b[31][0];
     auto result = f (aa, bb);
 
-    auto cond1Forzf = ((result == SymBitVector::constant(2, 0)) & (result == SymBitVector::constant(2, 3)));
+    auto cond1Forzf = ((result == SymBitVector::constant(2, 0)) | (result == SymBitVector::constant(2, 3)));
     auto cond1Forpf = (result == SymBitVector::constant(2, 0));
-    auto cond1Forcf = ((result == SymBitVector::constant(2, 0)) & (result == SymBitVector::constant(2, 2)));
+    auto cond1Forcf = ((result == SymBitVector::constant(2, 0)) | (result == SymBitVector::constant(2, 2)));
 
     ss.set(eflags_zf, cond1Forzf);
     ss.set(eflags_pf, cond1Forpf);
