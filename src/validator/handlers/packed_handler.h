@@ -401,18 +401,18 @@ public:
 
     }, 0);
 
-    // paddsb
+    // Extend Strata Base: paddsb
     add_opcode("paddsb", [this] (SymBitVector a, SymBitVector b) {
-      auto val1 = SymBitVector::constant(1, 0) || a;
-      auto val2 = SymBitVector::constant(1, 0) || b;
-      return signedSaturate(val1 + val2, 9, 8);
+      auto val1 =  a.extend(16);
+      auto val2 =  b.extend(16);
+      return signedSaturate(val1 + val2, 16, 8)[7][0];
     }, 8, 8);
 
-    // paddsw
+    // Extend Strata Base: paddsw
     add_opcode("paddsw", [this] (SymBitVector a, SymBitVector b) {
-      auto val1 = SymBitVector::constant(1, 0) || a;
-      auto val2 = SymBitVector::constant(1, 0) || b;
-      return signedSaturate(val1 + val2, 17, 16);
+      auto val1 = a.extend(32);
+      auto val2 = b.extend(32);
+      return signedSaturate(val1 + val2, 32, 16)[15][0];
     }, 16, 16);
 
     // Extend Strata Base: psadbw
@@ -442,6 +442,8 @@ public:
     }, 0);
 
     // Extend Strata Base: packsswb
+    // Intel manual bug:  If the signed doubleword value is beyond the range of an unsigned word (i.e. greater than 7FH or less than 80H),
+    // What does that even mean!!
     add_opcode("packsswb", [this] (SymBitVector a, SymBitVector b) {
       auto a_width = a.width();
       auto b_width = b.width();

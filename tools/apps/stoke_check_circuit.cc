@@ -113,16 +113,17 @@ int main(int argc, char** argv) {
   }
 
   // check equivalence of two symbolic states for a given register
-  auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation) {
+  auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
     SymBool eq = a == b;
-    //cout << a << "\n";
-    //cout << b << "\n";
     bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
       return false;
     }
     if (!res) {
+      cout << cs << "\n";
+      cout << "\n\n";
+
       explanation << "  states do not agree for '" << (*reg) << "':" << endl;
       auto simplify = true;
       if (!simplify) {
@@ -178,13 +179,13 @@ int main(int argc, char** argv) {
     stringstream ss;
     ss << "Sandbox and validator do not agree for '" << instr << "' (opcode " << opcode << ")" << endl;
     for (auto gp_it = rs.gp_begin(); gp_it != rs.gp_end(); ++gp_it) {
-      eq = eq && is_eq(gp_it, sym_validator.lookup(*gp_it), sb_validator.lookup(*gp_it), ss);
+      eq = eq && is_eq(gp_it, sym_validator.lookup(*gp_it), sb_validator.lookup(*gp_it), ss, cs);
     }
     for (auto sse_it = rs.sse_begin(); sse_it != rs.sse_end(); ++sse_it) {
-      eq = eq && is_eq(sse_it, sym_validator.lookup(*sse_it), sb_validator.lookup(*sse_it), ss);
+      eq = eq && is_eq(sse_it, sym_validator.lookup(*sse_it), sb_validator.lookup(*sse_it), ss, cs);
     }
     for (auto flag_it = rs.flags_begin(); flag_it != rs.flags_end(); ++flag_it) {
-      eq = eq && is_eq(flag_it, sym_validator[*flag_it], sb_validator[*flag_it], ss);
+      eq = eq && is_eq(flag_it, sym_validator[*flag_it], sb_validator[*flag_it], ss, cs);
     }
     if (!eq) {
       cout << ss.str() << endl;
