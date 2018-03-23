@@ -384,8 +384,8 @@ public:
       auto dest_width = a.width();
       auto index = SymBitVector::constant(3,0);
       auto min = b[15][0];
-      
-      for(size_t i = 1; i < dest_width/16; i++ ) {
+
+      for (size_t i = 1; i < dest_width/16; i++ ) {
         auto val_ = b[15+16*i][16*i];
         index = (val_ < min).ite(SymBitVector::constant(3,i), index);
         min = (val_ < min).ite(val_, min);
@@ -403,13 +403,13 @@ public:
       auto result = signedSaturate(val1 - val2, 32, 16);
 
       size_t i = 2;
-      for(size_t k = 0; k < dest_width/128; k++, i=0 ) {
-        for(; i < 8; i+= 2 ) {
+      for (size_t k = 0; k < dest_width/128; k++, i=0 ) {
+        for (; i < 8; i+= 2 ) {
           val1 = a[15+16*i+128*k][16*i+128*k].extend(32);
           val2 = a[15+16*(i+1)+128*k][16*(i+1)+128*k].extend(32);
           result = signedSaturate(val1 - val2, 32, 16) || result;
         }
-        for(size_t j = 0 ; j < 8; j+=2 ) {
+        for (size_t j = 0 ; j < 8; j+=2 ) {
           val1 = b[15+16*j+128*k][16*j+128*k].extend(32);
           val2 = b[15+16*(j+1)+128*k][16*(j+1)+128*k].extend(32);
           result = signedSaturate(val1 - val2, 32, 16) || result;
