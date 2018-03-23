@@ -390,6 +390,106 @@ void SimpleHandler::add_all() {
 
   // Extendng Base
 
+  // Extend Strata Base:  vcvtph2ps
+  // This is not an avx or avx2 instr, so cannot get binefited from
+  // packed handler infrastructure.
+  add_opcode_str({"vcvtph2ps"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+    SymFunction f("cvt_half_to_single", 32, {16});
+
+    auto result = f(b[15][0]);
+
+    for (size_t i = 1; i < dest_width/32; ++i) {
+      result = f(b[15 + 16*i][16*i]) || result;
+    }
+
+    size_t pad = 256 - dest_width;
+    if (pad > 0)
+      ss.set(dst, result, true);
+    else
+      ss.set(dst, result, true);
+  });
+  
+  // Extend Strata Base:  cvtsi2ssl/cvtsi2ssq
+  add_opcode_str({"cvtsi2ssl", "cvtsi2ssq"},
+  [this] (Operand dst, Operand src1, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto src_width = b.width();
+    if(32 == src_width) {
+      SymFunction f("cvt_int32_to_single", 32, {32});
+      ss.set(dst, a[127][32] ||  f(b));
+    }
+    if(64 == src_width) {
+      SymFunction f("cvt_int64_to_single", 32, {64});
+      ss.set(dst, a[127][32] ||  f(b));
+    }
+  });
+
+  // Extend Strata Base:  vcvtsi2ssl/vcvtsi2ssq
+  add_opcode_str({"vcvtsi2ssl", "vcvtsi2ssq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+
+    auto src_width = b.width();
+    if(32 == src_width) {
+      SymFunction f("cvt_int32_to_single", 32, {32});
+      ss.set(dst, a[127][32] ||  f(b), true);
+    }
+    if(64 == src_width) {
+      SymFunction f("cvt_int64_to_single", 32, {64});
+      ss.set(dst, a[127][32] ||  f(b), true);
+    }
+  });
+
+  // Extend Strata Base:  cvtsi2sdl/cvtsi2sdq
+  add_opcode_str({"cvtsi2sdl", "cvtsi2sdq"},
+  [this] (Operand dst, Operand src1, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto src_width = b.width();
+    if(32 == src_width) {
+      SymFunction f("cvt_int32_to_double", 64, {32});
+      ss.set(dst, a[127][64] ||  f(b));
+    }
+    if(64 == src_width) {
+      SymFunction f("cvt_int64_to_double", 64, {64});
+      ss.set(dst, a[127][64] ||  f(b));
+    }
+  });
+
+  // Extend Strata Base:  vcvtsi2sdl/vcvtsi2sdq
+  add_opcode_str({"vcvtsi2sdl", "vcvtsi2sdq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+
+    auto src_width = b.width();
+    if(32 == src_width) {
+      SymFunction f("cvt_int32_to_double", 64, {32});
+      ss.set(dst, a[127][64] ||  f(b), true);
+    }
+    if(64 == src_width) {
+      SymFunction f("cvt_int64_to_double", 64, {64});
+      ss.set(dst, a[127][64] ||  f(b), true);
+    }
+  });
+
+
+
+  // Extend Strata Base: movmskps
+  add_opcode_str({"movmskps", "vmovmskps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    size_t dst_size = dst.size();
+    size_t src_size = src.size();
+
+    auto mask = b[31][31];
+    for (size_t i = 1; i < src_size/32; ++i) {
+      mask = b[32*i+31][32*i+31] || mask;
+    }
+
+    size_t pad = dst_size - src_size/32;
+    if (pad > 0)
+      ss.set(dst, SymBitVector::constant(pad, 0) || mask);
+    else
+      ss.set(dst, mask);
+
+  });
+
   // Extend Strata Base: psrad
   add_opcode_str({"psrad"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
@@ -566,6 +666,7 @@ void SimpleHandler::add_all() {
     ss.set(eflags_sf, SymBool::_false());
   });
 
+  /*
   add_opcode_str({"pmovmskb", "vpmovmskb"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     size_t dst_size = dst.size();
@@ -583,6 +684,7 @@ void SimpleHandler::add_all() {
       ss.set(dst, mask);
 
   });
+  */
 
   // Extend Strata Base: pblendvb
   add_opcode_str({"pblendvb"},
@@ -669,6 +771,222 @@ void SimpleHandler::add_all() {
     ss.set(dst, result, true);
   });
 
+  // Extend Strata Base: vfmaddsub132pd 
+  // (cannot have it in packed_handler as this need 3rd src operand and that handlercould not support that)
+  add_opcode_str({"vfmaddsub132pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 64;
+
+    SymFunction f("vfmadd132_double", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction g("vfmsub132_double", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+   // Extend Strata Base: vfmaddsub132ps 
+  add_opcode_str({"vfmaddsub132ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 32;
+
+    SymFunction f("vfmadd132_single", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction g("vfmsub132_single", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: vfmsubadd132pd 
+  add_opcode_str({"vfmsubadd132pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 64;
+
+    SymFunction g("vfmadd132_double", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction f("vfmsub132_double", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+   // Extend Strata Base: vfmsubadd132ps 
+  add_opcode_str({"vfmsubadd132ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 32;
+
+    SymFunction g("vfmadd132_single", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction f("vfmsub132_single", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: vfmaddsub213pd 
+  add_opcode_str({"vfmaddsub213pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 64;
+
+    SymFunction f("vfmadd213_double", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction g("vfmsub213_double", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+   // Extend Strata Base: vfmaddsub213ps 
+  add_opcode_str({"vfmaddsub213ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 32;
+
+    SymFunction f("vfmadd213_single", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction g("vfmsub213_single", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: vfmsubadd213pd 
+  add_opcode_str({"vfmsubadd213pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 64;
+
+    SymFunction g("vfmadd213_double", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction f("vfmsub213_double", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+   // Extend Strata Base: vfmsubadd213ps 
+  add_opcode_str({"vfmsubadd213ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 32;
+
+    SymFunction g("vfmadd213_single", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction f("vfmsub213_single", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: vfmaddsub231pd 
+  add_opcode_str({"vfmaddsub231pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 64;
+
+    SymFunction f("vfmadd231_double", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction g("vfmsub231_double", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+   // Extend Strata Base: vfmaddsub231ps 
+  add_opcode_str({"vfmaddsub231ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 32;
+
+    SymFunction f("vfmadd231_single", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction g("vfmsub231_single", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  // Extend Strata Base: vfmsubadd231pd 
+  add_opcode_str({"vfmsubadd231pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 64;
+
+    SymFunction g("vfmadd231_double", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction f("vfmsub231_double", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+   // Extend Strata Base: vfmsubadd231ps 
+  add_opcode_str({"vfmsubadd231ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    auto dest_size = a.width();
+    short unsigned int vec_size = 32;
+
+    SymFunction g("vfmadd231_single", vec_size, {vec_size, vec_size, vec_size});
+    SymFunction f("vfmsub231_single", vec_size, {vec_size, vec_size, vec_size});
+
+    auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
+    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
+          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    }
+
+    ss.set(dst, result, true);
+  });
   /* vpshufb
   add_opcode_str({"vpshufb"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
@@ -686,6 +1004,8 @@ void SimpleHandler::add_all() {
 
   });
   */
+
+  // End Extend Strata
 
   // for min/max|ss/sd: can't be done with packed handler because the upper 96/64 bits are from src1, not dest in the v variant
 

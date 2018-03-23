@@ -54,13 +54,17 @@ public:
     add_opcode("addsubpd", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("add_double", 64, {64, 64});
       SymFunction g("sub_double", 64, {64, 64});
-      return g(a[63][0], b[63][0]) || f(a[127][64], b[127][64]);
+      //Bug: Wrong Order
+      //return g(a[63][0], b[63][0]) || f(a[127][64], b[127][64]);
+      return f(a[127][64], b[127][64]) || g(a[63][0], b[63][0]);
     }, 128, 128, true);
 
     add_opcode("addsubps", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("add_single", 32, {32, 32});
       SymFunction g("sub_single", 32, {32, 32});
-      return g(a[31][0], b[31][0]) || f(a[63][32], b[63][32]);
+      //Bug: Wrong Order
+      //return g(a[31][0], b[31][0]) || f(a[63][32], b[63][32]);
+      return f(a[63][32], b[63][32]) || g(a[31][0], b[31][0]);
     }, 64, 64, true);
 
     add_opcode("andpd", [] (SymBitVector a, SymBitVector b) {
@@ -139,25 +143,31 @@ public:
       return f(b);
     }, 64, 32, true, true);
 
+    /*
+    // Strata Bug: Correct implementation is in simple_handler   
     add_opcode("cvtsi2sdl", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int32_to_double", 64, {32});
       return f(b);
     }, 32, 64, true, true);
 
+    // Strata Bug   
     add_opcode("cvtsi2sdq", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int64_to_double", 64, {64});
       return f(b);
     }, 64, 64, true, true);
 
+    // Strata Bug   
     add_opcode("cvtsi2ssl", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int32_to_single", 32, {32});
       return f(b);
     }, 32, 32, true, true);
 
+    // Strata Bug   
     add_opcode("cvtsi2ssq", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int64_to_single", 32, {64});
       return f(b);
     }, 64, 32, true, true);
+    */
 
     add_opcode("cvtss2sd", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_single_to_double", 64, {32});
@@ -582,7 +592,7 @@ public:
     }, 0);
 
     // Extend Strata Base: packsswb
-    // Intel manual bug:  If the signed doubleword value is beyond the range of an unsigned word (i.e. greater than 7FH or less than 80H),
+    // Intel Manual Bug:  If the signed doubleword value is beyond the range of an unsigned word (i.e. greater than 7FH or less than 80H),
     // What does that even mean!!
     add_opcode("packsswb", [this] (SymBitVector a, SymBitVector b) {
       auto a_width = a.width();
@@ -684,7 +694,7 @@ public:
       for (uint16_t i = 1 ; i <= index; i++) {
         result = a[31 + i*32][i*32].s_shr(b[31 + i*32][i*32]) || result;
       }
-      // Intel manual bug
+      // Intel Manual Bug
       //result = a[31 + 32*index][32*index].s_shr( SymBitVector::constant(27, 0) || (b[4 + 32*index][32*index])) || result;
       return result;
     }, 0);

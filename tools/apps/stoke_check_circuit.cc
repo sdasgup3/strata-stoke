@@ -115,6 +115,8 @@ int main(int argc, char** argv) {
   // check equivalence of two symbolic states for a given register
   auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
     SymBool eq = a == b;
+    //cout << SymSimplify().simplify(a) << "\n\n";
+    //cout << b << "\n\n";
     bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
