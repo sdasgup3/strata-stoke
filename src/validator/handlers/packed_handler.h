@@ -402,8 +402,8 @@ public:
       size_t i = 1;
       for (size_t k = 0; k < dest_width/128; k++, i = 0) {
         for (; i < 2; i++ ) {
-          result = (b[1 + 64*i + 128*k][1 + 64*i + 128*k] == SymBitVector::constant(1,0)).ite(a[63 + 128*k][128*k], 
-              a[63 + 64 + 128*k][64 + 128*k]) || result;
+          result = (b[1 + 64*i + 128*k][1 + 64*i + 128*k] == SymBitVector::constant(1,0)).ite(a[63 + 128*k][128*k],
+                   a[63 + 64 + 128*k][64 + 128*k]) || result;
         }
       }
       return result;
@@ -1365,10 +1365,10 @@ private:
   }
 
   SymBitVector select4(SymBitVector a, SymBitVector b) {
-    return (b == SymBitVector::constant(2, 0)).ite(a[31][0], 
-        (b == SymBitVector::constant(2, 1)).ite(a[63][32], 
-        (b == SymBitVector::constant(2, 2)).ite(a[95][64], 
-        (b == SymBitVector::constant(2, 3)).ite(a[127][96], a[127][96])))); 
+    return (b == SymBitVector::constant(2, 0)).ite(a[31][0],
+           (b == SymBitVector::constant(2, 1)).ite(a[63][32],
+               (b == SymBitVector::constant(2, 2)).ite(a[95][64],
+                   (b == SymBitVector::constant(2, 3)).ite(a[127][96], a[127][96]))));
   }
 
   /** Adds an opcode to our internal maps */
