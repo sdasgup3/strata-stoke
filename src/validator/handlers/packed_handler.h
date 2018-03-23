@@ -379,6 +379,64 @@ public:
     }, 32);
 
     // Extend Base
+
+    // Extend Strata Base: vpermilps
+    add_opcode("vpermilps", [this] (SymBitVector a, SymBitVector b) {
+      auto dest_width = a.width();
+      auto result = select4(a[127][0], b[1][0]);
+
+      size_t i = 1;
+      for (size_t k = 0; k < dest_width/128; k++, i = 0) {
+        for (; i < 4; i++ ) {
+          result = select4(a[127+128*k][128*k], b[1+32*i + 128*k][32*i + 128*k]) || result;
+        }
+      }
+      return result;
+    }, 0);
+
+    // Extend Strata Base: vpermilpd
+    add_opcode("vpermilpd", [this] (SymBitVector a, SymBitVector b) {
+      auto dest_width = a.width();
+      auto result = (b[1][1] == SymBitVector::constant(1,0)).ite(a[63][0], a[127][64]);
+
+      size_t i = 1;
+      for (size_t k = 0; k < dest_width/128; k++, i = 0) {
+        for (; i < 2; i++ ) {
+          result = (b[1 + 64*i + 128*k][1 + 64*i + 128*k] == SymBitVector::constant(1,0)).ite(a[63 + 128*k][128*k], 
+              a[63 + 64 + 128*k][64 + 128*k]) || result;
+        }
+      }
+      return result;
+    }, 0);
+
+
+    // Extend Strata Base: vpermps
+    add_opcode("vpermps", [this] (SymBitVector a, SymBitVector b) {
+      auto dest_width = a.width();
+
+      auto result = (b[255][0] >> ( (SymBitVector::constant(253,0) || a[2][0]) * SymBitVector::constant(256,32)))[31][0];
+
+      for (size_t i = 1; i < dest_width/32; i++ ) {
+        result = (b[255][0] >> ( (SymBitVector::constant(253,0) || a[2 + 32*i][32*i]) * SymBitVector::constant(256,32)))[31][0] || result;
+      }
+      return result;
+    }, 0);
+
+    // Extend Strata Base: vpermd
+    add_opcode("vpermd", [this] (SymBitVector a, SymBitVector b) {
+      auto dest_width = a.width();
+
+      auto result = (b[255][0] >> ( (SymBitVector::constant(253,0) || a[2][0]) * SymBitVector::constant(256,32)))[31][0];
+
+      for (size_t i = 1; i < dest_width/32; i++ ) {
+        result = (b[255][0] >> ( (SymBitVector::constant(253,0) || a[2 + 32*i][32*i]) * SymBitVector::constant(256,32)))[31][0] || result;
+      }
+
+      return result;
+    }, 0);
+
+
+
     // Extend Strata Base: phminposuw
     add_opcode("phminposuw", [this] (SymBitVector a, SymBitVector b) {
       auto dest_width = a.width();
@@ -1303,8 +1361,14 @@ private:
   }
 
   SymBitVector absolute(SymBitVector a, SymBitVector b) {
-    //return (a-b).s_lt(SymBitVector::constant(a.width(), 0)).ite(b-a, a-b);
     return (a>b).ite(a-b, b-a);
+  }
+
+  SymBitVector select4(SymBitVector a, SymBitVector b) {
+    return (b == SymBitVector::constant(2, 0)).ite(a[31][0], 
+        (b == SymBitVector::constant(2, 1)).ite(a[63][32], 
+        (b == SymBitVector::constant(2, 2)).ite(a[95][64], 
+        (b == SymBitVector::constant(2, 3)).ite(a[127][96], a[127][96])))); 
   }
 
   /** Adds an opcode to our internal maps */
