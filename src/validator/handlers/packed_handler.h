@@ -144,25 +144,25 @@ public:
     }, 64, 32, true, true);
 
     /*
-    // Strata Bug: Correct implementation is in simple_handler   
+    // Strata Bug: Correct implementation is in simple_handler
     add_opcode("cvtsi2sdl", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int32_to_double", 64, {32});
       return f(b);
     }, 32, 64, true, true);
 
-    // Strata Bug   
+    // Strata Bug
     add_opcode("cvtsi2sdq", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int64_to_double", 64, {64});
       return f(b);
     }, 64, 64, true, true);
 
-    // Strata Bug   
+    // Strata Bug
     add_opcode("cvtsi2ssl", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int32_to_single", 32, {32});
       return f(b);
     }, 32, 32, true, true);
 
-    // Strata Bug   
+    // Strata Bug
     add_opcode("cvtsi2ssq", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_int64_to_single", 32, {64});
       return f(b);

@@ -410,16 +410,16 @@ void SimpleHandler::add_all() {
     else
       ss.set(dst, result, true);
   });
-  
+
   // Extend Strata Base:  cvtsi2ssl/cvtsi2ssq
   add_opcode_str({"cvtsi2ssl", "cvtsi2ssq"},
   [this] (Operand dst, Operand src1, SymBitVector a, SymBitVector b, SymState& ss) {
     auto src_width = b.width();
-    if(32 == src_width) {
+    if (32 == src_width) {
       SymFunction f("cvt_int32_to_single", 32, {32});
       ss.set(dst, a[127][32] ||  f(b));
     }
-    if(64 == src_width) {
+    if (64 == src_width) {
       SymFunction f("cvt_int64_to_single", 32, {64});
       ss.set(dst, a[127][32] ||  f(b));
     }
@@ -430,11 +430,11 @@ void SimpleHandler::add_all() {
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
 
     auto src_width = b.width();
-    if(32 == src_width) {
+    if (32 == src_width) {
       SymFunction f("cvt_int32_to_single", 32, {32});
       ss.set(dst, a[127][32] ||  f(b), true);
     }
-    if(64 == src_width) {
+    if (64 == src_width) {
       SymFunction f("cvt_int64_to_single", 32, {64});
       ss.set(dst, a[127][32] ||  f(b), true);
     }
@@ -444,11 +444,11 @@ void SimpleHandler::add_all() {
   add_opcode_str({"cvtsi2sdl", "cvtsi2sdq"},
   [this] (Operand dst, Operand src1, SymBitVector a, SymBitVector b, SymState& ss) {
     auto src_width = b.width();
-    if(32 == src_width) {
+    if (32 == src_width) {
       SymFunction f("cvt_int32_to_double", 64, {32});
       ss.set(dst, a[127][64] ||  f(b));
     }
-    if(64 == src_width) {
+    if (64 == src_width) {
       SymFunction f("cvt_int64_to_double", 64, {64});
       ss.set(dst, a[127][64] ||  f(b));
     }
@@ -459,11 +459,11 @@ void SimpleHandler::add_all() {
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
 
     auto src_width = b.width();
-    if(32 == src_width) {
+    if (32 == src_width) {
       SymFunction f("cvt_int32_to_double", 64, {32});
       ss.set(dst, a[127][64] ||  f(b), true);
     }
-    if(64 == src_width) {
+    if (64 == src_width) {
       SymFunction f("cvt_int64_to_double", 64, {64});
       ss.set(dst, a[127][64] ||  f(b), true);
     }
@@ -771,7 +771,7 @@ void SimpleHandler::add_all() {
     ss.set(dst, result, true);
   });
 
-  // Extend Strata Base: vfmaddsub132pd 
+  // Extend Strata Base: vfmaddsub132pd
   // (cannot have it in packed_handler as this need 3rd src operand and that handlercould not support that)
   add_opcode_str({"vfmaddsub132pd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
@@ -782,15 +782,15 @@ void SimpleHandler::add_all() {
     SymFunction g("vfmsub132_double", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-   // Extend Strata Base: vfmaddsub132ps 
+  // Extend Strata Base: vfmaddsub132ps
   add_opcode_str({"vfmaddsub132ps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -800,15 +800,15 @@ void SimpleHandler::add_all() {
     SymFunction g("vfmsub132_single", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-  // Extend Strata Base: vfmsubadd132pd 
+  // Extend Strata Base: vfmsubadd132pd
   add_opcode_str({"vfmsubadd132pd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -818,15 +818,15 @@ void SimpleHandler::add_all() {
     SymFunction f("vfmsub132_double", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-   // Extend Strata Base: vfmsubadd132ps 
+  // Extend Strata Base: vfmsubadd132ps
   add_opcode_str({"vfmsubadd132ps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -836,15 +836,15 @@ void SimpleHandler::add_all() {
     SymFunction f("vfmsub132_single", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-  // Extend Strata Base: vfmaddsub213pd 
+  // Extend Strata Base: vfmaddsub213pd
   add_opcode_str({"vfmaddsub213pd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -854,15 +854,15 @@ void SimpleHandler::add_all() {
     SymFunction g("vfmsub213_double", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-   // Extend Strata Base: vfmaddsub213ps 
+  // Extend Strata Base: vfmaddsub213ps
   add_opcode_str({"vfmaddsub213ps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -872,15 +872,15 @@ void SimpleHandler::add_all() {
     SymFunction g("vfmsub213_single", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-  // Extend Strata Base: vfmsubadd213pd 
+  // Extend Strata Base: vfmsubadd213pd
   add_opcode_str({"vfmsubadd213pd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -890,15 +890,15 @@ void SimpleHandler::add_all() {
     SymFunction f("vfmsub213_double", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-   // Extend Strata Base: vfmsubadd213ps 
+  // Extend Strata Base: vfmsubadd213ps
   add_opcode_str({"vfmsubadd213ps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -908,15 +908,15 @@ void SimpleHandler::add_all() {
     SymFunction f("vfmsub213_single", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-  // Extend Strata Base: vfmaddsub231pd 
+  // Extend Strata Base: vfmaddsub231pd
   add_opcode_str({"vfmaddsub231pd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -926,15 +926,15 @@ void SimpleHandler::add_all() {
     SymFunction g("vfmsub231_double", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-   // Extend Strata Base: vfmaddsub231ps 
+  // Extend Strata Base: vfmaddsub231ps
   add_opcode_str({"vfmaddsub231ps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -944,15 +944,15 @@ void SimpleHandler::add_all() {
     SymFunction g("vfmsub231_single", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-  // Extend Strata Base: vfmsubadd231pd 
+  // Extend Strata Base: vfmsubadd231pd
   add_opcode_str({"vfmsubadd231pd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -962,15 +962,15 @@ void SimpleHandler::add_all() {
     SymFunction f("vfmsub231_double", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/128; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/128; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
   });
 
-   // Extend Strata Base: vfmsubadd231ps 
+  // Extend Strata Base: vfmsubadd231ps
   add_opcode_str({"vfmsubadd231ps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     auto dest_size = a.width();
@@ -980,9 +980,9 @@ void SimpleHandler::add_all() {
     SymFunction f("vfmsub231_single", vec_size, {vec_size, vec_size, vec_size});
 
     auto result = f(a[2*vec_size-1][vec_size], b[2*vec_size-1][vec_size], c[2*vec_size-1][vec_size]) || g(a[(vec_size-1)][0], b[(vec_size-1)][0], c[(vec_size-1)][0]);
-    for(size_t i = 2 ; i < 2*dest_size/64; i+=2) {
-      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)]) 
-          || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
+    for (size_t i = 2 ; i < 2*dest_size/64; i+=2) {
+      result = f(a[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], b[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)], c[(vec_size-1)+vec_size*(i+1)][vec_size*(i+1)])
+               || g(a[(vec_size-1)+vec_size*i][vec_size*i], b[(vec_size-1)+vec_size*i][vec_size*i], c[(vec_size-1)+vec_size*i][vec_size*i]) || result;
     }
 
     ss.set(dst, result, true);
