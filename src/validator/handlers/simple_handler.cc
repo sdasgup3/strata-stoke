@@ -395,7 +395,7 @@ void SimpleHandler::add_all() {
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = a.width();
 
-    auto result = (-b) & b; 
+    auto result = (-b) & b;
     ss.set(dst, result);
 
     ss.set_szp_flags(result, dest_width);
@@ -410,7 +410,7 @@ void SimpleHandler::add_all() {
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = d.width();
 
-     auto select_ = [&](SymBitVector src, SymBitVector idx ) {
+    auto select_ = [&](SymBitVector src, SymBitVector idx ) {
       auto res = SymBitVector::constant(dest_width, 0);
       for (size_t i = 1; i < dest_width; i++) {
         auto cond = idx == SymBitVector::constant(8, i);
@@ -438,7 +438,7 @@ void SimpleHandler::add_all() {
     auto dest_width = d1.width();
 
     auto s1 = ss[Constants::edx()];
-    if(64 == dest_width ) {
+    if (64 == dest_width ) {
       s1 = ss[Constants::rdx()];
     }
 
@@ -455,7 +455,7 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
     auto temp = a;
     auto mask = b;
-    
+
     auto select_ = [&](SymBitVector src, int start) {
       int i = start;
       SymBitVector res = SymBitVector::constant(1,0);
@@ -483,7 +483,7 @@ void SimpleHandler::add_all() {
     auto temp = a;
     auto mask = b;
     auto one = SymBitVector::constant(dest_width, 1);
-    
+
     auto select_byte = [&](SymBitVector src, int n_bytes, SymBitVector idx) {
       SymBitVector res = src[0][0];
       for (int i = 1; i < n_bytes; i++) {
@@ -511,7 +511,7 @@ void SimpleHandler::add_all() {
   add_opcode_str({"tzcntw", "tzcntl", "tzcntq"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = a.width();
-    
+
     auto result = SymBitVector::constant(dest_width, dest_width);
 
     for (int i = dest_width - 1; i >= 0; --i) {
@@ -532,7 +532,7 @@ void SimpleHandler::add_all() {
   add_opcode_str({"lzcntw", "lzcntl", "lzcntq"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = a.width();
-    
+
     auto result = SymBitVector::constant(dest_width, dest_width);
 
     for (size_t i = 0 ; i < dest_width; i++) {
@@ -547,7 +547,7 @@ void SimpleHandler::add_all() {
     ss.set(eflags_sf, SymBool::tmp_var());
     ss.set(eflags_pf, SymBool::tmp_var());
     ss.set(eflags_af, SymBool::tmp_var());
-    });
+  });
 
 
   // Extend Strata Base:  vcvtph2ps
