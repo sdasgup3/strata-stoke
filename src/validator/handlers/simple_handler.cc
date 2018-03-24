@@ -390,6 +390,166 @@ void SimpleHandler::add_all() {
 
   // Extendng Base
 
+  // Extend Strata Base:  blsil/q
+  add_opcode_str({"blsiq", "blsil"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+
+    auto result = (-b) & b; 
+    ss.set(dst, result);
+
+    ss.set_szp_flags(result, dest_width);
+    ss.set(eflags_pf, SymBool::tmp_var());
+    ss.set(eflags_af, SymBool::tmp_var());
+    ss.set(eflags_cf, b != SymBitVector::constant(dest_width, 0));
+    ss.set(eflags_of, SymBool::_false());
+  });
+
+  // Extend Strata Base:  bzhil(q)
+  add_opcode_str({"bzhil", "bzhiq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+
+     auto select_ = [&](SymBitVector src, SymBitVector idx ) {
+      auto res = SymBitVector::constant(dest_width, 0);
+      for (size_t i = 1; i < dest_width; i++) {
+        auto cond = idx == SymBitVector::constant(8, i);
+        res = cond.ite(SymBitVector::constant(dest_width - i, 0) || src[i-1][0], res);
+      }
+      return res;
+    };
+
+    auto index = b[7][0];
+    auto result = select_(a, index);
+
+    ss.set(dst, result);
+    ss.set_szp_flags(result, dest_width);
+    ss.set(eflags_cf, index >=  SymBitVector::constant(8,dest_width));
+    ss.set(eflags_pf, SymBool::tmp_var());
+    ss.set(eflags_af, SymBool::tmp_var());
+
+  });
+
+
+  // Extend Strata Base:  mulxl(q)
+
+  add_opcode_str({"mulxl", "mulxq"},
+  [this] (Operand dst1, Operand dst2, Operand src2, SymBitVector d1, SymBitVector d2, SymBitVector s2, SymState& ss) {
+    auto dest_width = d1.width();
+
+    auto s1 = ss[Constants::edx()];
+    if(64 == dest_width ) {
+      s1 = ss[Constants::rdx()];
+    }
+
+    auto us1 = SymBitVector::constant(dest_width, 0) || s1;
+    auto us2 = SymBitVector::constant(dest_width, 0) || s2;
+
+    ss.set(dst2, (us1*us2)[dest_width-1][0]);
+    ss.set(dst1, (us1*us2)[2*dest_width-1][dest_width]);
+  });
+
+  /* Extend Strata Base:  pextl(q)
+  add_opcode_str({"pextl", "pextq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+    auto temp = a;
+    auto mask = b;
+    
+    auto select_ = [&](SymBitVector src, int start) {
+      int i = start;
+      SymBitVector res = SymBitVector::constant(1,0);
+      for ( i = start; i < dest_width; i++) {
+        auto cond = mask[i][i] == SymBitVector::constant(1, 1);
+        res = cond.ite(src[i][i], res);
+      }
+      return res;
+    };
+
+    size_t m = 0;
+    auto result = select_(temp, 0);
+    for (m = 1; m < dest_width; m++) {
+      result = select_(temp, m) || result;
+    }
+
+    ss.set(dst, result);
+  });
+  */
+
+  // Extend Strata Base:  pdepl(q)
+  add_opcode_str({"pdepl", "pdepq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+    auto temp = a;
+    auto mask = b;
+    auto one = SymBitVector::constant(dest_width, 1);
+    
+    auto select_byte = [&](SymBitVector src, int n_bytes, SymBitVector idx) {
+      SymBitVector res = src[0][0];
+      for (int i = 1; i < n_bytes; i++) {
+        auto cond = idx == SymBitVector::constant(dest_width, i);
+        res = cond.ite(src[i][i], res);
+      }
+      return res;
+    };
+
+    size_t m = 0;
+    auto k_bv = SymBitVector::constant(dest_width, 0);
+    auto result = (mask[m][m] == SymBitVector::constant(1, 1)).ite( select_byte(temp, dest_width, k_bv), SymBitVector::constant(1, 0));
+    k_bv = (mask[m][m] == SymBitVector::constant(1, 1)).ite(k_bv + one, k_bv);
+
+    for (m = 1; m < dest_width; m++) {
+      result = (mask[m][m] == SymBitVector::constant(1, 1)).ite( select_byte(temp, dest_width, k_bv), SymBitVector::constant(1, 0)) || result;
+      k_bv = (mask[m][m] == SymBitVector::constant(1, 1)).ite(k_bv + one, k_bv);
+    }
+
+    ss.set(dst, result);
+  });
+
+
+  // Extend Strata Base:  tzcntw(l/q)
+  add_opcode_str({"tzcntw", "tzcntl", "tzcntq"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+    
+    auto result = SymBitVector::constant(dest_width, dest_width);
+
+    for (int i = dest_width - 1; i >= 0; --i) {
+      result = (b[i][i] == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(dest_width, i), result);
+    }
+
+    ss.set(dst, result);
+    ss.set(eflags_cf, result == SymBitVector::constant(dest_width, dest_width));
+    ss.set(eflags_zf, result == SymBitVector::constant(dest_width, 0));
+
+    ss.set(eflags_of, SymBool::tmp_var());
+    ss.set(eflags_sf, SymBool::tmp_var());
+    ss.set(eflags_pf, SymBool::tmp_var());
+    ss.set(eflags_af, SymBool::tmp_var());
+  });
+
+  // Extend Strata Base:  lzcntw(l/q)
+  add_opcode_str({"lzcntw", "lzcntl", "lzcntq"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+    
+    auto result = SymBitVector::constant(dest_width, dest_width);
+
+    for (size_t i = 0 ; i < dest_width; i++) {
+      result = (b[i][i] == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(dest_width, dest_width - i - 1), result);
+    }
+
+    ss.set(dst, result);
+    ss.set(eflags_cf, result == SymBitVector::constant(dest_width, dest_width));
+    ss.set(eflags_zf, result == SymBitVector::constant(dest_width, 0));
+
+    ss.set(eflags_of, SymBool::tmp_var());
+    ss.set(eflags_sf, SymBool::tmp_var());
+    ss.set(eflags_pf, SymBool::tmp_var());
+    ss.set(eflags_af, SymBool::tmp_var());
+    });
+
+
   // Extend Strata Base:  vcvtph2ps
   // This is not an avx or avx2 instr, so cannot get binefited from
   // packed handler infrastructure.
@@ -1006,6 +1166,47 @@ void SimpleHandler::add_all() {
   */
 
   // End Extend Strata
+
+  // Borrowed from master Stoke
+
+  add_opcode_str({"pshufb"},
+  [this] (Operand dst, Operand src, SymBitVector b, SymBitVector c, SymState& ss) {
+
+    // lots of case splits, so may not be very efficient
+
+    // also, could be easily adapted to support non-v version of the instruction
+
+    auto select_byte = [](SymBitVector src, int n_bytes, SymBitVector idx) {
+      SymBitVector res = src[7][0];
+      for (int i = 1; i < n_bytes; i++) {
+        auto cond = idx == SymBitVector::constant(4, i);
+        res = cond.ite(src[i*8+7][i*8], res);
+      }
+      return res;
+    };
+
+    int n_bytes = dst.size()/8;
+    if (n_bytes > 16) n_bytes = 16;
+
+    SymBitVector result;
+    for (size_t i = 0; i < 16; ++i) {
+      auto cond = (c[i*8+7][i*8+7]) == SymBitVector::constant(1, 1);
+      auto idx = c[i*8+3][i*8+0]; // == SRC2[(i*8)+3 .. (i*8)+0]
+      auto byte = select_byte(b[127][0], n_bytes, idx);
+      result = cond.ite(SymBitVector::constant(8, 0), byte) || result;
+    }
+    if (dst.size() == 256) {
+      for (size_t i = 0; i < 16; ++i) {
+        auto cond = (c[128+i*8+7][128+i*8+7]) == SymBitVector::constant(1, 1);
+        auto idx = c[128+i*8+3][128+i*8+0]; // == SRC2[(i*8)+3 .. (i*8)+0]
+        auto byte = select_byte(b[128+127][128+0], n_bytes, idx);
+        result = cond.ite(SymBitVector::constant(8, 0), byte) || result;
+      }
+    }
+    ss.set(dst, result, true);
+  });
+
+  // End Borrowed from master Stoke
 
   // for min/max|ss/sd: can't be done with packed handler because the upper 96/64 bits are from src1, not dest in the v variant
 
