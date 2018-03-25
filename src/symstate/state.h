@@ -30,13 +30,17 @@ class SymState {
 public:
 
   /** Returns a new symbolic CPU state filled with 0s*/
-  SymState() : gp(16, 64), sse(16, 256), memory(NULL), delete_memory_(false) { }
+  SymState() : gp(16, 64), sse(16, 256), memory(NULL), delete_memory_(false) { 
+    keep_imm_symbolic = false;
+  }
   /** Builds a symbolic CPU state from a concrete one */
   SymState(const CpuState& cs) : gp(16, 64), sse(16, 256) {
+    keep_imm_symbolic = false;
     build_from_cpustate(cs);
   }
   /** Builds a symbolic CPU state with variable name suffix */
   SymState(const std::string& suffix, bool no_suffix = false) : gp(16, 64), sse(16, 256), memory(NULL), delete_memory_(false) {
+    keep_imm_symbolic = false;
     build_with_suffix(suffix, no_suffix);
   }
 
@@ -45,6 +49,8 @@ public:
     //   delete memory;
   }
 
+  /** Flag to print ims as symbolic values */
+  bool keep_imm_symbolic; 
   /** Symbolic general purpose registers */
   SymRegs gp;
   /** Symbolic SSE registers */
@@ -127,6 +133,10 @@ public:
 
   /** Replace symbolic values with variables and add constraints.*/
   void simplify();
+
+  void set_keep_imm_symbolic() {
+    keep_imm_symbolic = true;
+  }
 
 private:
 

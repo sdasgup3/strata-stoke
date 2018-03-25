@@ -66,6 +66,10 @@ cpputil::ValueArg<std::string>& strata_path_arg =
   .description("The path to the directory with the strata circuits (a collection of .s files)")
   .default_val("");
 
+auto& keep_imm_symbolic_arg =
+  FlagArg::create("keep_imm_symbolic")
+  .description("Should immediates be kept symbolic?");
+
 template <typename T>
 string out_padded(T t, size_t min_length, char pad = ' ') {
   stringstream ss;
@@ -146,6 +150,11 @@ int main(int argc, char** argv) {
 
   ComboHandler ch(strata_path_arg.value());
   SymState state("", true);
+
+
+  if(keep_imm_symbolic_arg.value()) {
+    state.set_keep_imm_symbolic();
+  }
 
   // TODO: doesn't handle memory
 

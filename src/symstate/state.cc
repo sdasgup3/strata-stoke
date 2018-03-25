@@ -151,10 +151,11 @@ SymBitVector SymState::lookup(const Operand o) const {
 
   if (o.is_gp_register()) {
     auto& r = reinterpret_cast<const R&>(o);
-    if (o.size() != 64)
+    if (o.size() != 64) {
       return gp[r][o.size() - 1][0];
-    else
+    } else {
       return gp[r];
+    }
   }
 
   if (o.type() == Type::XMM || o.type() == Type::XMM_0) {
@@ -169,7 +170,11 @@ SymBitVector SymState::lookup(const Operand o) const {
 
   if (o.is_immediate()) {
     auto& imm = reinterpret_cast<const Imm&>(o);
-    return SymBitVector::constant(o.size(), imm);
+    if(keep_imm_symbolic) {
+      return SymBitVector::var(o.size(), "imm");
+    } else {
+      return SymBitVector::constant(o.size(), imm);
+    }
   }
 
   assert(false);
