@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
   SymState state("", true);
 
 
-  if(keep_imm_symbolic_arg.value()) {
+  if (keep_imm_symbolic_arg.value()) {
     state.set_keep_imm_symbolic();
   }
 

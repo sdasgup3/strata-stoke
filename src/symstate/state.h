@@ -30,7 +30,7 @@ class SymState {
 public:
 
   /** Returns a new symbolic CPU state filled with 0s*/
-  SymState() : gp(16, 64), sse(16, 256), memory(NULL), delete_memory_(false) { 
+  SymState() : gp(16, 64), sse(16, 256), memory(NULL), delete_memory_(false) {
     keep_imm_symbolic = false;
   }
   /** Builds a symbolic CPU state from a concrete one */
@@ -50,7 +50,7 @@ public:
   }
 
   /** Flag to print ims as symbolic values */
-  bool keep_imm_symbolic; 
+  bool keep_imm_symbolic;
   /** Symbolic general purpose registers */
   SymRegs gp;
   /** Symbolic SSE registers */
