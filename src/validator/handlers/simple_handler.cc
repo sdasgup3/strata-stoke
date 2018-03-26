@@ -388,6 +388,54 @@ void SimpleHandler::add_all() {
 
   });
 
+  // Extend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
+  // roundsd
+  add_opcode_str({"roundsd"},
+  [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
+    short unsigned int vec_len = 64;
+    SymFunction f("cvt_double_to_int64_rm", vec_len, {vec_len, 8});
+    auto dest_width = d.width();
+
+    auto result = d[dest_width-1][vec_len] || f(s[vec_len-1][0], imm);
+    ss.set(dst, result);
+  });
+
+  // vroundsd
+  add_opcode_str({"vroundsd"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d, SymBitVector s1, SymBitVector s2, SymBitVector imm, SymState& ss) {
+    short unsigned int vec_len = 64;
+    SymFunction f("cvt_double_to_int64_rm", vec_len, {vec_len, 8});
+    auto dest_width = d.width();
+
+    auto result = s1[dest_width-1][vec_len] || f(s2[vec_len-1][0], imm);
+    ss.set(dst, result, true);
+  });
+
+  // roundss
+  add_opcode_str({"roundss"},
+  [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
+    short unsigned int vec_len = 64;
+    SymFunction f("cvt_single_to_int32_rm", vec_len, {vec_len, 8});
+    auto dest_width = d.width();
+
+    auto result = d[dest_width-1][vec_len] || f(s[vec_len-1][0], imm);
+    ss.set(dst, result);
+  });
+
+  // vroundss
+  add_opcode_str({"vroundss"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d, SymBitVector s1, SymBitVector s2, SymBitVector imm, SymState& ss) {
+    short unsigned int vec_len = 64;
+    SymFunction f("cvt_single_to_int32_rm", vec_len, {vec_len, 8});
+    auto dest_width = d.width();
+
+    auto result = s1[dest_width-1][vec_len] || f(s2[vec_len-1][0], imm);
+    ss.set(dst, result, true);
+  });
+  
+
+  // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
+
   // Extendng Base
 
   // Extend Strata Base:  blsil/q
