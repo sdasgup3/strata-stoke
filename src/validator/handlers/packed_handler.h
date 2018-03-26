@@ -388,7 +388,7 @@ public:
       return a + b;
     }, 32);
 
-    // Extend Immediate Instructions; Ungeneralized; Unstratified; Unstoked 
+    // Extend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
     // roundpd
     add_opcode("roundpd", [] (SymBitVector a, SymBitVector b, SymBitVector imm, uint16_t k) {
       short unsigned int vec_len = 64;
@@ -424,7 +424,7 @@ public:
       auto src = b;
 
       auto select_ = [&](SymBitVector dest, SymBitVector offset, uint16_t high, uint16_t low) {
-       if(offset.width() == 1) {
+        if (offset.width() == 1) {
           auto slice0 = SymBitVector::constant(8, 0) || dest[0*32+high][0*32+low];
           auto slice1 = SymBitVector::constant(8, 0) || dest[1*32+high][1*32+low];
           return (offset == SymBitVector::constant(1, 0x0)).ite(slice0, slice1);
@@ -434,15 +434,15 @@ public:
           auto slice2 = SymBitVector::constant(8,0) || dest[2*32+high][2*32+low];
           auto slice3 = SymBitVector::constant(8,0) || dest[3*32+high][3*32+low];
           return (offset == SymBitVector::constant(2, 0x0)).ite(slice0,
-                  (offset == SymBitVector::constant(2, 0x1)).ite(slice1,
-                  (offset == SymBitVector::constant(2, 0x2)).ite(slice2,
-                  (offset == SymBitVector::constant(2, 0x3)).ite(slice3,
-                  slice3))));
+                 (offset == SymBitVector::constant(2, 0x1)).ite(slice1,
+                     (offset == SymBitVector::constant(2, 0x2)).ite(slice2,
+                         (offset == SymBitVector::constant(2, 0x3)).ite(slice3,
+                             slice3))));
         }
       };
 
       auto result = SymBitVector::constant(dest_width, 0);
-      for(size_t i = 0, k = 0 ; i < dest_width/128; i++, k += 3) {
+      for (size_t i = 0, k = 0 ; i < dest_width/128; i++, k += 3) {
         auto src_offset = imm8[k+1][k];
         auto dest_offset = imm8[k+2][k+2];
 
@@ -463,65 +463,65 @@ public:
         auto dest_byte9  = select_(dest, dest_offset, 79 + 128*i, 72 + 128*i);
         auto dest_byte10 = select_(dest, dest_offset, 87 + 128*i, 80 + 128*i);
 
-        auto temp0 = absoluteUnsignedDifference(dest_byte0 , src_byte0);
-        auto temp1 = absoluteUnsignedDifference(dest_byte1 , src_byte1);
-        auto temp2 = absoluteUnsignedDifference(dest_byte2 , src_byte2);
-        auto temp3 = absoluteUnsignedDifference(dest_byte3 , src_byte3);
+        auto temp0 = absoluteUnsignedDifference(dest_byte0, src_byte0);
+        auto temp1 = absoluteUnsignedDifference(dest_byte1, src_byte1);
+        auto temp2 = absoluteUnsignedDifference(dest_byte2, src_byte2);
+        auto temp3 = absoluteUnsignedDifference(dest_byte3, src_byte3);
 
-        if(i == 0) {
+        if (i == 0) {
           result = (temp0 + temp1 + temp2 + temp3);
         } else {
           result = (temp0 + temp1 + temp2 + temp3) || result;
         }
 
-        temp0 = absoluteUnsignedDifference(dest_byte1 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte2 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte3 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte4 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte1, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte2, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte3, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte4, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
 
-        temp0 = absoluteUnsignedDifference(dest_byte2 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte3 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte4 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte5 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte2, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte3, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte4, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte5, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
 
-        temp0 = absoluteUnsignedDifference(dest_byte3 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte4 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte5 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte6 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte3, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte4, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte5, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte6, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
 
-        temp0 = absoluteUnsignedDifference(dest_byte4 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte5 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte6 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte7 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte4, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte5, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte6, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte7, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
 
-        temp0 = absoluteUnsignedDifference(dest_byte5 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte6 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte7 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte8 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte5, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte6, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte7, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte8, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
 
-        temp0 = absoluteUnsignedDifference(dest_byte6 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte7 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte8 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte9 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte6, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte7, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte8, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte9, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
 
-        temp0 = absoluteUnsignedDifference(dest_byte7 , src_byte0);
-        temp1 = absoluteUnsignedDifference(dest_byte8 , src_byte1);
-        temp2 = absoluteUnsignedDifference(dest_byte9 , src_byte2);
-        temp3 = absoluteUnsignedDifference(dest_byte10 , src_byte3);
+        temp0 = absoluteUnsignedDifference(dest_byte7, src_byte0);
+        temp1 = absoluteUnsignedDifference(dest_byte8, src_byte1);
+        temp2 = absoluteUnsignedDifference(dest_byte9, src_byte2);
+        temp3 = absoluteUnsignedDifference(dest_byte10, src_byte3);
         result = (temp0 + temp1 + temp2 + temp3) || result;
       }
-    
+
       return result;
     }, 0, 0);
 
 
-    // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked 
+    // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
 
     // Extend Register Instructions; Unstratified; Unstoked
     // vpermilps

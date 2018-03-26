@@ -432,7 +432,7 @@ void SimpleHandler::add_all() {
     auto result = s1[dest_width-1][vec_len] || f(s2[vec_len-1][0], imm);
     ss.set(dst, result, true);
   });
-  
+
 
   // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
 
