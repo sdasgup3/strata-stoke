@@ -388,6 +388,154 @@ void SimpleHandler::add_all() {
 
   });
 
+  // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
+  add_opcode_str({"pextrw", "vpextrw"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 16;
+    uint64_t offset = constant & (128/vec_len - 1);
+    auto dest_width = a.width();
+
+    ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
+  });
+
+  add_opcode_str({"pextrb", "vpextrb"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 8;
+    uint64_t offset = constant & (128/vec_len - 1);
+    auto dest_width = a.width();
+
+    ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
+  });    
+
+  add_opcode_str({"pextrq", "vpextrq"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 64;
+    uint64_t offset = constant & (128/vec_len - 1);
+    auto dest_width = a.width();
+
+    ss.set(dst, (b >> offset*vec_len)[vec_len-1][0]);
+  });
+
+  add_opcode_str({"pextrd", "vpextrd"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 32;
+    uint64_t offset = constant & (128/vec_len - 1);
+    auto dest_width = a.width();
+
+    ss.set(dst, (b >> offset*vec_len)[vec_len-1][0]);
+  });
+
+  // pinsrb
+  add_opcode_str({"pinsrb"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 8;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp);
+  });
+
+  // vpinsrb
+  add_opcode_str({"vpinsrb"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 8;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp, true);
+  });
+
+  // pinsrw
+  add_opcode_str({"pinsrw"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 16;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp);
+  });
+
+  // vpinsrw
+  add_opcode_str({"vpinsrw"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 16;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp, true);
+  });
+
+  // pinsrd
+  add_opcode_str({"pinsrd"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 32;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffffffff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp);
+  });
+
+  // vpinsrd
+  add_opcode_str({"vpinsrd"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 32;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffffffff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp, true);
+  });
+
+   // vpinsrq
+  add_opcode_str({"vpinsrq"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 64;
+    auto dest_width = a.width();
+    auto src_width = b.width();
+    uint64_t offset = constant & (dest_width/vec_len - 1);
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffffffffffffffff) << offset*vec_len);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+
+    ss.set(dst, (a & !mask) | temp, true);
+  });
+
+  // END Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
+
   // Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
   // The following are borrowed from master stoke
   add_opcode_str({"palignr"},
