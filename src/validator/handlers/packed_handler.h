@@ -388,7 +388,92 @@ public:
       return a + b;
     }, 32);
 
+    // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
+    // blendpd
+    add_opcode("blendpd", [] (SymBitVector a, SymBitVector b, SymBitVector imm, uint16_t k) {
+      short unsigned int vec_len = 64;
+      auto dest_width = a.width();
+
+      auto result = SymBitVector::constant(vec_len, 0);
+      for (size_t i = 0; i < dest_width/vec_len; i++) {
+        if(0 == i) {
+          result = (imm[i][i] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]);
+        } else {
+          result = (imm[i][i] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]) 
+              || result;
+        }
+      }
+
+      return result;
+    }, 0, 0);
+
+    // blendps
+    add_opcode("blendps", [] (SymBitVector a, SymBitVector b, SymBitVector imm, uint16_t k) {
+      short unsigned int vec_len = 32;
+      auto dest_width = a.width();
+
+      auto result = SymBitVector::constant(vec_len, 0);
+      for (size_t i = 0; i < dest_width/vec_len; i++) {
+        if(0 == i) {
+          result = (imm[i][i] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]);
+        } else {
+          result = (imm[i][i] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]) 
+              || result;
+        }
+      }
+
+      return result;
+    }, 0, 0);
+
+    // blendd
+    add_opcode("vpblendd", [] (SymBitVector a, SymBitVector b, SymBitVector imm, uint16_t k) {
+      short unsigned int vec_len = 32;
+      auto dest_width = a.width();
+
+      auto result = SymBitVector::constant(vec_len, 0);
+      for (size_t i = 0; i < dest_width/vec_len; i++) {
+        if(0 == i) {
+          result = (imm[i][i] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]);
+        } else {
+          result = (imm[i][i] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]) 
+              || result;
+        }
+      }
+
+      return result;
+    }, 0, 0);
+
+    // blendw
+    add_opcode("pblendw", [] (SymBitVector a, SymBitVector b, SymBitVector imm, uint16_t k) {
+      short unsigned int vec_len = 16;
+      auto dest_width = a.width();
+
+      auto result = SymBitVector::constant(vec_len, 0);
+      for (size_t i = 0; i < dest_width/vec_len; i++) {
+        if(0 == i) {
+          result = (imm[i%8][i%8] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]);
+        } else {
+          result = (imm[i%8][i%8] == SymBitVector::constant(1, 0)).ite(
+              a[vec_len -1 + vec_len*i][vec_len*i], b[vec_len -1 + vec_len*i][vec_len*i]) 
+              || result;
+        }
+      }
+
+      return result;
+    }, 0, 0);
+
+
+    // END Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
+
     // Extend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
+ 
     // roundpd
     add_opcode("roundpd", [] (SymBitVector a, SymBitVector b, SymBitVector imm, uint16_t k) {
       short unsigned int vec_len = 64;
@@ -521,7 +606,7 @@ public:
     }, 0, 0);
 
 
-    // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
+    // END Extend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
 
     // Extend Register Instructions; Unstratified; Unstoked
     // vpermilps
