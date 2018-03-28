@@ -407,7 +407,7 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
-  });    
+  });
 
   add_opcode_str({"pextrq", "vpextrq"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
@@ -519,7 +519,7 @@ void SimpleHandler::add_all() {
     ss.set(dst, (a & !mask) | temp, true);
   });
 
-   // vpinsrq
+  // vpinsrq
   add_opcode_str({"vpinsrq"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
