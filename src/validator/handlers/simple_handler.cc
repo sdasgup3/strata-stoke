@@ -467,7 +467,7 @@ void SimpleHandler::add_all() {
     ss.set(dst, result, true);
   });
 
-    add_opcode_str({"shufpd"},
+  add_opcode_str({"shufpd"},
                  [this] (Operand dst, Operand src, Operand ctl,
   SymBitVector arg1, SymBitVector arg2, SymBitVector imm, SymState& ss) {
 
@@ -542,7 +542,7 @@ void SimpleHandler::add_all() {
   // pclmulqdq
   add_opcode_str({"pclmulqdq"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector a, SymBitVector b,  SymBitVector imm8, SymState& ss) {
-  
+
     auto temp1 = (imm8[0][0] == SymBitVector::constant(1, 0)).ite(a[63][0], a[127][64]);
     auto temp2 = (imm8[4][4] == SymBitVector::constant(1, 0)).ite(b[63][0], b[127][64]);
 
@@ -555,7 +555,7 @@ void SimpleHandler::add_all() {
         tempB[i]  = tempB[i] ^ (temp1[j][j] & temp2[i-j][i-j]);
       }
 
-      if(0 == i) {
+      if (0 == i) {
         result = tempB[i];
       } else {
         result = tempB[i] || result;
@@ -577,7 +577,7 @@ void SimpleHandler::add_all() {
   // vpclmulqdq
   add_opcode_str({"vpclmulqdq"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector a, SymBitVector b,  SymBitVector imm8, SymState& ss) {
-  
+
     auto temp1 = (imm8[0][0] == SymBitVector::constant(1, 0)).ite(a[63][0], a[127][64]);
     auto temp2 = (imm8[4][4] == SymBitVector::constant(1, 0)).ite(b[63][0], b[127][64]);
 
@@ -590,7 +590,7 @@ void SimpleHandler::add_all() {
         tempB[i]  = tempB[i] ^ (temp1[j][j] & temp2[i-j][i-j]);
       }
 
-      if(0 == i) {
+      if (0 == i) {
         result = tempB[i];
       } else {
         result = tempB[i] || result;
@@ -616,7 +616,7 @@ void SimpleHandler::add_all() {
     auto dest_width_bv = SymBitVector::constant(dest_width, dest_width);
 
     auto mask =  (SymBitVector::constant(dest_width - 8, 0) || imm8) & SymBitVector::constant(dest_width, 0x1f);
-    if(64 == dest_width ) {
+    if (64 == dest_width ) {
       mask =  (SymBitVector::constant(dest_width - 8, 0) || imm8) & SymBitVector::constant(dest_width, 0x3f);
     }
 
@@ -636,7 +636,7 @@ void SimpleHandler::add_all() {
     for (size_t i = 1; i < dest_width/vec_len; i++) {
       cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
       result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0))
-          || result;
+                || result;
     }
 
     ss.set(dst, result);
@@ -654,7 +654,7 @@ void SimpleHandler::add_all() {
     for (size_t i = 1; i < dest_width/vec_len; i++) {
       cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
       result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0))
-          || result;
+                || result;
     }
 
     ss.set(dst, result, true);
@@ -689,7 +689,7 @@ void SimpleHandler::add_all() {
     for (size_t i = 1; i < dest_width/vec_len; i++) {
       cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
       result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0))
-          || result;
+                || result;
     }
 
     ss.set(dst, result, true);
@@ -766,7 +766,7 @@ void SimpleHandler::add_all() {
     }
 
     auto pad = dest_width - (src_width/src_vec_len)*dest_vec_len;
-    if(pad > 0) {
+    if (pad > 0) {
       result = SymBitVector::constant(pad, 0) || result;
     }
 
