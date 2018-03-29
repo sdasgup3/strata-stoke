@@ -390,6 +390,52 @@ void SimpleHandler::add_all() {
 
   // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
 
+  // pslldq
+  add_opcode_str({"pslldq"},
+  [this] (Operand dst, Operand src, SymBitVector d, SymBitVector a, SymState& ss) {
+    auto dest_width = d.width();
+    auto count  = (a > SymBitVector::constant(8, 15)).ite(SymBitVector::constant(8, 16), a);
+
+    auto result = (d << ((SymBitVector::constant(dest_width - 8, 0) || count) << 3));
+    ss.set(dst, result);
+  });
+
+  // vpslldq
+  add_opcode_str({"vpslldq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d1, SymBitVector d, SymBitVector a, SymState& ss) {
+    auto dest_width = d1.width();
+    auto count  = (a > SymBitVector::constant(8, 15)).ite(SymBitVector::constant(8, 16), a);
+
+    auto result = (d[127][0] << ((SymBitVector::constant(dest_width - 8, 0) || count) << 3));
+    for (size_t k = 1 ; k < dest_width/128; k++) {
+      result = (d[127+128*k][128*k] << ((SymBitVector::constant(dest_width - 8, 0) || count) << 3)) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  // psrldq
+  add_opcode_str({"psrldq"},
+  [this] (Operand dst, Operand src, SymBitVector d, SymBitVector a, SymState& ss) {
+    auto dest_width = d.width();
+    auto count  = (a > SymBitVector::constant(8, 15)).ite(SymBitVector::constant(8, 16), a);
+
+    auto result = (d >> ((SymBitVector::constant(dest_width - 8, 0) || count) << 3));
+    ss.set(dst, result);
+  });
+
+  // vpsrldq
+  add_opcode_str({"vpsrldq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d1, SymBitVector d, SymBitVector a, SymState& ss) {
+    auto dest_width = d1.width();
+    auto count  = (a > SymBitVector::constant(8, 15)).ite(SymBitVector::constant(8, 16), a);
+
+    auto result = (d[127][0] >> ((SymBitVector::constant(dest_width - 8, 0) || count) << 3));
+    for (size_t k = 1 ; k < dest_width/128; k++) {
+      result = (d[127+128*k][128*k] >> ((SymBitVector::constant(dest_width - 8, 0) || count) << 3)) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
   // vpermq/vpermpd
   add_opcode_str({"vpermq", "vpermpd"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
@@ -862,7 +908,7 @@ void SimpleHandler::add_all() {
 
   // vcmppd
   add_opcode_str({"vcmppd"},
-  [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d1, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 64;
     SymFunction f("cmp_double_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
@@ -898,7 +944,7 @@ void SimpleHandler::add_all() {
 
   // vcmpps
   add_opcode_str({"vcmpps"},
-  [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d1, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 32;
     SymFunction f("cmp_single_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
@@ -930,7 +976,7 @@ void SimpleHandler::add_all() {
 
   // vcmpsd
   add_opcode_str({"vcmpsd"},
-  [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d1, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 64;
     SymFunction f("cmp_double_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
@@ -958,7 +1004,7 @@ void SimpleHandler::add_all() {
 
   // vcmpss
   add_opcode_str({"vcmpss"},
-  [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d1, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 32;
     SymFunction f("cmp_single_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
@@ -1039,7 +1085,59 @@ void SimpleHandler::add_all() {
 
   // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
 
-  // Extendng Base
+  // Extend Register Instructions; Unstratified; Unstoked
+
+  // vpermilps
+  add_opcode_str({"vpermilps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+
+    auto select4 = [&](SymBitVector a, SymBitVector b ) {
+    return (b == SymBitVector::constant(2, 0)).ite(a[31][0],
+           (b == SymBitVector::constant(2, 1)).ite(a[63][32],
+               (b == SymBitVector::constant(2, 2)).ite(a[95][64],
+                   (b == SymBitVector::constant(2, 3)).ite(a[127][96], a[127][96]))));
+  };
+
+      auto result = select4(a[127][0], b[1][0]);
+
+      size_t i = 1;
+      for (size_t k = 0; k < dest_width/128; k++, i = 0) {
+        for (; i < 4; i++ ) {
+          auto mask = b[1+2*i][2*i];
+          if(b.width() > 8) {
+            mask = b[1+32*i + 128*k][32*i + 128*k];
+          }
+          result = select4(a[127+128*k][128*k], mask) || result;
+        }
+      }
+      ss.set(dst, result, true);
+    });
+
+
+    // vpermilpd
+  add_opcode_str({"vpermilpd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+      auto dest_width = d.width();
+      auto mask = b[0][0];
+      if(b.width() > 8) {
+        mask = b[1][1];
+      }
+      auto result = (mask == SymBitVector::constant(1,0)).ite(a[63][0], a[127][64]);
+
+      size_t i = 1;
+      for (size_t k = 0; k < dest_width/128; k++, i = 0) {
+        for (; i < 2; i++ ) {
+          auto mask = b[i+2*k][i+2*k];
+          if(b.width() > 8) {
+            mask = b[1 + 64*i + 128*k][1 + 64*i + 128*k];
+          }
+          result = (mask == SymBitVector::constant(1,0)).ite(a[63 + 128*k][128*k],
+                   a[63 + 64 + 128*k][64 + 128*k]) || result;
+        }
+      }
+      ss.set(dst, result, true);
+    });
 
   // Extend Strata Base:  blsil/q
   add_opcode_str({"blsiq", "blsil"},
@@ -1816,7 +1914,7 @@ void SimpleHandler::add_all() {
   });
   */
 
-  // End Extend Strata
+  // END Extend Register Instructions; Unstratified; Unstoked
 
   // Borrowed from master Stoke
 
