@@ -397,7 +397,7 @@ public:
 
       auto temp1_1 = (c[4][4] == SymBitVector::constant(1, 1)).ite(f(a[63][0], b[63][0]), SymBitVector::constant(64, 0x0));
       auto temp1_2 = (c[5][5] == SymBitVector::constant(1, 1)).ite(f(a[127][64], b[127][64]), SymBitVector::constant(64, 0x0));
-      auto temp2 = g(temp1_1 , temp1_2);
+      auto temp2 = g(temp1_1, temp1_2);
 
       auto result = (c[1][1] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0)) ||
                     (c[0][0] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0));
@@ -415,9 +415,9 @@ public:
       auto temp1_3 = (c[6][6] == SymBitVector::constant(1, 1)).ite(f(a[95][64], b[95][64]), SymBitVector::constant(32, 0x0));
       auto temp1_4 = (c[7][7] == SymBitVector::constant(1, 1)).ite(f(a[127][96], b[127][96]), SymBitVector::constant(32, 0x0));
 
-      auto temp2 = g(temp1_1 , temp1_2);
-      auto temp3 = g(temp1_3 , temp1_4);
-      auto temp4 = g(temp2   ,   temp3);
+      auto temp2 = g(temp1_1, temp1_2);
+      auto temp3 = g(temp1_3, temp1_4);
+      auto temp4 = g(temp2,   temp3);
 
       auto result = (c[3][3] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
                     (c[2][2] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
