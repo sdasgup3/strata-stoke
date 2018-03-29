@@ -389,6 +389,76 @@ void SimpleHandler::add_all() {
   });
 
   // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
+
+  // vpermq/vpermpd
+  add_opcode_str({"vpermq", "vpermpd"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    short unsigned int vec_len = 64;
+    auto src_width = b.width();
+    auto dest_width = a.width();
+
+    auto result = SymBitVector::constant(256,0);
+    for(size_t k = 0 ; k < dest_width/vec_len; k++) {
+      if(0 == k) {
+        result = (b >> ((SymBitVector::constant(254, 0) || c[1+2*k][2*k]) << 6))[vec_len-1][0];
+      } else {
+        result = (b >> ((SymBitVector::constant(254, 0) || c[1+2*k][2*k]) << 6))[vec_len-1][0] || result;
+      }
+    }
+    
+    ss.set(dst, result, true);
+  });
+
+  // vperm2i128/vperm2f128
+  add_opcode_str({"vperm2i128", "vperm2f128"},
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    short unsigned int vec_len = 64;
+    auto src_width = b.width();
+    auto dest_width = a.width();
+
+    auto result = (c[1][0] == SymBitVector::constant(2, 0)).ite(a[127][0], 
+            (c[1][0] == SymBitVector::constant(2, 1)).ite(a[255][128], 
+            (c[1][0] == SymBitVector::constant(2, 2)).ite(b[127][0], 
+            (c[1][0] == SymBitVector::constant(2, 3)).ite(b[255][128], b[255][128]))));
+
+    result = (c[5][4] == SymBitVector::constant(2, 0)).ite(a[127][0], 
+             (c[5][4] == SymBitVector::constant(2, 1)).ite(a[255][128], 
+             (c[5][4] == SymBitVector::constant(2, 2)).ite(b[127][0], 
+             (c[5][4] == SymBitVector::constant(2, 3)).ite(b[255][128], b[255][128])))) || result;
+
+    result = (c[3][3] == SymBitVector::constant(1, 1)).ite(result[255][128] || SymBitVector::constant(128, 0x0), result);
+    result = (c[7][7] == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(128, 0x0) || result[127][0], result);
+    ss.set(dst, result, true);
+  });
+
+  // extractps/vextractps
+  add_opcode_str({"extractps", "vextractps"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    short unsigned int vec_len = 32;
+    auto src_width = b.width();
+    auto dest_width = a.width();
+    uint64_t offset = constant & (src_width/vec_len - 1);
+
+    if(64 == dest_width) {
+      ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || ((b >> (offset*vec_len))[vec_len-1][0]) ); 
+    } else {
+      ss.set(dst, (b >> (offset*vec_len))[vec_len-1][0]); 
+    }
+  });
+
+  // vextractf128/vextracti128
+  add_opcode_str({"vextractf128", "vextracti128"},
+  [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    ss.set(dst, (c[0][0] ==  SymBitVector::constant(1, 0)).ite(b[127][0], b[255][128]), true);
+  });
+
+  // vinsertf128
+  add_opcode_str({"vinsertf128", "vinserti128"},
+  [this] (Operand dst, Operand src1,  Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    ss.set(dst, (c[0][0] ==  SymBitVector::constant(1, 0)).ite(a[255][128] || b[127][0], b[127][0] || a[127][0]), true);
+  });
+
   add_opcode_str({"pextrw", "vpextrw"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
@@ -776,13 +846,13 @@ void SimpleHandler::add_all() {
   add_opcode_str({"cmppd"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 64;
-    SymFunction f("cmp_double_pred", 1, {vec_len, 8});
+    SymFunction f("cmp_double_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
-    auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0));
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
+    auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0000000000000000));
     for (size_t i = 1; i < dest_width/vec_len; i++) {
-      cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
+      cmp =  f(d[vec_len-1 + i*vec_len][vec_len*i], s[vec_len-1 + i*vec_len][vec_len*i], imm);
       result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0))
                 || result;
     }
@@ -794,13 +864,13 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vcmppd"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 64;
-    SymFunction f("cmp_double_pred", vec_len, {vec_len, 8});
+    SymFunction f("cmp_double_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0000000000000000));
     for (size_t i = 1; i < dest_width/vec_len; i++) {
-      cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
+      cmp =  f(d[vec_len-1 + i*vec_len][vec_len*i], s[vec_len-1 + i*vec_len][vec_len*i], imm);
       result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0))
                 || result;
     }
@@ -812,30 +882,31 @@ void SimpleHandler::add_all() {
   add_opcode_str({"cmpps"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 32;
-    SymFunction f("cmp_single_pred", 1, {vec_len, 8});
+    SymFunction f("cmp_single_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0));
     for (size_t i = 1; i < dest_width/vec_len; i++) {
-      cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
-      result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0)) || result;
+      cmp =  f(d[vec_len-1 + i*vec_len][vec_len*i], s[vec_len-1 + i*vec_len][vec_len*i], imm);
+      result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0))
+                || result;
     }
 
-    ss.set(dst, result);
+    ss.set(dst, result);  
   });
 
   // vcmpps
   add_opcode_str({"vcmpps"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 32;
-    SymFunction f("cmp_single_pred", vec_len, {vec_len, 8});
+    SymFunction f("cmp_single_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0));
     for (size_t i = 1; i < dest_width/vec_len; i++) {
-      cmp =  f(s[vec_len-1 + i*vec_len][vec_len*i], imm);
+      cmp =  f(d[vec_len-1 + i*vec_len][vec_len*i], s[vec_len-1 + i*vec_len][vec_len*i], imm);
       result =  (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0))
                 || result;
     }
@@ -847,10 +918,10 @@ void SimpleHandler::add_all() {
   add_opcode_str({"cmpsd"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 64;
-    SymFunction f("cmp_double_pred", 1, {vec_len, 8});
+    SymFunction f("cmp_double_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0));
 
     result =  d[dest_width-1][vec_len] || result;
@@ -861,10 +932,10 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vcmpsd"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 64;
-    SymFunction f("cmp_double_pred", 1, {vec_len, 8});
+    SymFunction f("cmp_double_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffffffffffff), SymBitVector::constant(vec_len, 0x0));
 
     result =  d[dest_width-1][vec_len] || result;
@@ -875,10 +946,10 @@ void SimpleHandler::add_all() {
   add_opcode_str({"cmpss"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 32;
-    SymFunction f("cmp_single_pred", 1, {vec_len, 8});
+    SymFunction f("cmp_single_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0));
 
     result =  d[dest_width-1][vec_len] || result;
@@ -889,10 +960,10 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vcmpss"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
     short unsigned int vec_len = 32;
-    SymFunction f("cmp_single_pred", 1, {vec_len, 8});
+    SymFunction f("cmp_single_pred", 1, {vec_len, vec_len, 8});
     auto dest_width = d.width();
 
-    auto cmp = f(s[vec_len-1][0], imm);
+    auto cmp = f(d[vec_len-1][0], s[vec_len-1][0], imm);
     auto result = (cmp == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(vec_len, 0xffffffff), SymBitVector::constant(vec_len, 0x0));
 
     result =  d[dest_width-1][vec_len] || result;
