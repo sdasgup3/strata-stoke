@@ -396,8 +396,8 @@ public:
       uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
       auto result = SymBitVector::constant(128, 0);
 
-      for(size_t k = 0 ; k < dest_width/128; k++) {
-        if(0 == k) {
+      for (size_t k = 0 ; k < dest_width/128; k++) {
+        if (0 == k) {
           result = b[63+128*k][0+128*k];
         } else {
           result = b[63+128*k][0+128*k] || result;
@@ -420,21 +420,21 @@ public:
       auto zmask   = imm8[3][0];
 
       auto temp = (count_s == SymBitVector::constant(2, 0x0)).ite(
-            b[31][0], (count_s == SymBitVector::constant(2, 0x1)).ite(
-            b[63][32], (count_s == SymBitVector::constant(2, 0x2)).ite(
-            b[95][64], (count_s == SymBitVector::constant(2, 0x3)).ite(
-            b[127][96], b[127][96]))));
+                    b[31][0], (count_s == SymBitVector::constant(2, 0x1)).ite(
+                      b[63][32], (count_s == SymBitVector::constant(2, 0x2)).ite(
+                        b[95][64], (count_s == SymBitVector::constant(2, 0x3)).ite(
+                          b[127][96], b[127][96]))));
 
-      auto temp2 =      (count_d == SymBitVector::constant(2, 0x0)).ite( a[127][32] || temp,   
-                        (count_d == SymBitVector::constant(2, 0x1)).ite( a[127][64] || temp || a[31][0],  
-                        (count_d == SymBitVector::constant(2, 0x2)).ite( a[127][96] || temp || a[63][0],
-                        (count_d == SymBitVector::constant(2, 0x3)).ite( temp || a[95][0], temp || a[95][0]))));
+      auto temp2 =      (count_d == SymBitVector::constant(2, 0x0)).ite( a[127][32] || temp,
+                        (count_d == SymBitVector::constant(2, 0x1)).ite( a[127][64] || temp || a[31][0],
+                            (count_d == SymBitVector::constant(2, 0x2)).ite( a[127][96] || temp || a[63][0],
+                                (count_d == SymBitVector::constant(2, 0x3)).ite( temp || a[95][0], temp || a[95][0]))));
 
       auto result = (zmask[3][3] == SymBitVector::constant(1, 0x1)).ite(SymBitVector::constant(32, 0x0), temp2[127][96])
                     || (zmask[2][2] == SymBitVector::constant(1, 0x1)).ite(SymBitVector::constant(32, 0x0), temp2[95][64])
                     || (zmask[1][1] == SymBitVector::constant(1, 0x1)).ite(SymBitVector::constant(32, 0x0), temp2[63][32])
                     || (zmask[0][0] == SymBitVector::constant(1, 0x1)).ite(SymBitVector::constant(32, 0x0), temp2[31][0]);
-                          
+
       return result;
     }, 0, 0);
 

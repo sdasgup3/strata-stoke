@@ -398,14 +398,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto result = SymBitVector::constant(256,0);
-    for(size_t k = 0 ; k < dest_width/vec_len; k++) {
-      if(0 == k) {
+    for (size_t k = 0 ; k < dest_width/vec_len; k++) {
+      if (0 == k) {
         result = (b >> ((SymBitVector::constant(254, 0) || c[1+2*k][2*k]) << 6))[vec_len-1][0];
       } else {
         result = (b >> ((SymBitVector::constant(254, 0) || c[1+2*k][2*k]) << 6))[vec_len-1][0] || result;
       }
     }
-    
+
     ss.set(dst, result, true);
   });
 
@@ -416,15 +416,15 @@ void SimpleHandler::add_all() {
     auto src_width = b.width();
     auto dest_width = a.width();
 
-    auto result = (c[1][0] == SymBitVector::constant(2, 0)).ite(a[127][0], 
-            (c[1][0] == SymBitVector::constant(2, 1)).ite(a[255][128], 
-            (c[1][0] == SymBitVector::constant(2, 2)).ite(b[127][0], 
-            (c[1][0] == SymBitVector::constant(2, 3)).ite(b[255][128], b[255][128]))));
+    auto result = (c[1][0] == SymBitVector::constant(2, 0)).ite(a[127][0],
+                  (c[1][0] == SymBitVector::constant(2, 1)).ite(a[255][128],
+                      (c[1][0] == SymBitVector::constant(2, 2)).ite(b[127][0],
+                          (c[1][0] == SymBitVector::constant(2, 3)).ite(b[255][128], b[255][128]))));
 
-    result = (c[5][4] == SymBitVector::constant(2, 0)).ite(a[127][0], 
-             (c[5][4] == SymBitVector::constant(2, 1)).ite(a[255][128], 
-             (c[5][4] == SymBitVector::constant(2, 2)).ite(b[127][0], 
-             (c[5][4] == SymBitVector::constant(2, 3)).ite(b[255][128], b[255][128])))) || result;
+    result = (c[5][4] == SymBitVector::constant(2, 0)).ite(a[127][0],
+             (c[5][4] == SymBitVector::constant(2, 1)).ite(a[255][128],
+                 (c[5][4] == SymBitVector::constant(2, 2)).ite(b[127][0],
+                     (c[5][4] == SymBitVector::constant(2, 3)).ite(b[255][128], b[255][128])))) || result;
 
     result = (c[3][3] == SymBitVector::constant(1, 1)).ite(result[255][128] || SymBitVector::constant(128, 0x0), result);
     result = (c[7][7] == SymBitVector::constant(1, 1)).ite(SymBitVector::constant(128, 0x0) || result[127][0], result);
@@ -440,10 +440,10 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
     uint64_t offset = constant & (src_width/vec_len - 1);
 
-    if(64 == dest_width) {
-      ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || ((b >> (offset*vec_len))[vec_len-1][0]) ); 
+    if (64 == dest_width) {
+      ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || ((b >> (offset*vec_len))[vec_len-1][0]) );
     } else {
-      ss.set(dst, (b >> (offset*vec_len))[vec_len-1][0]); 
+      ss.set(dst, (b >> (offset*vec_len))[vec_len-1][0]);
     }
   });
 
@@ -893,7 +893,7 @@ void SimpleHandler::add_all() {
                 || result;
     }
 
-    ss.set(dst, result);  
+    ss.set(dst, result);
   });
 
   // vcmpps
