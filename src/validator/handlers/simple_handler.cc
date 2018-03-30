@@ -396,9 +396,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
@@ -412,9 +412,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
@@ -428,9 +428,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
@@ -444,9 +444,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
@@ -460,9 +460,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
@@ -476,9 +476,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
@@ -493,9 +493,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
@@ -509,9 +509,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
@@ -525,9 +525,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
@@ -541,9 +541,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
@@ -557,9 +557,9 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
@@ -573,16 +573,16 @@ void SimpleHandler::add_all() {
     if (b.width() != a.width())
       amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
 
-      
+
     auto result =  a[vec_len-1][0] << amt;
-    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
     ss.set(dst, result, true);
   });
 
- 
+
   // END Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
 
 
