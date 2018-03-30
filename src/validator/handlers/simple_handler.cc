@@ -1403,7 +1403,7 @@ void SimpleHandler::add_all() {
   add_opcode_str({"psrad"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     auto b_ = b;
-    if(b.width() == 8) {
+    if (b.width() == 8) {
       b_ = SymBitVector::constant(a.width()-8, 0) || b;
     }
 
@@ -1426,7 +1426,7 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vpsrad"},
   [] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     auto b_ = b;
-    if(b.width() == 8) {
+    if (b.width() == 8) {
       b_ = SymBitVector::constant(a.width()-8, 0) || b;
     }
 
@@ -1448,7 +1448,7 @@ void SimpleHandler::add_all() {
   add_opcode_str({"psraw"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
     auto b_ = b;
-    if(b.width() == 8) {
+    if (b.width() == 8) {
       b_ = SymBitVector::constant(a.width()-8, 0) || b;
     }
 
@@ -1471,7 +1471,7 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vpsraw"},
   [] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     auto b_ = b;
-    if(b.width() == 8) {
+    if (b.width() == 8) {
       b_ = SymBitVector::constant(a.width()-8, 0) || b;
     }
 
