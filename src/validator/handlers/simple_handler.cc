@@ -387,6 +387,204 @@ void SimpleHandler::add_all() {
     ss.set_szp_flags(a + one, dst.size());
 
   });
+  // Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
+  // Borrowed from master stoke
+  add_opcode_str({"psllw"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 16;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  add_opcode_str({"vpsllw"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 16;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"pslld"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 32;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  add_opcode_str({"vpslld"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 32;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"psllq"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 64;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  add_opcode_str({"vpsllq"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 64;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+
+  add_opcode_str({"psrlw"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 16;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  add_opcode_str({"vpsrlw"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 16;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"psrld"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 32;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  add_opcode_str({"vpsrld"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 32;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"psrlq"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 64;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    }
+
+    ss.set(dst, result);
+  });
+
+  add_opcode_str({"vpsrlq"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto amt = b;
+    short unsigned int vec_len = 64;
+    if (b.width() != a.width())
+      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+
+      
+    auto result =  a[vec_len-1][0] << amt;
+    for(size_t i = 1 ; i < a.width()/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    }
+
+    ss.set(dst, result, true);
+  });
+
+ 
+  // END Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
+
 
   // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
 
@@ -404,11 +602,12 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vpslldq"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d1, SymBitVector d, SymBitVector a, SymState& ss) {
     auto dest_width = d1.width();
+    short unsigned int vec_len = 128;
     auto count  = (a > SymBitVector::constant(8, 15)).ite(SymBitVector::constant(8, 16), a);
 
-    auto result = (d[127][0] << ((SymBitVector::constant(dest_width - 8, 0) || count) << 3));
-    for (size_t k = 1 ; k < dest_width/128; k++) {
-      result = (d[127+128*k][128*k] << ((SymBitVector::constant(dest_width - 8, 0) || count) << 3)) || result;
+    auto result = (d[vec_len-1][0] << ((SymBitVector::constant(vec_len - 8, 0) || count) << 3));
+    for (size_t k = 1 ; k < dest_width/vec_len; k++) {
+      result = (d[(vec_len-1) + vec_len*k][vec_len*k] << ((SymBitVector::constant(vec_len - 8, 0) || count) << 3)) || result;
     }
     ss.set(dst, result, true);
   });
@@ -427,11 +626,12 @@ void SimpleHandler::add_all() {
   add_opcode_str({"vpsrldq"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d1, SymBitVector d, SymBitVector a, SymState& ss) {
     auto dest_width = d1.width();
+    short unsigned int vec_len = 128;
     auto count  = (a > SymBitVector::constant(8, 15)).ite(SymBitVector::constant(8, 16), a);
 
-    auto result = (d[127][0] >> ((SymBitVector::constant(dest_width - 8, 0) || count) << 3));
-    for (size_t k = 1 ; k < dest_width/128; k++) {
-      result = (d[127+128*k][128*k] >> ((SymBitVector::constant(dest_width - 8, 0) || count) << 3)) || result;
+    auto result = (d[vec_len-1][0] >> ((SymBitVector::constant(vec_len - 8, 0) || count) << 3));
+    for (size_t k = 1 ; k < dest_width/vec_len; k++) {
+      result = (d[(vec_len-1)+vec_len*k][vec_len*k] >> ((SymBitVector::constant(vec_len - 8, 0) || count) << 3)) || result;
     }
     ss.set(dst, result, true);
   });

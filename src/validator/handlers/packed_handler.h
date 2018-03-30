@@ -388,48 +388,6 @@ public:
       return a + b;
     }, 32);
 
-    // Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
-    // Borrowed from master stoke
-    add_opcode("psllw", [] (SymBitVector a, SymBitVector b) {
-      auto amt = b;
-      if (b.width() != a.width())
-        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
-      return a << amt;
-    }, 16);
-    add_opcode("pslld", [] (SymBitVector a, SymBitVector b) {
-      auto amt = b;
-      if (b.width() != a.width())
-        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
-      return a << amt;
-    }, 32);
-    add_opcode("psllq", [] (SymBitVector a, SymBitVector b) {
-      auto amt = b;
-      if (b.width() != a.width())
-        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
-      return a << amt;
-    }, 64);
-
-    add_opcode("psrlw", [] (SymBitVector a, SymBitVector b) {
-      auto amt = b;
-      if (b.width() != a.width())
-        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
-      return a >> amt;
-    }, 16);
-    add_opcode("psrld", [] (SymBitVector a, SymBitVector b) {
-      auto amt = b;
-      if (b.width() != a.width())
-        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
-      return a >> amt;
-    }, 32);
-    add_opcode("psrlq", [] (SymBitVector a, SymBitVector b) {
-      auto amt = b;
-      if (b.width() != a.width())
-        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
-      return a >> amt;
-    }, 64);
-
-    // END Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
-
     // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
 
     // dppd
@@ -451,21 +409,34 @@ public:
     add_opcode("dpps", [] (SymBitVector a, SymBitVector b, SymBitVector c, uint16_t k) {
       SymFunction f("mul_single", 32, {32, 32});
       SymFunction g("add_double", 32, {32, 32});
+      auto dest_width = a.width();
+      short unsigned int vec_len = 128;
 
-      auto temp1_1 = (c[4][4] == SymBitVector::constant(1, 1)).ite(f(a[31][0], b[31][0]), SymBitVector::constant(32, 0x0));
-      auto temp1_2 = (c[5][5] == SymBitVector::constant(1, 1)).ite(f(a[63][32], b[63][32]), SymBitVector::constant(32, 0x0));
-      auto temp1_3 = (c[6][6] == SymBitVector::constant(1, 1)).ite(f(a[95][64], b[95][64]), SymBitVector::constant(32, 0x0));
-      auto temp1_4 = (c[7][7] == SymBitVector::constant(1, 1)).ite(f(a[127][96], b[127][96]), SymBitVector::constant(32, 0x0));
+      auto dp_primitive = [&](SymBitVector a, SymBitVector b, SymBitVector c) {
+        auto temp1_1 = (c[4][4] == SymBitVector::constant(1, 1)).ite(f(a[31][0], b[31][0]), SymBitVector::constant(32, 0x0));
+        auto temp1_2 = (c[5][5] == SymBitVector::constant(1, 1)).ite(f(a[63][32], b[63][32]), SymBitVector::constant(32, 0x0));
+        auto temp1_3 = (c[6][6] == SymBitVector::constant(1, 1)).ite(f(a[95][64], b[95][64]), SymBitVector::constant(32, 0x0));
+        auto temp1_4 = (c[7][7] == SymBitVector::constant(1, 1)).ite(f(a[127][96], b[127][96]), SymBitVector::constant(32, 0x0));
 
-      auto temp2 = g(temp1_1, temp1_2);
-      auto temp3 = g(temp1_3, temp1_4);
-      auto temp4 = g(temp2,   temp3);
+        auto temp2 = g(temp1_1, temp1_2);
+        auto temp3 = g(temp1_3, temp1_4);
+        auto temp4 = g(temp2,   temp3);
 
-      auto result = (c[3][3] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
-                    (c[2][2] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
-                    (c[1][1] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
-                    (c[0][0] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0));
+        auto result = (c[3][3] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
+                      (c[2][2] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
+                      (c[1][1] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0)) ||
+                      (c[0][0] == SymBitVector::constant(1, 1)).ite(temp4, SymBitVector::constant(32, 0x0));
+        return result;
+      };
+
+      size_t i = 0;
+      auto  result = dp_primitive(a[vec_len-1 + vec_len*i][vec_len*i], b[vec_len-1 + vec_len*i][vec_len*i], c);
+      for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+        result = dp_primitive(a[vec_len-1 + vec_len*i][vec_len*i], b[vec_len-1 + vec_len*i][vec_len*i], c) || result;
+      }
+
       return result;
+
     }, 0, 0);
 
     // pshufhw
@@ -480,10 +451,10 @@ public:
         } else {
           result = b[63+128*k][0+128*k] || result;
         }
-        result = (b >> ((SymBitVector::constant(126, 0) ||  c[1][0]) << 4))[79 + 128*k][64 + 128*k] || result;
-        result = (b >> ((SymBitVector::constant(126, 0) ||  c[3][2]) << 4))[79 + 128*k][64 + 128*k] || result;
-        result = (b >> ((SymBitVector::constant(126, 0) ||  c[5][4]) << 4))[79 + 128*k][64 + 128*k] || result;
-        result = (b >> ((SymBitVector::constant(126, 0) ||  c[7][6]) << 4))[79 + 128*k][64 + 128*k] || result;
+        result = (b >> ((SymBitVector::constant(dest_width - 2, 0) ||  c[1][0]) << 4))[79 + 128*k][64 + 128*k] || result;
+        result = (b >> ((SymBitVector::constant(dest_width - 2, 0) ||  c[3][2]) << 4))[79 + 128*k][64 + 128*k] || result;
+        result = (b >> ((SymBitVector::constant(dest_width - 2, 0) ||  c[5][4]) << 4))[79 + 128*k][64 + 128*k] || result;
+        result = (b >> ((SymBitVector::constant(dest_width - 2, 0) ||  c[7][6]) << 4))[79 + 128*k][64 + 128*k] || result;
       }
       return result;
     }, 0, 0);
