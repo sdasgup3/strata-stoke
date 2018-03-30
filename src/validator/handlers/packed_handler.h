@@ -388,6 +388,48 @@ public:
       return a + b;
     }, 32);
 
+    // Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
+    // Borrowed from master stoke
+    add_opcode("psllw", [] (SymBitVector a, SymBitVector b) {
+      auto amt = b;
+      if (b.width() != a.width())
+        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+      return a << amt;
+    }, 16);
+    add_opcode("pslld", [] (SymBitVector a, SymBitVector b) {
+      auto amt = b;
+      if (b.width() != a.width())
+        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+      return a << amt;
+    }, 32);
+    add_opcode("psllq", [] (SymBitVector a, SymBitVector b) {
+      auto amt = b;
+      if (b.width() != a.width())
+        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+      return a << amt;
+    }, 64);
+
+    add_opcode("psrlw", [] (SymBitVector a, SymBitVector b) {
+      auto amt = b;
+      if (b.width() != a.width())
+        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+      return a >> amt;
+    }, 16);
+    add_opcode("psrld", [] (SymBitVector a, SymBitVector b) {
+      auto amt = b;
+      if (b.width() != a.width())
+        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+      return a >> amt;
+    }, 32);
+    add_opcode("psrlq", [] (SymBitVector a, SymBitVector b) {
+      auto amt = b;
+      if (b.width() != a.width())
+        amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+      return a >> amt;
+    }, 64);
+
+    // END Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
+
     // Extend Immediate Instructions; Ungeneralized; Stratified; UnStoked
 
     // dppd
@@ -1556,17 +1598,17 @@ private:
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, SymState& ss) {
-      assert(!has_constant_);
+      //assert(!has_constant_);
       return binop_(bv1, bv2);
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, x64asm::Operand arg3, SymBitVector bv3, SymState& ss) {
-      assert(!has_constant_);
+      //assert(!has_constant_);
       return ternaryop_(bv1, bv2, bv3);
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, SymState& ss, SymBitVector imm, uint16_t k) {
-      assert(has_constant_);
+      //assert(has_constant_);
       return binop_with_constant_(bv1, bv2, imm, k);
     }
 

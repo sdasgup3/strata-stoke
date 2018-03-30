@@ -140,8 +140,8 @@ int main(int argc, char** argv) {
   auto is_eq = [&solver](auto& reg, auto a_in, auto b_in, stringstream& explanation) {
     auto a = (a_in);
     auto b = (b_in);
-    //std::cout << a << "\n\n";
-    //std::cout << b << "\n";
+    //std::cout << SymSimplify().simplify(a) << "\n\n";
+    //std::cout << SymSimplify().simplify(b) << "\n";
 
     SymBool eq = a == b;
     SymPrettyVisitor pretty(explanation);

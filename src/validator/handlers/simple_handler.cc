@@ -1402,9 +1402,15 @@ void SimpleHandler::add_all() {
   // Extend Strata Base: psrad
   add_opcode_str({"psrad"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto b_ = b;
+    if(b.width() == 8) {
+      b_ = SymBitVector::constant(a.width()-8, 0) || b;
+    }
+
     auto shift_count1 = SymBitVector::constant(32, 32);
-    auto shift_count2 = b[31][0];
-    auto bb = b[63][0];
+    auto shift_count2 = b_[31][0];
+    auto bb = b_[63][0];
+
     auto const_ = SymBitVector::constant(64, 31);
     auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
 
@@ -1419,9 +1425,14 @@ void SimpleHandler::add_all() {
   // Extend Strata Base: vpsrad
   add_opcode_str({"vpsrad"},
   [] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto b_ = b;
+    if(b.width() == 8) {
+      b_ = SymBitVector::constant(a.width()-8, 0) || b;
+    }
+
     auto shift_count1 = SymBitVector::constant(32, 32);
-    auto shift_count2 = b[31][0];
-    auto bb = b[63][0];
+    auto shift_count2 = b_[31][0];
+    auto bb = b_[63][0];
     auto const_ = SymBitVector::constant(64, 31);
     auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
 
@@ -1436,9 +1447,14 @@ void SimpleHandler::add_all() {
   // Extend Strata Base: psraw
   add_opcode_str({"psraw"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto b_ = b;
+    if(b.width() == 8) {
+      b_ = SymBitVector::constant(a.width()-8, 0) || b;
+    }
+
     auto shift_count1 = SymBitVector::constant(16, 16);
-    auto shift_count2 = b[15][0];
-    auto bb = b[63][0];
+    auto shift_count2 = b_[15][0];
+    auto bb = b_[63][0];
     auto const_ = SymBitVector::constant(64, 15);
     auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
 
@@ -1454,9 +1470,14 @@ void SimpleHandler::add_all() {
   // Extend Strata Base: vpsraw
   add_opcode_str({"vpsraw"},
   [] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto b_ = b;
+    if(b.width() == 8) {
+      b_ = SymBitVector::constant(a.width()-8, 0) || b;
+    }
+
     auto shift_count1 = SymBitVector::constant(16, 16);
-    auto shift_count2 = b[15][0];
-    auto bb = b[63][0];
+    auto shift_count2 = b_[15][0];
+    auto bb = b_[63][0];
     auto const_ = SymBitVector::constant(64, 15);
     auto shift_count = (bb > const_).ite(shift_count1, shift_count2);
 
