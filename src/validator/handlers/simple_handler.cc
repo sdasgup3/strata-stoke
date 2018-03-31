@@ -391,198 +391,262 @@ void SimpleHandler::add_all() {
   // Borrowed from master stoke
   add_opcode_str({"psllw"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
     short unsigned int vec_len = 16;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = a.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
     auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    ss.set(dst, result);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult);
   });
 
   add_opcode_str({"vpsllw"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     short unsigned int vec_len = 16;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = d.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
     auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    ss.set(dst, result, true);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult, true);
+
   });
 
   add_opcode_str({"pslld"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
     short unsigned int vec_len = 32;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = a.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
     auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    ss.set(dst, result);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult);
   });
 
   add_opcode_str({"vpslld"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     short unsigned int vec_len = 32;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = d.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
     auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    ss.set(dst, result, true);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult, true);
+
   });
 
   add_opcode_str({"psllq"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
     short unsigned int vec_len = 64;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = a.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
     auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    ss.set(dst, result);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult);
   });
 
   add_opcode_str({"vpsllq"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     short unsigned int vec_len = 64;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = d.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
     auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    ss.set(dst, result, true);
-  });
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult, true);
 
+  });
+  
 
   add_opcode_str({"psrlw"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
     short unsigned int vec_len = 16;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = a.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
-    auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    auto result =  a[vec_len-1][0] >> amt;
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    ss.set(dst, result);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult);
   });
 
   add_opcode_str({"vpsrlw"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     short unsigned int vec_len = 16;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = d.width();
 
-
-    auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
-      result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
     }
 
-    ss.set(dst, result, true);
+    auto result =  a[vec_len-1][0] >> amt;
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+      result =   a[vec_len-1 + vec_len*i][vec_len*i]  >> amt || result;
+    }
+
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult, true);
+
   });
 
   add_opcode_str({"psrld"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
     short unsigned int vec_len = 32;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = a.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
-    auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    auto result =  a[vec_len-1][0]  >> amt;
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    ss.set(dst, result);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult);
   });
 
   add_opcode_str({"vpsrld"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     short unsigned int vec_len = 32;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = d.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
-    auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    auto result =  a[vec_len-1][0] >> amt;
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    ss.set(dst, result, true);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult, true);
+
   });
 
   add_opcode_str({"psrlq"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
     short unsigned int vec_len = 64;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = a.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
-    auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    auto result =  a[vec_len-1][0] >> amt;
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    ss.set(dst, result);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult);
   });
 
   add_opcode_str({"vpsrlq"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto amt = b;
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     short unsigned int vec_len = 64;
-    if (b.width() != a.width())
-      amt = SymBitVector::constant(a.width() - b.width(), 0) || b;
+    auto dest_width = d.width();
 
+    auto amt = b;
+    if (b.width() <  vec_len) {
+      amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
+    } else {
+      amt = b[vec_len][0];
+    }
 
-    auto result =  a[vec_len-1][0] << amt;
-    for (size_t i = 1 ; i < a.width()/vec_len; i++) {
+    auto result =  a[vec_len-1][0] >> amt;
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    ss.set(dst, result, true);
+    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    ss.set(dst, fresult, true);
+
   });
-
-
   // END Extend Immediate Instructions; Ungeneralized; Stratified; Stoked
 
 
