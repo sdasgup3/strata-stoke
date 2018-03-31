@@ -266,6 +266,7 @@ public:
       case SymBitVector::MINUS:
         return cache(bv, make_constant(width, ls - rs));
       case SymBitVector::MOD:
+        return cache(bv, make_constant(width, ls % rs));
       case SymBitVector::MULT:
         return cache(bv, make_constant(width, ls * rs));
       case SymBitVector::OR:
@@ -533,6 +534,7 @@ private:
 
 SymBitVector SymSimplify::simplify(const SymBitVector& b) {
   auto ptr = b.ptr;
+  //std::cout << "\n\nEnter simplify:\n" << SymBitVector(ptr) << "\n";
 
   SymMergeExtracts merger(cache_bool1_, cache_bits1_, cache_array1_);
   SymMoveExtractsInside mover(cache_bool2_, cache_bits2_, cache_array2_);
@@ -542,11 +544,15 @@ SymBitVector SymSimplify::simplify(const SymBitVector& b) {
   while (true) {
     auto old = ptr;
     ptr = mover(ptr);
+    //std::cout << "Mover:\n" << SymBitVector(ptr) << "\n";
     ptr = merger(ptr);
+    //std::cout << "Merger:\n" << SymBitVector(ptr) << "\n";
     ptr = constprop(ptr);
+    //std::cout << "ConstProp:\n" << SymBitVector(ptr) << "\n";
     if (old == ptr) break;
   }
 
+  //std::cout << "Retun simplify:\n" << SymBitVector(ptr) << "\n";
   return SymBitVector(ptr);
 }
 

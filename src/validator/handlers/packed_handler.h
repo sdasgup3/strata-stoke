@@ -394,13 +394,26 @@ public:
     add_opcode("dppd", [] (SymBitVector a, SymBitVector b, SymBitVector c, uint16_t k) {
       SymFunction f("mul_double", 64, {64, 64});
       SymFunction g("add_double", 64, {64, 64});
-
       auto temp1_1 = (c[4][4] == SymBitVector::constant(1, 1)).ite(f(a[63][0], b[63][0]), SymBitVector::constant(64, 0x0));
       auto temp1_2 = (c[5][5] == SymBitVector::constant(1, 1)).ite(f(a[127][64], b[127][64]), SymBitVector::constant(64, 0x0));
       auto temp2 = g(temp1_1, temp1_2);
 
       auto result = (c[1][1] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0)) ||
                     (c[0][0] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0));
+
+/*
+      auto temp1_1 = f(a[63][0], b[63][0]);
+      auto temp1_2 = f(a[127][64], b[127][64]);
+      auto temp1_3 = SymBitVector::constant(64, 0x0);
+      auto temp2 =  ((c[4][4] == SymBitVector::constant(1, 1)) & (c[5][5] == SymBitVector::constant(1, 1))).ite(g(temp1_1, temp1_2), 
+                    ((c[4][4] == SymBitVector::constant(1, 0)) & (c[5][5] == SymBitVector::constant(1, 1))).ite(g(temp1_3, temp1_2), 
+                    ((c[4][4] == SymBitVector::constant(1, 1)) & (c[5][5] == SymBitVector::constant(1, 0))).ite(g(temp1_1, temp1_3), 
+                    ((c[4][4] == SymBitVector::constant(1, 0)) & (c[5][5] == SymBitVector::constant(1, 0))).ite(g(temp1_3, temp1_3), 
+            g(temp1_3, temp1_3)))));
+
+      auto result = (c[1][1] == SymBitVector::constant(1, 1)).ite(temp2 , SymBitVector::constant(64, 0x0)) ||
+                    (c[0][0] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0));
+                    */
 
       return result;
     }, 0, 0);
@@ -431,7 +444,7 @@ public:
 
       size_t i = 0;
       auto  result = dp_primitive(a[vec_len-1 + vec_len*i][vec_len*i], b[vec_len-1 + vec_len*i][vec_len*i], c);
-      for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+      for (i = 1 ; i < dest_width/vec_len; i++) {
         result = dp_primitive(a[vec_len-1 + vec_len*i][vec_len*i], b[vec_len-1 + vec_len*i][vec_len*i], c) || result;
       }
 

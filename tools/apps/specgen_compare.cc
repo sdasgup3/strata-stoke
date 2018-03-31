@@ -140,10 +140,13 @@ int main(int argc, char** argv) {
   auto is_eq = [&solver](auto& reg, auto a_in, auto b_in, stringstream& explanation) {
     auto a = (a_in);
     auto b = (b_in);
-    //std::cout << SymSimplify().simplify(a) << "\n\n";
-    //std::cout << SymSimplify().simplify(b) << "\n";
 
     SymBool eq = a == b;
+
+    //std::cout << SymSimplify().simplify(a) << "\n\n";
+    //std::cout << SymSimplify().simplify(b) << "\n";
+    //std::cout << eq << "\n";
+
     SymPrettyVisitor pretty(explanation);
     bool res = solver.is_sat({ !eq });
     if (solver.has_error()) {
@@ -153,6 +156,26 @@ int main(int argc, char** argv) {
     if (!res) {
       return true;
     } else {
+      SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
+      bool res = solver.is_sat({ !eq });
+      if(!res) {
+        explanation << "    strata:        ";
+        pretty(a);
+        explanation << endl;
+        explanation << "    hand-written:  ";
+        pretty(b);
+
+        explanation << "\n\nBut Equivalent after simplification\n\n" << endl;
+
+        explanation << "    strata:        ";
+        pretty(SymSimplify().simplify(a));
+        explanation << endl;
+        explanation << "    hand-written:  ";
+        pretty(SymSimplify().simplify(b));
+
+        return false;
+      }
+
       explanation << "  not equivalent for '" << (*reg) << "':" << endl;
       explanation << "    strata:        ";
       pretty(SymSimplify().simplify(a));
@@ -160,6 +183,8 @@ int main(int argc, char** argv) {
       explanation << "    hand-written:  ";
       pretty(SymSimplify().simplify(b));
       explanation << endl;
+
+
       return false;
     }
   };
