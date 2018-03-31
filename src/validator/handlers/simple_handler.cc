@@ -517,7 +517,7 @@ void SimpleHandler::add_all() {
     ss.set(dst, fresult, true);
 
   });
-  
+
 
   add_opcode_str({"psrlw"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
