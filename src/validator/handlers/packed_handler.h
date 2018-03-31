@@ -401,19 +401,19 @@ public:
       auto result = (c[1][1] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0)) ||
                     (c[0][0] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0));
 
-/*
-      auto temp1_1 = f(a[63][0], b[63][0]);
-      auto temp1_2 = f(a[127][64], b[127][64]);
-      auto temp1_3 = SymBitVector::constant(64, 0x0);
-      auto temp2 =  ((c[4][4] == SymBitVector::constant(1, 1)) & (c[5][5] == SymBitVector::constant(1, 1))).ite(g(temp1_1, temp1_2), 
-                    ((c[4][4] == SymBitVector::constant(1, 0)) & (c[5][5] == SymBitVector::constant(1, 1))).ite(g(temp1_3, temp1_2), 
-                    ((c[4][4] == SymBitVector::constant(1, 1)) & (c[5][5] == SymBitVector::constant(1, 0))).ite(g(temp1_1, temp1_3), 
-                    ((c[4][4] == SymBitVector::constant(1, 0)) & (c[5][5] == SymBitVector::constant(1, 0))).ite(g(temp1_3, temp1_3), 
-            g(temp1_3, temp1_3)))));
+      /*
+            auto temp1_1 = f(a[63][0], b[63][0]);
+            auto temp1_2 = f(a[127][64], b[127][64]);
+            auto temp1_3 = SymBitVector::constant(64, 0x0);
+            auto temp2 =  ((c[4][4] == SymBitVector::constant(1, 1)) & (c[5][5] == SymBitVector::constant(1, 1))).ite(g(temp1_1, temp1_2),
+                          ((c[4][4] == SymBitVector::constant(1, 0)) & (c[5][5] == SymBitVector::constant(1, 1))).ite(g(temp1_3, temp1_2),
+                          ((c[4][4] == SymBitVector::constant(1, 1)) & (c[5][5] == SymBitVector::constant(1, 0))).ite(g(temp1_1, temp1_3),
+                          ((c[4][4] == SymBitVector::constant(1, 0)) & (c[5][5] == SymBitVector::constant(1, 0))).ite(g(temp1_3, temp1_3),
+                  g(temp1_3, temp1_3)))));
 
-      auto result = (c[1][1] == SymBitVector::constant(1, 1)).ite(temp2 , SymBitVector::constant(64, 0x0)) ||
-                    (c[0][0] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0));
-                    */
+            auto result = (c[1][1] == SymBitVector::constant(1, 1)).ite(temp2 , SymBitVector::constant(64, 0x0)) ||
+                          (c[0][0] == SymBitVector::constant(1, 1)).ite(temp2, SymBitVector::constant(64, 0x0));
+                          */
 
       return result;
     }, 0, 0);

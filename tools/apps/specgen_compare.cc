@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
     } else {
       SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
       bool res = solver.is_sat({ !eq });
-      if(!res) {
+      if (!res) {
         explanation << "    strata:        ";
         pretty(a);
         explanation << endl;
