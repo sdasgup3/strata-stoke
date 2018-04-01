@@ -395,6 +395,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -406,7 +414,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult);
   });
 
@@ -416,6 +425,14 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -427,7 +444,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult, true);
 
   });
@@ -438,6 +456,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -449,7 +475,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult);
   });
 
@@ -459,6 +486,14 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -470,7 +505,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult, true);
 
   });
@@ -481,6 +517,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -492,7 +536,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult);
   });
 
@@ -502,6 +547,14 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -513,7 +566,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] << amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult, true);
 
   });
@@ -525,6 +579,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -536,7 +598,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult);
   });
 
@@ -546,6 +609,14 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -557,7 +628,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i]  >> amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult, true);
 
   });
@@ -568,6 +640,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -579,7 +659,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult);
   });
 
@@ -589,6 +670,14 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -600,7 +689,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult, true);
 
   });
@@ -611,6 +701,14 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -622,7 +720,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult);
   });
 
@@ -632,6 +731,14 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     auto amt = b;
+    auto cmp_amt = SymBool::_false();
+
+    if (b.width() <  64) {
+      cmp_amt = ((SymBitVector::constant(64 - b.width(), 0) || b) > SymBitVector::constant(64, vec_len-1));
+    } else {
+      cmp_amt = b[63][0] > SymBitVector::constant(64, vec_len-1);
+    }
+
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
@@ -643,7 +750,8 @@ void SimpleHandler::add_all() {
       result =   a[vec_len-1 + vec_len*i][vec_len*i] >> amt || result;
     }
 
-    auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    //auto fresult = (amt > SymBitVector::constant(vec_len, vec_len-1)).ite(SymBitVector::constant(dest_width, 0x0), result);
+    auto fresult = (cmp_amt).ite(SymBitVector::constant(dest_width, 0x0), result);
     ss.set(dst, fresult, true);
 
   });
@@ -2716,7 +2824,7 @@ void SimpleHandler::add_all() {
 
   add_opcode({VFNMSUB132PD_YMM_YMM_YMM},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    SymFunction f("vnfmsub132_double", 64, {64, 64, 64});
+    SymFunction f("vfnmsub132_double", 64, {64, 64, 64});
     ss.set(dst, vectorize(f, a, b, c), true);
   });
 
@@ -2772,7 +2880,7 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"vfnmsub132sd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    SymFunction f("vnfmsub132_double", 64, {64, 64, 64});
+    SymFunction f("vfnmsub132_double", 64, {64, 64, 64});
     auto res = f(a[63][0], b[63][0], c[63][0]);
     ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][64] || res, true);
   });

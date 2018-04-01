@@ -182,6 +182,14 @@ public:
       }
     }
 
+    if (f.args.size() == 3) {
+      auto a = (*this)(bv->args_[0]);
+      auto b = (*this)(bv->args_[1]);
+      auto c = (*this)(bv->args_[2]);
+      if ((f.name == "vfmsub132_double" || f.name == "vfmsub132_double") && (is_zero(a) && is_zero(b) && is_zero(c))) {
+        return cache(bv, make_constant(bv->width_, 0));
+      }
+    }
     // conversion of 0
     // sqrt of 0
     if (f.args.size() == 1) {
