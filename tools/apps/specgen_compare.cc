@@ -204,7 +204,7 @@ int main(int argc, char** argv) {
     eq = eq && is_eq(flag_it, strata_state[*flag_it], stoke_state[*flag_it], ss);
   }
   if (!eq) {
-    cout << "Circuit for '" << instr << "' (opcode " << opcode << ")" << endl;
+    cout << "Circuit for '" << instr << "' (opcode " << opcode_arg.value() << ")" << endl;
     cout << ss.str();
     cout << endl << endl;
     exit(4);

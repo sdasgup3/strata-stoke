@@ -1182,29 +1182,29 @@ void SimpleHandler::add_all() {
     auto temp1 = (imm8[0][0] == SymBitVector::constant(1, 0)).ite(a[63][0], a[127][64]);
     auto temp2 = (imm8[4][4] == SymBitVector::constant(1, 0)).ite(b[63][0], b[127][64]);
 
-    std::vector<SymBitVector> tempB(128, SymBitVector::constant(1, 0));
     auto result = SymBitVector::constant(1, 0);
 
     for (size_t i = 0; i <= 63; i++) {
-      tempB[i] = (temp1[0][0] & temp2[i][i]);
-      for (size_t j = 0; j <= i; j++) {
-        tempB[i]  = tempB[i] ^ (temp1[j][j] & temp2[i-j][i-j]);
+      auto tempB = (temp1[0][0] & temp2[i][i]);
+      for (size_t j = 1; j <= i; j++) {
+        tempB  = tempB ^ (temp1[j][j] & temp2[i-j][i-j]);
       }
 
       if (0 == i) {
-        result = tempB[i];
+        result = tempB;
       } else {
-        result = tempB[i] || result;
+        result = tempB || result;
       }
     }
 
     for (size_t i = 64; i <= 126; i++) {
-      tempB[i] = SymBitVector::constant(1, 0);
+      auto tempB = SymBitVector::constant(1, 0);
       for (size_t j = i - 63; j <= 63; j++) {
-        tempB[i]  = tempB[i] ^ (temp1[j][j] & temp2[i-j][i-j]);
+        tempB  = tempB ^ (temp1[j][j] & temp2[i-j][i-j]);
       }
-      result = tempB[i] || result;
+      result = tempB || result;
     }
+
 
     result = SymBitVector::constant(1, 0) || result;
     ss.set(dst, result);
@@ -1212,36 +1212,37 @@ void SimpleHandler::add_all() {
 
   // vpclmulqdq
   add_opcode_str({"vpclmulqdq"},
-  [this] (Operand dst, Operand src, Operand imm_, SymBitVector a, SymBitVector b,  SymBitVector imm8, SymState& ss) {
+  [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d, SymBitVector a, SymBitVector b,  SymBitVector imm8, SymState& ss) {
 
     auto temp1 = (imm8[0][0] == SymBitVector::constant(1, 0)).ite(a[63][0], a[127][64]);
     auto temp2 = (imm8[4][4] == SymBitVector::constant(1, 0)).ite(b[63][0], b[127][64]);
 
-    std::vector<SymBitVector> tempB(128, SymBitVector::constant(1, 0));
     auto result = SymBitVector::constant(1, 0);
 
     for (size_t i = 0; i <= 63; i++) {
-      tempB[i] = (temp1[0][0] & temp2[i][i]);
-      for (size_t j = 0; j <= i; j++) {
-        tempB[i]  = tempB[i] ^ (temp1[j][j] & temp2[i-j][i-j]);
+      auto tempB = (temp1[0][0] & temp2[i][i]);
+      for (size_t j = 1; j <= i; j++) {
+        tempB  = tempB ^ (temp1[j][j] & temp2[i-j][i-j]);
       }
 
       if (0 == i) {
-        result = tempB[i];
+        result = tempB;
       } else {
-        result = tempB[i] || result;
+        result = tempB || result;
       }
     }
 
     for (size_t i = 64; i <= 126; i++) {
-      tempB[i] = SymBitVector::constant(1, 0);
+      auto tempB = SymBitVector::constant(1, 0);
       for (size_t j = i - 63; j <= 63; j++) {
-        tempB[i]  = tempB[i] ^ (temp1[j][j] & temp2[i-j][i-j]);
+        tempB  = tempB ^ (temp1[j][j] & temp2[i-j][i-j]);
       }
-      result = tempB[i] || result;
+      result = tempB || result;
     }
 
+
     result = SymBitVector::constant(1, 0) || result;
+
     ss.set(dst, result, true);
   });
 
