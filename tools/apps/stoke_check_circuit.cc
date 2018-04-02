@@ -108,7 +108,8 @@ int main(int argc, char** argv) {
   cout << "Build Handler\n";
   ComboHandler ch;
   if (ch.get_support(instr) == Handler::SupportLevel::NONE) {
-    cout << "\033[1;31mNot supported\033[0m\n";
+    //cout << "\033[1;31mNot supported\033[0m\n";
+    cout << "Not Supported (" <<  opcode << ")\n";
     exit(4);
   }
 
