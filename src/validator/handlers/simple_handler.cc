@@ -1576,10 +1576,10 @@ void SimpleHandler::add_all() {
   add_opcode_str({"sarxl", "sarxq"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = d.width();
-  
+
     //auto temp  = a;
     auto countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x3f);
-    if(dest_width == 32) {
+    if (dest_width == 32) {
       countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x1f);
     }
     ss.set(dst, a.s_shr(b & countmask));
@@ -1590,10 +1590,10 @@ void SimpleHandler::add_all() {
   add_opcode_str({"shlxl", "shlxq"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = d.width();
-  
+
     //auto temp  = a;
     auto countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x3f);
-    if(dest_width == 32) {
+    if (dest_width == 32) {
       countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x1f);
     }
     ss.set(dst, a << (b & countmask));
