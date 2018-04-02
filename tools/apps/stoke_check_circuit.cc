@@ -88,21 +88,21 @@ int main(int argc, char** argv) {
   sb.set_entrypoint(target.get_code()[0].get_operand<x64asm::Label>(0));
   sb.run();
 
+  // Obtain the instruction
+  auto instr = target.get_code()[1];
+  auto opcode = instr.get_opcode();
+
   // Collect the run results
   cout << "Collect Results\n";
   std::vector<CpuState> reference_out_;
   for (auto i = sb.result_begin(), ie = sb.result_end(); i != ie; ++i) {
     CpuState ss = *i;
     if (ss.code != stoke::ErrorCode::NORMAL) {
-      cout<< "Sandbox did not finish normally: " << (int)ss.code << std::endl;
+      cout<< "Sandbox did not finish normally: " << opcode << " " <<  (int)ss.code << std::endl;
       exit(4);
     }
     reference_out_.push_back(*i);
   }
-
-  // Obtain the instruction
-  auto instr = target.get_code()[1];
-  auto opcode = instr.get_opcode();
 
   // Build the sym formula of the circuit
   cout << "Build Handler\n";
