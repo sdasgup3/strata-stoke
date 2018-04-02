@@ -57,7 +57,8 @@ endif
 
 #CXX_FLAGS are any extra flags the user might want to pass to the compiler
 
-WARNING_FLAGS=-Wall -Werror -Wextra -Wfatal-errors -Wno-deprecated -Wno-unused-parameter -Wno-unused-variable -Wno-vla -fdiagnostics-color=always
+#WARNING_FLAGS=-Wall -Werror -Wextra -Wfatal-errors -Wno-deprecated -Wno-unused-parameter -Wno-unused-variable -Wno-vla -fdiagnostics-color=always
+WARNING_FLAGS=-Wall  -Wextra  -Wno-deprecated -Wno-unused-parameter -Wno-unused-variable -Wno-vla -fdiagnostics-color=always
 CXX=ccache $(COMPILERBINARY) $(CXX_FLAGS) -std=c++14 $(WARNING_FLAGS)
 
 INC_FOLDERS=\
@@ -67,7 +68,8 @@ INC_FOLDERS=\
 						src/ext/gtest-1.7.0/include \
 						src/ext/z3/src/api \
 						src/ext/cvc4-1.4-build/include \
-						./../../../Install/boost_1_65_1
+						./../../../Install/boost_1_66_0.centos.install \
+						./../../../Install/cln.install/include 
 
 INC=$(addprefix -I./, $(INC_FOLDERS))
 
@@ -77,9 +79,9 @@ DEPS=\
 LIB=\
 	src/ext/x64asm/lib/libx64asm.a\
 	-pthread\
-	-L /home/sdasgup3/Install/boost_1_65_1/stage/lib -lboost_thread -lboost_system -lboost_regex -lboost_filesystem\
-	-lcln \
-	-liml -lgmp \
+	-L /home/sdasgup3/Install/boost_1_66_0.centos.install/stage/lib -lboost_thread -lboost_system -lboost_regex -lboost_filesystem\
+	-L /home/sdasgup3/Install/cln.install/lib -lcln \
+	-lgmp \
 	-L src/ext/cvc4-1.4-build/lib -lcvc4 \
 	-L src/ext/z3/build -lz3
 
@@ -147,10 +149,8 @@ SRC_OBJ=\
 	\
 	src/validator/bounded.o \
 	src/validator/cutpoints.o \
-	src/validator/ddec.o \
 	src/validator/handler.o \
 	src/validator/invariant.o \
-	src/validator/null.o \
 	src/validator/obligation_checker.o \
 	src/validator/validator.o \
 	\
