@@ -1528,6 +1528,7 @@ void SimpleHandler::add_all() {
   });
 
   // Extend Strata Base:  bzhil(q)
+
   add_opcode_str({"bzhil", "bzhiq"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
     auto dest_width = d.width();
@@ -1542,16 +1543,61 @@ void SimpleHandler::add_all() {
     };
 
     auto index = b[7][0];
-    auto result = select_(a, index);
-
+    auto result = (index < SymBitVector::constant(8, dest_width)).ite(select_(a, index), a);
     ss.set(dst, result);
+
     ss.set_szp_flags(result, dest_width);
     ss.set(eflags_cf, index >=  SymBitVector::constant(8,dest_width));
+
     ss.set(eflags_pf, SymBool::tmp_var());
     ss.set(eflags_af, SymBool::tmp_var());
-
+    ss.set(eflags_of, SymBool::_false());
   });
 
+  // Extend Strata Base:  blsmskl(q)
+
+  add_opcode_str({"blsmskl", "blsmskq"},
+  [this] (Operand dst, Operand src,  SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = a.width();
+
+    auto temp = (b - SymBitVector::constant(dest_width, 1)) ^ b;
+    ss.set(dst, temp);
+
+    ss.set(eflags_sf, temp[dest_width-1][dest_width-1] == SymBitVector::constant(1, 1));
+    ss.set(eflags_cf, b == SymBitVector::constant(dest_width, 0));
+    ss.set(eflags_zf, SymBool::_false());
+    ss.set(eflags_of, SymBool::_false());
+    ss.set(eflags_pf, SymBool::tmp_var());
+    ss.set(eflags_af, SymBool::tmp_var());
+  });
+
+  // Extend Strata Base:  sarxl(q)
+
+  add_opcode_str({"sarxl", "sarxq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+  
+    //auto temp  = a;
+    auto countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x3f);
+    if(dest_width == 32) {
+      countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x1f);
+    }
+    ss.set(dst, a.s_shr(b & countmask));
+  });
+
+  // Extend Strata Base:  shlxl(q)
+
+  add_opcode_str({"shlxl", "shlxq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+  
+    //auto temp  = a;
+    auto countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x3f);
+    if(dest_width == 32) {
+      countmask = SymBitVector::constant(dest_width - 8, 0) || SymBitVector::constant(8, 0x1f);
+    }
+    ss.set(dst, a << (b & countmask));
+  });
 
   // Extend Strata Base:  mulxl(q)
 
@@ -1574,27 +1620,68 @@ void SimpleHandler::add_all() {
   /* Extend Strata Base:  pextl(q)
   add_opcode_str({"pextl", "pextq"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
-    auto dest_width = a.width();
+    auto dest_width = d.width();
     auto temp = a;
-    auto mask = b;
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(b.ptr))->constant_;
 
-    auto select_ = [&](SymBitVector src, int start) {
-      int i = start;
-      SymBitVector res = SymBitVector::constant(1,0);
-      for ( i = start; i < dest_width; i++) {
-        auto cond = mask[i][i] == SymBitVector::constant(1, 1);
-        res = cond.ite(src[i][i], res);
+    auto result = SymBitVector::constant(1, 0);
+    bool first_occurance = true;
+    uint16_t count_zero = 0;
+
+    for (int i = 0; i < dest_width; i++) {
+      if(constant & 1) {
+        if(first_occurance) {
+          result = temp[i][i];
+          first_occurance = false;
+        } else {
+          result = temp[i][i] || result;
+        }
+      } else {
+        count_zero ++;
       }
-      return res;
-    };
-
-    size_t m = 0;
-    auto result = select_(temp, 0);
-    for (m = 1; m < dest_width; m++) {
-      result = select_(temp, m) || result;
+      constant >>= 1;
     }
 
-    ss.set(dst, result);
+    ss.set(dst, SymBitVector::constant(count_zero, 0) || result);
+  });
+  */
+
+  /*
+  add_opcode_str({"cmpxchgl"},
+  [this] (Operand dst, Operand src,  SymBitVector a, SymBitVector b,  SymState& ss) {
+    auto dest_width = a.width();
+    ss.set(dst, SymBitVector::constant(count_zero, 0) || result);
+
+    SymBitVector accumulator;
+    if (dest_width == 8) {
+      accumulator = ss[Constants::al()];
+    } else if (dest_width == 16) {
+      accumulator = ss[Constants::ax()];
+    } else if (dest_width == 32) {
+      accumulator = ss[Constants::eax()];
+    } else if (dest_width == 64) {
+      accumulator = ss[Constants::rax()];
+    } else {
+      assert(false);
+    }
+
+    ss.set(dst, (accumulator == a).ite(b, a));
+    if (dest_width == 8) {
+      ss.set(al, (accumulator == a).ite(accumulator, a));
+    } else if (dest_width == 16) {
+      ss.set(ax, (accumulator == a).ite(accumulator, a));
+    } else if (dest_width == 32) {
+      ss.set(eax, (accumulator == a).ite(accumulator, a));
+    } else if (dest_width == 64) {
+      ss.set(rax, (accumulator == a).ite(accumulator, a));
+    }
+
+    ss.set(dst, (accumulator == a).ite(b, a));
+
+    ss.set_szp_flags(a & b);
+    ss.set(eflags_zf, (accumulator == a));
+    ss.set(eflags_af, SymBool::tmp_var());
+
   });
   */
 
