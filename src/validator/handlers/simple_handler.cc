@@ -1460,7 +1460,7 @@ void SimpleHandler::add_all() {
 
   // Extend Register Instructions; Unstratified; Stoked by Master
   // Hence borrowed here.
-  
+
   /*
   // Handle the BT, BTC, BTR, BTS family of instructions. Modify is true if the
   // instruction is not BT, and "operation" combines a mask with a value to complement,
@@ -2515,7 +2515,7 @@ void SimpleHandler::add_all() {
 
     ss.set(dst, result, true);
   });
- 
+
   // END Extend Register Instructions; Unstratified; Unstoked
 
   // Borrowed from master Stoke
