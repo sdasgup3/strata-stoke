@@ -47,11 +47,6 @@
 #include "tools/gadgets/validator.h"
 #include "tools/gadgets/verifier.h"
 
-
-
-#include "src/specgen/specgen.h"
-#include "src/specgen/support.h"
-
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 
