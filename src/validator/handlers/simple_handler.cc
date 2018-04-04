@@ -1461,7 +1461,6 @@ void SimpleHandler::add_all() {
   // Extend Register Instructions; Unstratified; Stoked by Master
   // Hence borrowed here.
 
-  /*
   // Handle the BT, BTC, BTR, BTS family of instructions. Modify is true if the
   // instruction is not BT, and "operation" combines a mask with a value to complement,
   // set, or reset the bit as appropriate.
@@ -1484,7 +1483,7 @@ void SimpleHandler::add_all() {
         ss.set(op_base, operation(base_bvec, mask));
       }
     } else {
-
+      /*
       // Memory case. Immediates are masked to the lowest bits, registers are sign
       // extended from their original width, and not masked.
       auto bit_offset = op_offset.is_immediate() ? (SymBitVector::constant(56, 0) || (offset_bvec & size_mask)):
@@ -1507,6 +1506,7 @@ void SimpleHandler::add_all() {
         auto sigsev = ss.memory->write(addr, write_byte, 8, ss.get_lineno());
         ss.set_sigsegv(sigsev);
       }
+      */
     }
 
     // Set other flags, doesn't depend on operation
@@ -1543,7 +1543,6 @@ void SimpleHandler::add_all() {
       return v | mask;
     }, op_base, op_offset, base_bvec, offset_bvec, ss);
   });
-    */
 
   add_opcode_str({"pmovmskb", "vpmovmskb"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
