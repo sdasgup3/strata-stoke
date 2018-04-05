@@ -121,11 +121,11 @@ int main(int argc, char** argv) {
   DebugHandler::install_sigill();
 
   bool opcode_provided;
-  if(opc_arg.has_been_provided()) {
+  if (opc_arg.has_been_provided()) {
     opcode_provided = true;
   }
 
-  if(!opcode_provided) {
+  if (!opcode_provided) {
     if (!code_arg.has_been_provided() && !target_arg.has_been_provided()) {
       Console::error() << "Either --code or --target required." << endl;
     }
@@ -142,12 +142,12 @@ int main(int argc, char** argv) {
     code = code_arg.value();
   }
 
-  if(opcode_provided) {
+  if (opcode_provided) {
     auto instr = get_instruction_from_string(opc_arg);
     code.push_back(instr);
   }
 
-  if(!keep_quiet_arg.value()) {
+  if (!keep_quiet_arg.value()) {
     Console::msg() << "Target" << endl << endl;
     Console::msg() << code << endl << endl;
     if (code.size() == 1) {
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
     Console::error() << "Symbolic execution failed: " << ch.error() << endl;
   }
 
-  if(keep_quiet_arg.value()) {
+  if (keep_quiet_arg.value()) {
     return 0;
   }
 
