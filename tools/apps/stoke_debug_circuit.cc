@@ -23,6 +23,7 @@
 #include "src/symstate/simplify.h"
 #include "src/symstate/pretty_visitor.h"
 #include "src/symstate/print_visitor.h"
+#include "src/symstate/memory/trivial.h"
 #include "src/validator/handlers/combo_handler.h"
 
 #include "tools/gadgets/functions.h"
@@ -30,6 +31,8 @@
 #include "tools/gadgets/target.h"
 #include "tools/gadgets/validator.h"
 #include "src/specgen/specgen.h"
+#include "tools/gadgets/testcases.h"
+#include "tools/gadgets/seed.h"
 
 using namespace cpputil;
 using namespace std;
@@ -135,6 +138,9 @@ int main(int argc, char** argv) {
     }
   }
 
+  SeedGadget seed;
+  TestcaseGadget tc(seed);
+
   FunctionsGadget aux_fxns;
   TargetGadget target(aux_fxns, false);
   Code code = target.get_code();
@@ -170,17 +176,24 @@ int main(int argc, char** argv) {
     Console::msg() << endl;
   }
 
-  ComboHandler ch(strata_path_arg.value());
-  SymState state("", true);
+  // build initial state
+  SymState state;
+  TrivialMemory* mem = NULL;
+  if (testcases_arg.value().empty()) {
+    state = SymState("", true);
+    mem = new TrivialMemory();
+    state.memory = mem;
+  } else {
+    state = SymState(tc);
+  }
 
-
+  // Useful only for immediates
   if (keep_imm_symbolic_arg.value()) {
     state.set_keep_imm_symbolic();
   }
 
-  // TODO: doesn't handle memory
-
   // test validator support
+  ComboHandler ch(strata_path_arg.value());
   for (auto it : code) {
     if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
     if (it.get_opcode() == Opcode::RET) break; // only go until first break
@@ -267,6 +280,40 @@ int main(int argc, char** argv) {
   }
   if (printed) cout << endl;
   printed = false;
+
+  // print memory reads and writes
+  if (mem != NULL) {
+    auto reads = mem->get_reads();
+    auto writes = mem->get_writes();
+    if (reads.size() > 0) {
+      printed = true;
+      cout << "Information about memory reads:" << endl;
+      for (auto loc : reads) {
+        cout << "  Value ";
+        print(loc.value);
+        cout << " (" << loc.size << " bytes)" << endl;
+        cout << "    was read at address ";
+        print(loc.address);
+        cout << "." << endl;
+      }
+    }
+    if (printed) cout << endl;
+    printed = false;
+    if (writes.size() > 0) {
+      printed = true;
+      cout << "Information about memory writes:" << endl;
+      for (auto loc : writes) {
+        cout << "  Address ";
+        print(loc.address);
+        cout << " was updated to" << endl;
+        cout << "    ";
+        print(loc.value);
+        cout << " (" << loc.size << " bytes)." << endl;
+      }
+    }
+    if (printed) cout << endl;
+    printed = false;
+  }
 
   Console::msg() << "sigfpe  : ";
   print(state.sigfpe);
