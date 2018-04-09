@@ -29,6 +29,7 @@
 #include "tools/gadgets/solver.h"
 #include "tools/gadgets/target.h"
 #include "tools/gadgets/validator.h"
+#include "src/specgen/specgen.h"
 
 using namespace cpputil;
 using namespace std;
@@ -69,6 +70,13 @@ cpputil::ValueArg<std::string>& strata_path_arg =
 auto& keep_imm_symbolic_arg =
   FlagArg::create("keep_imm_symbolic")
   .description("Should immediates be kept symbolic?");
+
+auto& opc_arg = ValueArg<string>::create("opc")
+                .description("The opcode to consider;  use opcode_number to indicate an imm8 argument");
+
+auto& keep_quiet_arg =
+  FlagArg::create("keep_quiet")
+  .description("No circuit output");
 
 template <typename T>
 string out_padded(T t, size_t min_length, char pad = ' ') {
@@ -112,12 +120,19 @@ int main(int argc, char** argv) {
   DebugHandler::install_sigsegv();
   DebugHandler::install_sigill();
 
-  if (!code_arg.has_been_provided() && !target_arg.has_been_provided()) {
-    Console::error() << "Either --code or --target required." << endl;
+  bool opcode_provided;
+  if (opc_arg.has_been_provided()) {
+    opcode_provided = true;
   }
 
-  if (code_arg.has_been_provided() && target_arg.has_been_provided()) {
-    Console::error() << "At most one of --code and --target can be provided." << endl;
+  if (!opcode_provided) {
+    if (!code_arg.has_been_provided() && !target_arg.has_been_provided()) {
+      Console::error() << "Either --code or --target required." << endl;
+    }
+
+    if (code_arg.has_been_provided() && target_arg.has_been_provided()) {
+      Console::error() << "At most one of --code and --target can be provided." << endl;
+    }
   }
 
   FunctionsGadget aux_fxns;
@@ -127,26 +142,33 @@ int main(int argc, char** argv) {
     code = code_arg.value();
   }
 
-  Console::msg() << "Target" << endl << endl;
-  Console::msg() << code << endl << endl;
-  if (code.size() == 1) {
-    Console::msg() << "  maybe read:      " << target.maybe_read_set(code[0]) << endl;
-    Console::msg() << "  must read:       " << target.must_read_set(code[0]) << endl;
-    Console::msg() << "  maybe write:     " << target.maybe_write_set(code[0]) << endl;
-    Console::msg() << "  must write:      " << target.must_write_set(code[0]) << endl;
-    Console::msg() << "  maybe undef:     " << target.maybe_undef_set(code[0]) << endl;
-    Console::msg() << "  must undef:      " << target.must_undef_set(code[0]) << endl;
-  } else {
-    Console::msg() << "  maybe read:      " << code.maybe_read_set() << endl;
-    Console::msg() << "  must read:       " << code.must_read_set() << endl;
-    Console::msg() << "  maybe write:     " << code.maybe_write_set() << endl;
-    Console::msg() << "  must write:      " << code.must_write_set() << endl;
-    Console::msg() << "  maybe undef:     " << code.maybe_undef_set() << endl;
-    Console::msg() << "  must undef:      " << code.must_undef_set() << endl;
+  if (opcode_provided) {
+    auto instr = get_instruction_from_string(opc_arg);
+    code.push_back(instr);
   }
-  Console::msg() << "  required flags:  " << code.required_flags() << endl;
 
-  Console::msg() << endl;
+  if (!keep_quiet_arg.value()) {
+    Console::msg() << "Target" << endl << endl;
+    Console::msg() << code << endl << endl;
+    if (code.size() == 1) {
+      Console::msg() << "  maybe read:      " << target.maybe_read_set(code[0]) << endl;
+      Console::msg() << "  must read:       " << target.must_read_set(code[0]) << endl;
+      Console::msg() << "  maybe write:     " << target.maybe_write_set(code[0]) << endl;
+      Console::msg() << "  must write:      " << target.must_write_set(code[0]) << endl;
+      Console::msg() << "  maybe undef:     " << target.maybe_undef_set(code[0]) << endl;
+      Console::msg() << "  must undef:      " << target.must_undef_set(code[0]) << endl;
+    } else {
+      Console::msg() << "  maybe read:      " << code.maybe_read_set() << endl;
+      Console::msg() << "  must read:       " << code.must_read_set() << endl;
+      Console::msg() << "  maybe write:     " << code.maybe_write_set() << endl;
+      Console::msg() << "  must write:      " << code.must_write_set() << endl;
+      Console::msg() << "  maybe undef:     " << code.maybe_undef_set() << endl;
+      Console::msg() << "  must undef:      " << code.must_undef_set() << endl;
+    }
+    Console::msg() << "  required flags:  " << code.required_flags() << endl;
+
+    Console::msg() << endl;
+  }
 
   ComboHandler ch(strata_path_arg.value());
   SymState state("", true);
@@ -182,6 +204,10 @@ int main(int argc, char** argv) {
 
   if (ch.has_error()) {
     Console::error() << "Symbolic execution failed: " << ch.error() << endl;
+  }
+
+  if (keep_quiet_arg.value()) {
+    return 0;
   }
 
   Console::msg() << "Circuits:" << endl;
