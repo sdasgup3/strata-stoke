@@ -80,7 +80,7 @@ Handler* ComboHandler::get_handler(const Instruction& instr, Handler::SupportLev
   sl = Handler::SupportLevel::NONE;
   int handler_index = -1;
   int counter = 0;
- 
+
   for (auto h : handlers_) {
     auto cur_level = h->get_support(instr);
 

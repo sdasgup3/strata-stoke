@@ -501,7 +501,7 @@ void StrataHandler::init() {
 
 bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
   // Generalization from statified instr is wrong for these instructions
-  if(opcode == MOVSD_XMM_M64
+  if (opcode == MOVSD_XMM_M64
       || opcode == MOVSS_XMM_M32
       || opcode == XCHG_M8_R8
       || opcode == XCHG_M8_RH
@@ -513,12 +513,12 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == XCHG_R16_M16
       || opcode == XCHG_R32_M32
       || opcode == XCHG_R64_M64
-      ) {
+     ) {
     return false;
   }
 
   auto rs = support_reason(opcode);
-  // cout << "Opcode: " << opcode << " Reason: " << rs << "\n"; 
+  // cout << "Opcode: " << opcode << " Reason: " << rs << "\n";
 
   return rs != SupportReason::NONE;
 }
@@ -552,7 +552,7 @@ SupportReason StrataHandler::support_reason(const x64asm::Opcode& opcode) {
   }
 
   if (found) {
-    if (specgen_is_base(alt)) { 
+    if (specgen_is_base(alt)) {
       std::cout << "Base Instruction!!\n";
       return reason;
     }
@@ -786,37 +786,37 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
   // take a formula for specgen_instr in state tmp, and convert it to one that
   // makes sense for instr in state
   SymVarRenamer translate_circuit(
-    [&instr, &specgen_instr, &start, &opcode_str](SymBitVectorVar* var) -> SymBitVectorAbstract* {
-      auto name = var->name_;
-      if (name.size() <= opcode_str.size() || name.substr(name.size() - opcode_str.size()) != opcode_str) {
-        // no renaming for variable of unfamiliar names
-        return var;
-      }
-      auto real_name = name.substr(0, name.size() - opcode_str.size() - 1);
-      R64 gp = Constants::rax();
-      Ymm ymm = Constants::ymm0();
-      if (stringstream(real_name) >> gp) {
-        return translate_max_register(start, gp, specgen_instr, instr);
-      } else if (stringstream(real_name) >> ymm) {
-        return translate_max_register(start, ymm, specgen_instr, instr);
-      }
-      assert(false);
-      return NULL;
-    }, 
-    [&start, &opcode_str](SymBoolVar* var) -> SymBoolAbstract* {
-      auto name = var->name_;
-      if (name.size() <= opcode_str.size() || name.substr(name.size() - opcode_str.size()) != opcode_str) {
-        // no renaming for variable of unfamiliar names
-        return var;
-      }
-      auto real_name = name.substr(0, name.size() - opcode_str.size() - 1);
-      Eflags reg = Constants::eflags_cf();
-      if (stringstream(real_name) >> reg) {
-        return (SymBoolAbstract*)start[reg].ptr;
-      }
-      assert(false);
-      return NULL;
+  [&instr, &specgen_instr, &start, &opcode_str](SymBitVectorVar* var) -> SymBitVectorAbstract* {
+    auto name = var->name_;
+    if (name.size() <= opcode_str.size() || name.substr(name.size() - opcode_str.size()) != opcode_str) {
+      // no renaming for variable of unfamiliar names
+      return var;
     }
+    auto real_name = name.substr(0, name.size() - opcode_str.size() - 1);
+    R64 gp = Constants::rax();
+    Ymm ymm = Constants::ymm0();
+    if (stringstream(real_name) >> gp) {
+      return translate_max_register(start, gp, specgen_instr, instr);
+    } else if (stringstream(real_name) >> ymm) {
+      return translate_max_register(start, ymm, specgen_instr, instr);
+    }
+    assert(false);
+    return NULL;
+  },
+  [&start, &opcode_str](SymBoolVar* var) -> SymBoolAbstract* {
+    auto name = var->name_;
+    if (name.size() <= opcode_str.size() || name.substr(name.size() - opcode_str.size()) != opcode_str) {
+      // no renaming for variable of unfamiliar names
+      return var;
+    }
+    auto real_name = name.substr(0, name.size() - opcode_str.size() - 1);
+    Eflags reg = Constants::eflags_cf();
+    if (stringstream(real_name) >> reg) {
+      return (SymBoolAbstract*)start[reg].ptr;
+    }
+    assert(false);
+    return NULL;
+  }
   );
 
   auto extend_or_shrink = [](auto& in, uint64_t size) {

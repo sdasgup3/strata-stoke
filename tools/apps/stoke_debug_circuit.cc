@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
     if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
     if (it.get_opcode() == Opcode::RET) break;
     if (it.get_opcode() == Opcode::POP_M16 || it.get_opcode() == Opcode::POP_M64) {
-      mem_fetch_from_same_address = false;  
+      mem_fetch_from_same_address = false;
     }
     state.set_lineno(line);
     ch.build_circuit(it, state);
@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
     }
     if (use_smtlib_format_arg.value()) {
       //smtlib((c));
-      std::cout << solver.getZ3Formula(c); 
+      std::cout << solver.getZ3Formula(c);
     } else {
       pretty((c));
     }
@@ -314,19 +314,19 @@ int main(int argc, char** argv) {
       for (auto loc : reads) {
         cout << "  Value ";
         print(loc.value);
-        
+
         // Check if all the mem access are from same address and of same size
-        if(mem_fetch_from_same_address) {
-          if(firstInstance) {
+        if (mem_fetch_from_same_address) {
+          if (firstInstance) {
             sZ =   loc.size;
             sA = loc.address;
             firstInstance = false;
           } else {
-            if(loc.size != sZ) {
+            if (loc.size != sZ) {
               std::cout << "info: Loc Size Mismatch\n\n";
             }
             stringstream ss;
-            if(!is_eq(sA, loc.address, ss)) {
+            if (!is_eq(sA, loc.address, ss)) {
               std::cout << "info: Loc Address Mismatch\n\n";
             }
           }
@@ -352,8 +352,8 @@ int main(int argc, char** argv) {
         print(loc.address);
 
         // Check if all the mem access are from same address and of same size
-        if(mem_fetch_from_same_address) {
-          if(firstInstance) {
+        if (mem_fetch_from_same_address) {
+          if (firstInstance) {
             sZ =   loc.size;
             sA = loc.address;
             firstInstance = false;

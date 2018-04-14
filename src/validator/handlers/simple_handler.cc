@@ -885,7 +885,7 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto result = (b >> offset*vec_len)[vec_len-1][0];
-    if(dest_width > vec_len) {
+    if (dest_width > vec_len) {
       result = SymBitVector::constant(dest_width - vec_len, 0) || result;
     }
 
@@ -900,7 +900,7 @@ void SimpleHandler::add_all() {
     auto dest_width = a.width();
 
     auto result = (b >> offset*vec_len)[vec_len-1][0];
-    if(dest_width > vec_len) {
+    if (dest_width > vec_len) {
       result = SymBitVector::constant(dest_width - vec_len, 0) || result;
     }
 

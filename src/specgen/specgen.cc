@@ -338,22 +338,22 @@ std::map<x64asm::Type, std::vector<x64asm::Operand>> operands_ = {
 std::map<x64asm::Type, int> operands_idx_ = {
 };
 x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
-  if (t == x64asm::Type::M_8) { 
+  if (t == x64asm::Type::M_8) {
     return x64asm::M8(x64asm::Constants::rax());
   }
-  if (t == x64asm::Type::M_16) { 
+  if (t == x64asm::Type::M_16) {
     return x64asm::M16(x64asm::Constants::rax());
   }
-  if (t == x64asm::Type::M_32) { 
+  if (t == x64asm::Type::M_32) {
     return x64asm::M32(x64asm::Constants::rax());
   }
-  if (t == x64asm::Type::M_64) { 
+  if (t == x64asm::Type::M_64) {
     return x64asm::M64(x64asm::Constants::rax());
   }
-  if (t == x64asm::Type::M_128) { 
+  if (t == x64asm::Type::M_128) {
     return x64asm::M128(x64asm::Constants::rax());
   }
-  if (t == x64asm::Type::M_256) { 
+  if (t == x64asm::Type::M_256) {
     return x64asm::M256(x64asm::Constants::rax());
   }
   if (t == x64asm::Type::IMM_8) {
@@ -513,8 +513,8 @@ x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val) {
     for (size_t i = 0; i < instr.arity(); i++) {
       auto t = instr.type(i);
       // std::cout << "processing type: " << t << std::endl;
-      if (is_supported_type(t) 
-          || is_supported_type_reason(t) == SupportedReason::MM 
+      if (is_supported_type(t)
+          || is_supported_type_reason(t) == SupportedReason::MM
           || is_supported_type_reason(t) == SupportedReason::IMMEDIATE
           || is_supported_type_reason(t) == SupportedReason::MEMORY) {
         instr.set_operand(i, get_next_operand(t, imm8_val));

@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
     code.push_back(instr);
   }
 
- 
+
   // build initial state
   SymState state;
   TrivialMemory* mem = NULL;
@@ -118,38 +118,38 @@ int main(int argc, char** argv) {
   Handler::SupportLevel level;
   for (auto it : code) {
     if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
-    if (it.get_opcode() == Opcode::RET) break; 
+    if (it.get_opcode() == Opcode::RET) break;
 
 
     auto h = ch.get_handler(it, level) ;
-    if(dynamic_cast<StrataHandler *>(h)) {
+    if (dynamic_cast<StrataHandler *>(h)) {
       std::cout << "StrataHandler" << "\n";
     }
-    if(dynamic_cast<PackedHandler *>(h)) {
+    if (dynamic_cast<PackedHandler *>(h)) {
       std::cout << "PackedHandler" << "\n";
     }
-    if(dynamic_cast<SimpleHandler *>(h)) {
+    if (dynamic_cast<SimpleHandler *>(h)) {
       std::cout << "SimpleHandler" << "\n";
     }
-    if(dynamic_cast<AddHandler *>(h)) {
+    if (dynamic_cast<AddHandler *>(h)) {
       std::cout << "AddHandler" << "\n";
     }
-    if(dynamic_cast<ConditionalHandler *>(h)) {
+    if (dynamic_cast<ConditionalHandler *>(h)) {
       std::cout << "ConditionalHandler" << "\n";
     }
-    if(dynamic_cast<LeaHandler *>(h)) {
+    if (dynamic_cast<LeaHandler *>(h)) {
       std::cout << "LeaHandler" << "\n";
     }
-    if(dynamic_cast<MoveHandler *>(h)) {
+    if (dynamic_cast<MoveHandler *>(h)) {
       std::cout << "MoveHandler" << "\n";
     }
-    if(dynamic_cast<PunpckHandler *>(h)) {
+    if (dynamic_cast<PunpckHandler *>(h)) {
       std::cout << "PunpckHandler" << "\n";
     }
-    if(dynamic_cast<ShiftHandler *>(h)) {
+    if (dynamic_cast<ShiftHandler *>(h)) {
       std::cout << "ShiftHandler" << "\n";
     }
-    if(dynamic_cast<PseudoHandler *>(h)) {
+    if (dynamic_cast<PseudoHandler *>(h)) {
       std::cout << "PseudoHandler" << "\n";
     }
   }
