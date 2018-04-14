@@ -78,9 +78,9 @@ Handler* ComboHandler::get_handler(const Instruction& instr, Handler::SupportLev
   /* Find the best handler for this instruction */
   Handler* best_handler = NULL;
   sl = Handler::SupportLevel::NONE;
-
-  int handler_index = 0;
+  int handler_index = -1;
   int counter = 0;
+ 
   for (auto h : handlers_) {
     auto cur_level = h->get_support(instr);
 
@@ -98,7 +98,6 @@ Handler* ComboHandler::get_handler(const Instruction& instr, Handler::SupportLev
     ss << "Unsupported instruction: " << instr;
     error_ = ss.str();
   }
-
   cout << instr << ": Hindex" << handler_index << "(" << handlers_.size() << ")\n";
   return best_handler;
 

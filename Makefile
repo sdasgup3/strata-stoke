@@ -56,8 +56,8 @@ ifndef OPT
 endif
 
 #CXX_FLAGS are any extra flags the user might want to pass to the compiler
-
-WARNING_FLAGS=-Wall -Werror -Wextra -Wfatal-errors -Wno-deprecated -Wno-unused-parameter -Wno-unused-variable -Wno-vla -fdiagnostics-color=always
+# to avoid ununsed variables.
+WARNING_FLAGS=-Wall  -Wextra  -Wno-deprecated -Wno-unused-parameter -Wno-unused-variable -Wno-vla -fdiagnostics-color=always
 CXX=ccache $(COMPILERBINARY) $(CXX_FLAGS) -std=c++14 $(WARNING_FLAGS)
 
 INC_FOLDERS=\
@@ -210,6 +210,7 @@ BIN=\
 	bin/stoke_support_list \
 	bin/stoke_debug_cfg \
 	bin/stoke_debug_circuit \
+	bin/stoke_which_handler \
 	bin/stoke_debug_cost \
 	bin/stoke_debug_diff \
 	bin/stoke_debug_effect \

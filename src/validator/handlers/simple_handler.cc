@@ -884,7 +884,12 @@ void SimpleHandler::add_all() {
     uint64_t offset = constant & (128/vec_len - 1);
     auto dest_width = a.width();
 
-    ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
+    auto result = (b >> offset*vec_len)[vec_len-1][0];
+    if(dest_width > vec_len) {
+      result = SymBitVector::constant(dest_width - vec_len, 0) || result;
+    }
+
+    ss.set(dst, result);
   });
 
   add_opcode_str({"pextrb", "vpextrb"},
@@ -894,7 +899,12 @@ void SimpleHandler::add_all() {
     uint64_t offset = constant & (128/vec_len - 1);
     auto dest_width = a.width();
 
-    ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
+    auto result = (b >> offset*vec_len)[vec_len-1][0];
+    if(dest_width > vec_len) {
+      result = SymBitVector::constant(dest_width - vec_len, 0) || result;
+    }
+
+    ss.set(dst, result);
   });
 
   add_opcode_str({"pextrq", "vpextrq"},
@@ -1436,7 +1446,7 @@ void SimpleHandler::add_all() {
   // roundss
   add_opcode_str({"roundss"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
-    short unsigned int vec_len = 64;
+    short unsigned int vec_len = 32;
     SymFunction f("cvt_single_to_int32_rm", vec_len, {vec_len, 8});
     auto dest_width = d.width();
 
@@ -1447,7 +1457,7 @@ void SimpleHandler::add_all() {
   // vroundss
   add_opcode_str({"vroundss"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d, SymBitVector s1, SymBitVector s2, SymBitVector imm, SymState& ss) {
-    short unsigned int vec_len = 64;
+    short unsigned int vec_len = 32;
     SymFunction f("cvt_single_to_int32_rm", vec_len, {vec_len, 8});
     auto dest_width = d.width();
 
@@ -1483,7 +1493,6 @@ void SimpleHandler::add_all() {
         ss.set(op_base, operation(base_bvec, mask));
       }
     } else {
-      /*
       // Memory case. Immediates are masked to the lowest bits, registers are sign
       // extended from their original width, and not masked.
       auto bit_offset = op_offset.is_immediate() ? (SymBitVector::constant(56, 0) || (offset_bvec & size_mask)):
@@ -1506,7 +1515,6 @@ void SimpleHandler::add_all() {
         auto sigsev = ss.memory->write(addr, write_byte, 8, ss.get_lineno());
         ss.set_sigsegv(sigsev);
       }
-      */
     }
 
     // Set other flags, doesn't depend on operation
@@ -2661,6 +2669,44 @@ void SimpleHandler::add_all() {
     ss.set(dst, b[127][32] || (f(bb, cc)[0]).ite(bb, cc), true);
   });
 
+  // These are the memory instructions which have no regiter variant.
+  // Borrowed from master stoke.
+  add_opcode_str({"movlpd", "movlps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    if (dst.size() > 64)
+      ss.set(dst, a[dst.size() - 1][64] || b[63][0]);
+    else
+      ss.set(dst, b[63][0]);
+  });
+
+  add_opcode_str({"vmovlpd", "vmovlps"},
+  [] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    ss.set(dst, b[127][64] || c[63][0], true);
+  });
+
+  add_opcode_str({"vmovlpd", "vmovlps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    ss.set(dst, b[63][0], true);
+  });
+
+  add_opcode_str({"movhpd", "movhps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    if (dst.size() > 64)
+      ss.set(dst, b[63][0] || a[63][0]);
+    else
+      ss.set(dst, b[127][64]);
+  });
+
+  add_opcode_str({"vmovhpd", "vmovhps"},
+  [] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    ss.set(dst, c[63][0] || b[63][0], true);
+  });
+
+  add_opcode_str({"vmovhpd", "vmovhps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    ss.set(dst, b[127][64], true);
+  });
+
   // can't be done with packed handler because of special case for memory
   add_opcode_str({"movsd"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
@@ -2743,8 +2789,11 @@ void SimpleHandler::add_all() {
     ss.set_szp_flags(-a);
   });
 
-  add_opcode_str({"nop", "nopb", "nopw", "nopl", "nopq"},
+  add_opcode_str({"nop", "nopb", "nopq"},
   [] (SymState& ss) {});
+
+  add_opcode_str({"nopw", "nopl"},
+  [] (Operand dst, SymBitVector a, SymState& ss) {});
 
   add_opcode_str({"notb", "notw", "notl", "notq"},
   [] (Operand dst, SymBitVector a, SymState& ss) {
@@ -2973,8 +3022,13 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"xchgb", "xchgw", "xchgl", "xchgq"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    ss.set(dst, b);
-    ss.set(src, a);
+    if (src.is_typical_memory()) {
+      ss.set(src, a);
+      ss.set(dst, b);
+    } else {
+      ss.set(dst, b);
+      ss.set(src, a);
+    }
   });
 
   add_opcode_str({"xorb", "xorw", "xorl", "xorq"},
