@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
   // Check if there is a memory reference
   bool check_mem_writes = false;
-  if(-1 != instr.mem_index()) {
+  if (-1 != instr.mem_index()) {
     check_mem_writes = true;
   }
 
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
     }
 
     // Check Memory writes
-    if(check_mem_writes) {
+    if (check_mem_writes) {
       auto mem_op = instr.get_operand<M8>(instr.mem_index());
       eq = eq && is_eq(dummy, sym_validator.lookup(mem_op), sb_validator.lookup(mem_op), ss, cs);
     }
