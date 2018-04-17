@@ -63,8 +63,7 @@ auto& no_simplify_arg = FlagArg::create("no_simplify")
 cpputil::ValueArg<std::string>& strata_path_arg =
   cpputil::ValueArg<std::string>::create("strata_path")
   .usage("<path/to/dir>")
-  .description("The path to the directory with the strata circuits (a collection of .s files)")
-  .default_val("");
+  .description("The path to the directory with the strata circuits (a collection of .s files)");
 
 auto& opc_arg = ValueArg<string>::create("opc")
                 .description("The opcode to consider;  use opcode_number to indicate an imm8 argument");
@@ -74,6 +73,7 @@ auto& opc_arg = ValueArg<string>::create("opc")
 int main(int argc, char** argv) {
 
   // not actually required here
+  strata_path_arg.required(true);
   target_arg.required(false);
 
   CommandLineConfig::strict_with_convenience(argc, argv);

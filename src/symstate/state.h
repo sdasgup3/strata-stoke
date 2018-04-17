@@ -66,7 +66,7 @@ public:
   /** Has a #OF, #BR, #TS, #GP or #PF exception occurred? These trigger SIGSEGV on linux) */
   SymBool sigsegv;
   /** Current rip offset */
-  // SymBitVector rip;
+  SymBitVector rip;
   /** Shadow registers */
   // std::map<std::string, SymBitVector> shadow;
 

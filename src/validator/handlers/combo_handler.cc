@@ -98,7 +98,7 @@ Handler* ComboHandler::get_handler(const Instruction& instr, Handler::SupportLev
     ss << "Unsupported instruction: " << instr;
     error_ = ss.str();
   }
-  cout << instr << ": Hindex" << handler_index << "(" << handlers_.size() << ")\n";
+  // cout << instr << ": Hindex" << handler_index << "(" << handlers_.size() << ")\n";
   return best_handler;
 
 }

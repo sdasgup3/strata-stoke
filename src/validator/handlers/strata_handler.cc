@@ -553,7 +553,7 @@ SupportReason StrataHandler::support_reason(const x64asm::Opcode& opcode) {
 
   if (found) {
     if (specgen_is_base(alt)) {
-      std::cout << "Base Instruction!!\n";
+      // std::cout << "Base Instruction!!\n";
       return reason;
     }
     if (is_supported(alt)) return reason;

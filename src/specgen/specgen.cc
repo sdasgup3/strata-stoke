@@ -325,19 +325,30 @@ bool is_supported_type(x64asm::Type t) {
 }
 
 
+
+
 std::map<x64asm::Type, std::vector<x64asm::Operand>> operands_ = {
-  {x64asm::Type::RH, {x64asm::Constants::ah(), x64asm::Constants::bh(), x64asm::Constants::ch(), x64asm::Constants::dh()}},
-  {x64asm::Type::R_8, {x64asm::Constants::bl(), x64asm::Constants::cl(), x64asm::Constants::dl()}},
-  {x64asm::Type::R_16, {x64asm::Constants::bx(), x64asm::Constants::cx(), x64asm::Constants::dx()}},
-  {x64asm::Type::R_32, {x64asm::Constants::ebx(), x64asm::Constants::ecx(), x64asm::Constants::edx()}},
-  {x64asm::Type::R_64, {x64asm::Constants::rbx(), x64asm::Constants::rcx(), x64asm::Constants::rdx()}},
+  {x64asm::Type::RH,    {x64asm::Constants::ah(), x64asm::Constants::bh(), x64asm::Constants::ch(), x64asm::Constants::dh()}},
+  {x64asm::Type::R_8,   {x64asm::Constants::bl(), x64asm::Constants::cl(), x64asm::Constants::dl()}},
+  {x64asm::Type::R_16,  {x64asm::Constants::bx(), x64asm::Constants::cx(), x64asm::Constants::dx()}},
+  {x64asm::Type::R_32,  {x64asm::Constants::ebx(), x64asm::Constants::ecx(), x64asm::Constants::edx()}},
+  {x64asm::Type::R_64,  {x64asm::Constants::rbx(), x64asm::Constants::rcx(), x64asm::Constants::rdx()}},
+  {x64asm::Type::M_8,   {x64asm::M8(x64asm::Constants::rbx()),   x64asm::M8(x64asm::Constants::rcx()),    x64asm::M8(x64asm::Constants::rdx())}},
+  {x64asm::Type::M_16,  {x64asm::M16(x64asm::Constants::rbx()),  x64asm::M16(x64asm::Constants::rcx()),   x64asm::M16(x64asm::Constants::rdx())}},
+  {x64asm::Type::M_32,  {x64asm::M32(x64asm::Constants::rbx()),  x64asm::M32(x64asm::Constants::rcx()),   x64asm::M32(x64asm::Constants::rdx())}},
+  {x64asm::Type::M_64,  {x64asm::M64(x64asm::Constants::rbx()),  x64asm::M64(x64asm::Constants::rcx()),   x64asm::M64(x64asm::Constants::rdx())}},
+  {x64asm::Type::M_128, {x64asm::M128(x64asm::Constants::rbx()), x64asm::M128(x64asm::Constants::rcx()),  x64asm::M128(x64asm::Constants::rdx())}},
+  {x64asm::Type::M_256, {x64asm::M256(x64asm::Constants::rbx()), x64asm::M256(x64asm::Constants::rcx()),  x64asm::M256(x64asm::Constants::rdx())}},
   {x64asm::Type::XMM, {x64asm::Constants::xmm1(), x64asm::Constants::xmm2(), x64asm::Constants::xmm3(), x64asm::Constants::xmm4()}},
   {x64asm::Type::YMM, {x64asm::Constants::ymm1(), x64asm::Constants::ymm2(), x64asm::Constants::ymm3(), x64asm::Constants::ymm4()}},
   {x64asm::Type::MM, {x64asm::Constants::mm0(), x64asm::Constants::mm1(), x64asm::Constants::mm2(), x64asm::Constants::mm3()}}
 };
 std::map<x64asm::Type, int> operands_idx_ = {
 };
+
 x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
+  // std::cout << "Type: " << t << "\n"; 
+  /*
   if (t == x64asm::Type::M_8) {
     return x64asm::M8(x64asm::Constants::rax());
   }
@@ -356,6 +367,7 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
   if (t == x64asm::Type::M_256) {
     return x64asm::M256(x64asm::Constants::rax());
   }
+  */
   if (t == x64asm::Type::IMM_8) {
     return x64asm::Imm8(imm8_val);
   }
@@ -409,6 +421,60 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
   assert((int)operands_[t].size() > operands_idx_[t]);
   operands_idx_[t] += 1;
   // increment other counters, too, so that we don't reuse the same register id multiple times
+
+  auto incr_mem_counters = [&operands_idx_]() -> void {
+    if (operands_idx_.find(x64asm::Type::M_8) == operands_idx_.end())
+      operands_idx_[x64asm::Type::M_8] = 0;
+    operands_idx_[x64asm::Type::M_8] += 1;
+
+    if (operands_idx_.find(x64asm::Type::M_8) == operands_idx_.end())
+      operands_idx_[x64asm::Type::M_16] = 0;
+    operands_idx_[x64asm::Type::M_16] += 1;
+
+    if (operands_idx_.find(x64asm::Type::M_32) == operands_idx_.end())
+      operands_idx_[x64asm::Type::M_32] = 0;
+    operands_idx_[x64asm::Type::M_32] += 1;
+
+    if (operands_idx_.find(x64asm::Type::M_64) == operands_idx_.end())
+      operands_idx_[x64asm::Type::M_64] = 0;
+    operands_idx_[x64asm::Type::M_64] += 1;
+
+    if (operands_idx_.find(x64asm::Type::M_128) == operands_idx_.end())
+      operands_idx_[x64asm::Type::M_128] = 0;
+    operands_idx_[x64asm::Type::M_128] += 1;
+
+    if (operands_idx_.find(x64asm::Type::M_256) == operands_idx_.end())
+      operands_idx_[x64asm::Type::M_256] = 0;
+    operands_idx_[x64asm::Type::M_256] += 1;
+  };
+
+  if(t == x64asm::Type::R_8 
+      || t == x64asm::Type::R_16 
+      || t == x64asm::Type::R_32
+      || t == x64asm::Type::R_64) {
+      incr_mem_counters();
+  }
+
+  if(t == x64asm::Type::M_8
+      || t == x64asm::Type::M_16
+      || t == x64asm::Type::M_32
+      || t == x64asm::Type::M_64
+      || t == x64asm::Type::M_128
+      || t == x64asm::Type::M_256 ) {
+    if (operands_idx_.find(x64asm::Type::R_8) == operands_idx_.end())
+      operands_idx_[x64asm::Type::R_8] = 0;
+    operands_idx_[x64asm::Type::R_8] += 1;
+    if (operands_idx_.find(x64asm::Type::R_16) == operands_idx_.end())
+      operands_idx_[x64asm::Type::R_16] = 0;
+    operands_idx_[x64asm::Type::R_16] += 1;
+    if (operands_idx_.find(x64asm::Type::R_32) == operands_idx_.end())
+      operands_idx_[x64asm::Type::R_32] = 0;
+    operands_idx_[x64asm::Type::R_32] += 1;
+    if (operands_idx_.find(x64asm::Type::R_64) == operands_idx_.end())
+      operands_idx_[x64asm::Type::R_64] = 0;
+    operands_idx_[x64asm::Type::R_64] += 1;
+  }
+
   if (t == x64asm::Type::R_64) {
     if (operands_idx_.find(x64asm::Type::R_8) == operands_idx_.end())
       operands_idx_[x64asm::Type::R_8] = 0;
@@ -420,6 +486,7 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
       operands_idx_[x64asm::Type::R_32] = 0;
     operands_idx_[x64asm::Type::R_32] += 1;
   }
+
   if (t == x64asm::Type::R_32) {
     if (operands_idx_.find(x64asm::Type::R_8) == operands_idx_.end())
       operands_idx_[x64asm::Type::R_8] = 0;
@@ -428,16 +495,19 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
       operands_idx_[x64asm::Type::R_16] = 0;
     operands_idx_[x64asm::Type::R_16] += 1;
   }
+
   if (t == x64asm::Type::R_16) {
     if (operands_idx_.find(x64asm::Type::R_8) == operands_idx_.end())
       operands_idx_[x64asm::Type::R_8] = 0;
     operands_idx_[x64asm::Type::R_8] += 1;
   }
+
   if (t == x64asm::Type::YMM) {
     if (operands_idx_.find(x64asm::Type::XMM) == operands_idx_.end())
       operands_idx_[x64asm::Type::XMM] = 0;
     operands_idx_[x64asm::Type::XMM] += 1;
   }
+
   return operands_[t][operands_idx_[t] - 1];
 }
 

@@ -28,10 +28,12 @@ class FlatMemory : public SymMemory {
 
 public:
 
-  FlatMemory() {
+  FlatMemory(bool no_constraints = false) {
     variable_ = SymArray::tmp_var(64, 8);
+    start_variable_ = variable_;
     heap_ = variable_;
     variable_up_to_date_ = true;
+    no_constraints_ = no_constraints;
   }
 
   /** Updates the memory with a write.
@@ -59,26 +61,32 @@ public:
     return variable_;
   }
 
+  SymArray get_start_variable() {
+    return start_variable_;
+  }
+
   /** Get list of accesses accessed (via read or write).  This is needed for
    * marking relevant cells valid in the counterexample. */
   std::map<const SymBitVectorAbstract*, uint64_t> get_access_list() {
     return access_list_;
   }
 
+  /** The heap state */
+  SymArray heap_;
+  /** Extra constraints needed to make everything work. */
+  std::vector<SymBool> constraints_;
+
 private:
 
   /** A variable that represents the heap state */
   bool variable_up_to_date_;
   SymArray variable_;
-
-  /** The heap state */
-  SymArray heap_;
-
-  /** Extra constraints needed to make everything work. */
-  std::vector<SymBool> constraints_;
+  SymArray start_variable_;
 
   /** map of (symbolic address, size) pairs accessed. */
   std::map<const SymBitVectorAbstract*, uint64_t> access_list_;
+
+  bool no_constraints_;
 
 };
 
