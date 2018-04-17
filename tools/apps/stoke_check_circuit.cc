@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
   // Build the sym formula of the circuit
   cout << "Build Strata Combo Handler\n";
   ComboHandler ch("/home/sdasgup3/Github/strata-data/circuits/");
+  // ComboHandler ch;
   if (ch.get_support(instr) == Handler::SupportLevel::NONE) {
     //cout << "\033[1;31mNot supported\033[0m\n";
     cout << "Not Supported (" <<  opcode << ")\n";
@@ -115,8 +116,8 @@ int main(int argc, char** argv) {
     cout <<  "\n\n" << *reg << ":\n";
     // cout << SymSimplify().simplify(a) << "\n";
     // cout << b << "\n";
-    cout << solver.getZ3Formula(a) << "\n";
-    cout << b << "\n";
+    // cout << solver.getZ3Formula(a) << "\n";
+    // cout << b << "\n";
 
     bool res = solver.is_sat({ !eq });
     if (solver.has_error()) {

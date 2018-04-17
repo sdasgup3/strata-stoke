@@ -253,6 +253,7 @@ SymBitVectorAbstract* translate_max_register(const SymState& state, const Operan
         } else {
           auto operand_to = instr_to.get_operand<Operand>(i);
           auto res = (SymBitVectorAbstract*)state.lookup(operand_to).ptr;
+          // std::cout << "translate_max_register: " << operand_to << "\n\t" << res << "\n";
           assert(operand_to.size() <= operand_from.size());
           if (operand_to.size() < operand_from.size()) {
             return transformer.make_bitvector_sign_extend(res, operand_from.size());
@@ -849,6 +850,7 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
       if (!typecheck(val, (iter).size())) return;
       // rename variables in the tmp state to the values in start
       auto val_renamed = simplify(translate_circuit(val));
+      val_renamed = extend_or_shrink(val_renamed, iter_translated.size());
       if (!typecheck(val_renamed, (iter).size())) return;
       // update the start state with the circuits from tmp
       final.set(iter_translated, val_renamed, false, true);
@@ -891,11 +893,20 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
   }
   for (auto iter = liveouts.flags_begin(); iter != liveouts.flags_end(); ++iter) {
     auto iter_translated = *iter;
+
+    // cout << "Flag        -> " << (*iter) << endl;
+    // cout << "  translates to => " << iter_translated << endl;
+
     // look up live out in tmp state (no translation necessary for flags)
     auto val = tmp[*iter];
     if (!typecheck(val, 1)) return;
     // rename variables in the tmp state to the values in start
     auto val_renamed = simplifybool(translate_circuit(val));
+
+    // cout << "Value is               -> " << val << endl;
+    // cout << "  after renaming it is => " << val_renamed << endl;
+    // cout << endl;
+
     if (!typecheck(val_renamed, 1)) return;
     // update the start state with the circuits from tmp
     final.set(iter_translated, val_renamed);

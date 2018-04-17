@@ -23,8 +23,8 @@ SymBool FlatMemory::write(SymBitVector address, SymBitVector value, uint16_t siz
   // Little Endian
   // The least significant bit of value (i.e. the lowest bits) go in the lowest addresses
 
-  //std::cout << "\n\nAddress: " << address << "\n";
-  //std::cout << "Value: " << value << "\n";
+  // std::cout << "\n\nAddress(W): " << address << "\n";
+  // std::cout << "Value(W): " << value << "\n";
 
   for (size_t i = 0; i < size/8; ++i) {
     heap_ = heap_.update(address + SymBitVector::constant(64, i), value[8*i+7][8*i]);
@@ -61,8 +61,8 @@ std::pair<SymBitVector,SymBool> FlatMemory::read(SymBitVector address, uint16_t 
   for (size_t i = 1; i < size/8; ++i) {
     value = heap_[address + SymBitVector::constant(64, i)] || value;
   }
-  //std::cout << "\n\nAddress(R): " << address << "\n";
-  //std::cout << "\n\nValue(R): " << value << "\n";
+  // std::cout << "\n\nAddress(R): " << address << "\n";
+  // std::cout << "\n\nValue(R): " << value << "\n";
 
   return pair<SymBitVector,SymBool>(value, SymBool::_false());
 }
