@@ -115,8 +115,8 @@ int main(int argc, char** argv) {
     cout <<  "\n\n" << *reg << ":\n";
     // cout << SymSimplify().simplify(a) << "\n";
     // cout << b << "\n";
-     cout << solver.getZ3Formula(a) << "\n";
-     cout << b << "\n";
+    cout << solver.getZ3Formula(a) << "\n";
+    cout << b << "\n";
 
     bool res = solver.is_sat({ !eq });
     if (solver.has_error()) {

@@ -347,7 +347,7 @@ std::map<x64asm::Type, int> operands_idx_ = {
 };
 
 x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
-  // std::cout << "Type: " << t << "\n"; 
+  // std::cout << "Type: " << t << "\n";
   /*
   if (t == x64asm::Type::M_8) {
     return x64asm::M8(x64asm::Constants::rax());
@@ -448,14 +448,14 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
     operands_idx_[x64asm::Type::M_256] += 1;
   };
 
-  if(t == x64asm::Type::R_8 
-      || t == x64asm::Type::R_16 
+  if (t == x64asm::Type::R_8
+      || t == x64asm::Type::R_16
       || t == x64asm::Type::R_32
       || t == x64asm::Type::R_64) {
-      incr_mem_counters();
+    incr_mem_counters();
   }
 
-  if(t == x64asm::Type::M_8
+  if (t == x64asm::Type::M_8
       || t == x64asm::Type::M_16
       || t == x64asm::Type::M_32
       || t == x64asm::Type::M_64
