@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
   auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
     SymBool eq = a == b;
 
-    cout <<  "\n\n" << *reg << ":\n";
+    // cout <<  "\n\n" << *reg << ":\n";
     // cout << SymSimplify().simplify(a) << "\n";
     // cout << b << "\n";
     // cout << solver.getZ3Formula(a) << "\n";
