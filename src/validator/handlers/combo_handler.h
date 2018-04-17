@@ -50,11 +50,11 @@ public:
   /** Build a circuit for a particular instruction */
   void build_circuit(const x64asm::Instruction& instr, SymState& start);
 
-private:
 
   /** Get the handler and support level for an instruction */
   Handler* get_handler(const x64asm::Instruction& instr, SupportLevel& sl);
 
+private:
   /** Default prioritized list of handlers */
   std::vector<Handler*> default_handler_list() const;
 

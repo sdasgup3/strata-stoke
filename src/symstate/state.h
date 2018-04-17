@@ -45,8 +45,8 @@ public:
   }
 
   ~SymState() {
-    // if (delete_memory_)
-    //   delete memory;
+    if (delete_memory_)
+      delete memory;
   }
 
   /** Flag to print ims as symbolic values */
@@ -65,6 +65,15 @@ public:
   SymBool sigfpe;
   /** Has a #OF, #BR, #TS, #GP or #PF exception occurred? These trigger SIGSEGV on linux) */
   SymBool sigsegv;
+  /** Current rip offset */
+  SymBitVector rip;
+  /** Shadow registers */
+  // std::map<std::string, SymBitVector> shadow;
+
+  /** Should the memory be deleted? */
+  void set_delete_memory(bool b) {
+    delete_memory_ = b;
+  }
 
   /** Get the address corresponding to a memory location */
   template <typename T>
@@ -129,6 +138,9 @@ public:
   /** Set the line number.  Used as a parameter to access memory. */
   void set_lineno(size_t line) {
     lineno_ = line;
+  }
+  size_t get_lineno() const {
+    return lineno_;
   }
 
   /** Replace symbolic values with variables and add constraints.*/

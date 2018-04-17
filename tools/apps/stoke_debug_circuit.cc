@@ -23,12 +23,16 @@
 #include "src/symstate/simplify.h"
 #include "src/symstate/pretty_visitor.h"
 #include "src/symstate/print_visitor.h"
+#include "src/symstate/memory/trivial.h"
 #include "src/validator/handlers/combo_handler.h"
 
 #include "tools/gadgets/functions.h"
 #include "tools/gadgets/solver.h"
 #include "tools/gadgets/target.h"
 #include "tools/gadgets/validator.h"
+#include "src/specgen/specgen.h"
+#include "tools/gadgets/testcases.h"
+#include "tools/gadgets/seed.h"
 
 using namespace cpputil;
 using namespace std;
@@ -52,13 +56,15 @@ auto& input_header = Heading::create("More Input Formats:");
 auto& code_arg = ValueArg<Code, CodeReader, CodeWriter>::create("code")
                  .description("Input code directly");
 
-auto& dbg = Heading::create("Circuit Printing Options:");
+auto& dbg = Heading::create("Formula Printing Options:");
 auto& only_live_out_arg = FlagArg::create("only_live_outs")
                           .description("Only show live out registers");
 auto& show_unchanged_arg = FlagArg::create("show_unchanged")
                            .description("Show the formula for unchanged registers");
 auto& use_smtlib_format_arg = FlagArg::create("smtlib_format")
-                              .description("Show circuits in smtlib format");
+                              .description("Show formula in smtlib format");
+auto& no_simplify_arg = FlagArg::create("no_simplify")
+                        .description("Don't simplify formulas before printing them.");
 
 cpputil::ValueArg<std::string>& strata_path_arg =
   cpputil::ValueArg<std::string>::create("strata_path")
@@ -69,6 +75,13 @@ cpputil::ValueArg<std::string>& strata_path_arg =
 auto& keep_imm_symbolic_arg =
   FlagArg::create("keep_imm_symbolic")
   .description("Should immediates be kept symbolic?");
+
+auto& opc_arg = ValueArg<string>::create("opc")
+                .description("The opcode to consider;  use opcode_number to indicate an imm8 argument");
+
+auto& keep_quiet_arg =
+  FlagArg::create("keep_quiet")
+  .description("No circuit output");
 
 template <typename T>
 string out_padded(T t, size_t min_length, char pad = ' ') {
@@ -112,53 +125,69 @@ int main(int argc, char** argv) {
   DebugHandler::install_sigsegv();
   DebugHandler::install_sigill();
 
-  if (!code_arg.has_been_provided() && !target_arg.has_been_provided()) {
-    Console::error() << "Either --code or --target required." << endl;
+  bool opcode_provided;
+  if (opc_arg.has_been_provided()) {
+    opcode_provided = true;
   }
 
-  if (code_arg.has_been_provided() && target_arg.has_been_provided()) {
-    Console::error() << "At most one of --code and --target can be provided." << endl;
+  if (!opcode_provided) {
+    if (!code_arg.has_been_provided() && !target_arg.has_been_provided()) {
+      Console::error() << "Either --code or --target required." << endl;
+    }
+
+    if (code_arg.has_been_provided() && target_arg.has_been_provided()) {
+      Console::error() << "At most one of --code and --target can be provided." << endl;
+    }
   }
 
-  FunctionsGadget aux_fxns;
-  TargetGadget target(aux_fxns, false);
-  Code code = target.get_code();
+  // SeedGadget seed;
+  // TestcaseGadget tc(seed);
+
+  // FunctionsGadget aux_fxns;
+  // TargetGadget target(aux_fxns, false);
+
+  // Code code = target.get_code();
+  Code code;
   if (code_arg.has_been_provided()) {
     code = code_arg.value();
   }
 
-  Console::msg() << "Target" << endl << endl;
-  Console::msg() << code << endl << endl;
-  if (code.size() == 1) {
-    Console::msg() << "  maybe read:      " << target.maybe_read_set(code[0]) << endl;
-    Console::msg() << "  must read:       " << target.must_read_set(code[0]) << endl;
-    Console::msg() << "  maybe write:     " << target.maybe_write_set(code[0]) << endl;
-    Console::msg() << "  must write:      " << target.must_write_set(code[0]) << endl;
-    Console::msg() << "  maybe undef:     " << target.maybe_undef_set(code[0]) << endl;
-    Console::msg() << "  must undef:      " << target.must_undef_set(code[0]) << endl;
-  } else {
+  if (opc_arg.has_been_provided()) {
+    auto instr = get_instruction_from_string(opc_arg);
+    code.push_back(instr);
+  }
+
+  if (!keep_quiet_arg.value()) {
+    Console::msg() << "code: " << code << endl << endl;
     Console::msg() << "  maybe read:      " << code.maybe_read_set() << endl;
     Console::msg() << "  must read:       " << code.must_read_set() << endl;
     Console::msg() << "  maybe write:     " << code.maybe_write_set() << endl;
     Console::msg() << "  must write:      " << code.must_write_set() << endl;
     Console::msg() << "  maybe undef:     " << code.maybe_undef_set() << endl;
     Console::msg() << "  must undef:      " << code.must_undef_set() << endl;
+    Console::msg() << "  required flags:  " << code.required_flags() << endl;
+
+    Console::msg() << endl;
   }
-  Console::msg() << "  required flags:  " << code.required_flags() << endl;
 
-  Console::msg() << endl;
+  // build initial state
+  SymState state;
+  TrivialMemory* mem = NULL;
+  if (testcases_arg.value().empty()) {
+    state = SymState("", true);
+    mem = new TrivialMemory();
+    state.memory = mem;
+  } else {
+    // state = SymState(tc);
+  }
 
-  ComboHandler ch(strata_path_arg.value());
-  SymState state("", true);
-
-
+  // Useful only for immediates
   if (keep_imm_symbolic_arg.value()) {
     state.set_keep_imm_symbolic();
   }
 
-  // TODO: doesn't handle memory
-
   // test validator support
+  ComboHandler ch(strata_path_arg.value());
   for (auto it : code) {
     if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
     if (it.get_opcode() == Opcode::RET) break; // only go until first break
@@ -167,11 +196,15 @@ int main(int argc, char** argv) {
     }
   }
 
-  // compute circuit
+  // compute formula
+  bool mem_fetch_from_same_address = true;
   size_t line = 0;
   for (auto it : code) {
     if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
     if (it.get_opcode() == Opcode::RET) break;
+    if (it.get_opcode() == Opcode::POP_M16 || it.get_opcode() == Opcode::POP_M64) {
+      mem_fetch_from_same_address = false;
+    }
     state.set_lineno(line);
     ch.build_circuit(it, state);
     if (ch.has_error()) {
@@ -184,18 +217,27 @@ int main(int argc, char** argv) {
     Console::error() << "Symbolic execution failed: " << ch.error() << endl;
   }
 
-  Console::msg() << "Circuits:" << endl;
+  if (keep_quiet_arg.value()) {
+    return 0;
+  }
+
+  Console::msg() << "Formula:" << endl;
   Console::msg() << endl;
 
   SymPrettyVisitor pretty(Console::msg());
   SymPrintVisitor smtlib(Console::msg());
 
-  auto print = [&smtlib, &pretty](const auto c) {
+  SolverGadget solver;
+  auto print = [&solver, &smtlib, &pretty](const auto cc) {
+    auto c = SymSimplify().simplify(cc);
+    if (no_simplify_arg.value()) {
+      c = cc;
+    }
     if (use_smtlib_format_arg.value()) {
-      pretty((c));
+      //smtlib((c));
+      std::cout << solver.getZ3Formula(c);
     } else {
-      SymSimplify s;
-      pretty(s.simplify(c));
+      pretty((c));
     }
   };
 
@@ -209,7 +251,7 @@ int main(int argc, char** argv) {
               Constants::eflags_pf() +
               Constants::eflags_af();
   if (only_live_out_arg.value()) {
-    rs &= target.live_outs();
+    // rs &= target.live_outs();
   }
   for (auto gp_it = rs.gp_begin(); gp_it != rs.gp_end(); ++gp_it) {
     auto val = state.lookup(*gp_it);
@@ -241,6 +283,95 @@ int main(int argc, char** argv) {
   }
   if (printed) cout << endl;
   printed = false;
+
+  // check equivalence of two circuits for a given register
+  auto is_eq = [&solver](auto a_in, auto b_in, stringstream& explanation) {
+    auto a = (a_in);
+    auto b = (b_in);
+
+    SymBool eq = a == b;
+    SymPrettyVisitor pretty(explanation);
+    bool res = solver.is_sat({ !eq });
+    if (!res) {
+      return true;
+    }
+    return false;
+  };
+
+
+
+  // print memory reads and writes
+  if (mem != NULL) {
+    auto reads = mem->get_reads();
+    auto writes = mem->get_writes();
+    if (reads.size() > 0) {
+      printed = true;
+      cout << "Information about memory reads:" << endl;
+      bool firstInstance = true;
+      size_t sZ;
+      SymBitVector sA;
+
+      for (auto loc : reads) {
+        cout << "  Value ";
+        print(loc.value);
+
+        // Check if all the mem access are from same address and of same size
+        if (mem_fetch_from_same_address) {
+          if (firstInstance) {
+            sZ =   loc.size;
+            sA = loc.address;
+            firstInstance = false;
+          } else {
+            if (loc.size != sZ) {
+              std::cout << "info: Loc Size Mismatch\n\n";
+            }
+            stringstream ss;
+            if (!is_eq(sA, loc.address, ss)) {
+              std::cout << "info: Loc Address Mismatch\n\n";
+            }
+          }
+        }
+        cout << " (" << loc.size << " bytes)" << endl;
+        cout << "    was read at address ";
+        print(loc.address);
+        cout << "." << endl;
+      }
+    }
+
+    if (printed) cout << endl;
+    printed = false;
+    if (writes.size() > 0) {
+      printed = true;
+      cout << "Information about memory writes:" << endl;
+      bool firstInstance = true;
+      size_t sZ;
+      SymBitVector sA;
+
+      for (auto loc : writes) {
+        cout << "  Address ";
+        print(loc.address);
+
+        // Check if all the mem access are from same address and of same size
+        if (mem_fetch_from_same_address) {
+          if (firstInstance) {
+            sZ =   loc.size;
+            sA = loc.address;
+            firstInstance = false;
+          } else {
+            assert(loc.size == sZ && "Loc Size Mismatch");
+            stringstream ss;
+            assert(is_eq(sA, loc.address, ss) && "Loc Address Mismatch");
+          }
+        }
+        cout << " was updated to" << endl;
+        cout << "    ";
+        print(loc.value);
+        cout << " (" << loc.size << " bytes)." << endl;
+      }
+    }
+    if (printed) cout << endl;
+    printed = false;
+  }
 
   Console::msg() << "sigfpe  : ";
   print(state.sigfpe);

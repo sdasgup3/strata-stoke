@@ -25,7 +25,7 @@
 
 
 #define OBLIG_DEBUG(X) { }
-#define CONSTRAINT_DEBUG(X) { }
+#define CONSTRAINT_DEBUG(X) {X }
 #define BUILD_TC_DEBUG(X) { }
 #define ALIAS_DEBUG(X) { }
 #define ALIAS_CASE_DEBUG(X) { }
@@ -1361,6 +1361,8 @@ bool ObligationChecker::check(const Cfg& target, const Cfg& rewrite, const CfgPa
   })
 
     // Build inequality constraint
+    //cout <<  state_t << "\n";
+    //cout <<  state_r << "\n";
     auto prove_constraint = !prove(state_t, state_r);
     CONSTRAINT_DEBUG(cout << "Proof inequality: " << prove_constraint << endl;)
 
@@ -1383,6 +1385,7 @@ bool ObligationChecker::check(const Cfg& target, const Cfg& rewrite, const CfgPa
 
 
     bool is_sat = solver_.is_sat(constraints);
+    cout << "Salver says: " << is_sat <<  "\n";
     if (solver_.has_error()) {
       throw VALIDATOR_ERROR("solver: " + solver_.get_error());
     }

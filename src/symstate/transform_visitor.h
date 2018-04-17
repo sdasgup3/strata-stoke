@@ -97,6 +97,8 @@ public:
   std::map<SymArrayAbstract*, SymArrayAbstract*>& cache_array_;
   bool delete_caches_;
 
+public:
+
   // The make_* functions allow the creation of new bit vectors and bools, and takes
   // care of memory management (by using the memory manager seen last).
 

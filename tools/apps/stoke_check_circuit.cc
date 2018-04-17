@@ -47,11 +47,6 @@
 #include "tools/gadgets/validator.h"
 #include "tools/gadgets/verifier.h"
 
-
-
-#include "src/specgen/specgen.h"
-#include "src/specgen/support.h"
-
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 
@@ -92,6 +87,12 @@ int main(int argc, char** argv) {
   auto instr = target.get_code()[1];
   auto opcode = instr.get_opcode();
 
+  // Check if there is a memory reference
+  bool check_mem_writes = false;
+  if (-1 != instr.mem_index()) {
+    check_mem_writes = true;
+  }
+
   // Collect the run results
   cout << "Collect Results\n";
   std::vector<CpuState> reference_out_;
@@ -105,8 +106,9 @@ int main(int argc, char** argv) {
   }
 
   // Build the sym formula of the circuit
-  cout << "Build Handler\n";
-  ComboHandler ch;
+  cout << "Build Strata Combo Handler\n";
+  ComboHandler ch("/home/sdasgup3/Github/strata-data/circuits/");
+  // ComboHandler ch;
   if (ch.get_support(instr) == Handler::SupportLevel::NONE) {
     //cout << "\033[1;31mNot supported\033[0m\n";
     cout << "Not Supported (" <<  opcode << ")\n";
@@ -116,24 +118,34 @@ int main(int argc, char** argv) {
   // check equivalence of two symbolic states for a given register
   auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
     SymBool eq = a == b;
-    //cout << SymSimplify().simplify(a) << "\n\n";
-    //cout << b << "\n\n";
+
+    cout <<  "\n\n" << *reg << ":\n";
+    // cout << SymSimplify().simplify(a) << "\n";
+    // cout << b << "\n";
+    // cout << solver.getZ3Formula(a) << "\n";
+    // cout << solver.getZ3Formula(b) << "\n";
+
+    // bool res = solver.is_sat({ !eq });
     bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
       return false;
     }
+    //if (res) {
     if (!res) {
       cout << cs << "\n";
       cout << "\n\n";
 
       explanation << "  states do not agree for '" << (*reg) << "':" << endl;
       auto simplify = true;
+      /*
       if (!simplify) {
         explanation << "    validator: " << (a) << endl;
       } else {
         explanation << "    validator: " << SymSimplify().simplify(a) << endl;
       }
+      */
+      explanation << "    validator: " << solver.getZ3Formula(SymSimplify().simplify(a)) << endl;
       explanation << "    sandbox:   " << b << endl;
       return false;
     } else {
@@ -158,13 +170,15 @@ int main(int argc, char** argv) {
     rs = rs - instr.maybe_undef_set();
   }
   */
+
   // Just the live_outs
   auto rs = live_out_arg.value();
-
 
   //Iterate on each testcase
   cout << "Check Equivalence\n";
   int i = 0;
+  RegSet *dummy = new RegSet();
+
   for (const auto& cs : test_set) {
     // Create a formula with initial state as the test input
     SymState sym_validator(cs);
@@ -190,6 +204,13 @@ int main(int argc, char** argv) {
     for (auto flag_it = rs.flags_begin(); flag_it != rs.flags_end(); ++flag_it) {
       eq = eq && is_eq(flag_it, sym_validator[*flag_it], sb_validator[*flag_it], ss, cs);
     }
+
+    // Check Memory writes
+    if (check_mem_writes) {
+      auto mem_op = instr.get_operand<M8>(instr.mem_index());
+      eq = eq && is_eq(dummy, sym_validator.lookup(mem_op), sb_validator.lookup(mem_op), ss, cs);
+    }
+
     if (!eq) {
       cout << ss.str() << endl;
       return 1;

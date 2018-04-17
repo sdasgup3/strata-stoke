@@ -23,21 +23,26 @@ SymBool FlatMemory::write(SymBitVector address, SymBitVector value, uint16_t siz
   // Little Endian
   // The least significant bit of value (i.e. the lowest bits) go in the lowest addresses
 
+  // std::cout << "\n\nAddress(W): " << address << "\n";
+  // std::cout << "Value(W): " << value << "\n";
+
   for (size_t i = 0; i < size/8; ++i) {
     heap_ = heap_.update(address + SymBitVector::constant(64, i), value[8*i+7][8*i]);
   }
 
   // Update the access list
   auto access_var = SymBitVector::tmp_var(64);
-  constraints_.push_back(access_var == address);
+  if (!no_constraints_)
+    constraints_.push_back(access_var == address);
   access_list_[access_var.ptr] = size;
 
   // Get a new array variable and update the heap
-  auto new_arr = SymArray::tmp_var(64, 8);
-  auto constr = heap_ == new_arr;
-  constraints_.push_back(constr);
-  //constraints_.push_back(heap_ == new_arr);
-  heap_ = new_arr;
+  if (!no_constraints_) {
+    auto new_arr = SymArray::tmp_var(64, 8);
+    auto constr = heap_ == new_arr;
+    constraints_.push_back(constr);
+    heap_ = new_arr;
+  }
 
   return SymBool::_false();
 }
@@ -56,6 +61,8 @@ std::pair<SymBitVector,SymBool> FlatMemory::read(SymBitVector address, uint16_t 
   for (size_t i = 1; i < size/8; ++i) {
     value = heap_[address + SymBitVector::constant(64, i)] || value;
   }
+  // std::cout << "\n\nAddress(R): " << address << "\n";
+  // std::cout << "\n\nValue(R): " << value << "\n";
 
   return pair<SymBitVector,SymBool>(value, SymBool::_false());
 }

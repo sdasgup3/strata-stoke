@@ -199,7 +199,11 @@ const R translate_gp_register(const R& operand_from, const Instruction& instr_fr
     // same full register?
     if (instr_from.get_operand<Operand>(i).is_gp_register()) {
       if (r_to_r64(operand_from) == r_to_r64(instr_from.get_operand<R>(i))) {
-        return r_to_r64(instr_to.get_operand<R>(i));
+        if (instr_to.get_operand<Operand>(i).is_gp_register()) {
+          return r_to_r64(instr_to.get_operand<R>(i));
+        } else {
+          return instr_to.get_operand<R>(i);
+        }
       }
     }
   }
@@ -215,7 +219,11 @@ const Sse translate_sse_register(const Sse& operand_from, const Instruction& ins
     // same full register?
     if (instr_from.get_operand<Operand>(i).is_sse_register()) {
       if (sse_to_ymm(operand_from) == sse_to_ymm(instr_from.get_operand<Sse>(i))) {
-        return sse_to_ymm(instr_to.get_operand<Sse>(i));
+        if (instr_to.get_operand<Operand>(i).is_sse_register()) {
+          return sse_to_ymm(instr_to.get_operand<Sse>(i));
+        } else {
+          return instr_to.get_operand<Sse>(i);
+        }
       }
     }
   }
@@ -239,22 +247,38 @@ SymBitVectorAbstract* translate_max_register(const SymState& state, const Operan
           auto val = (uint64_t)instr_to.get_operand<Imm>(i);
           auto c = transformer.make_bitvector_constant(bit_width_of_type(instr_to.type(i)), val);
           return transformer.make_bitvector_sign_extend(c, 64);
-        } else {
-          assert(is_gp_type(instr_to.type(i)));
+        } else if (is_gp_type(instr_to.type(i))) {
           auto translated_reg = r_to_r64(instr_to.get_operand<R>(i));
           return (SymBitVectorAbstract*)state.lookup(translated_reg).ptr;
+        } else {
+          auto operand_to = instr_to.get_operand<Operand>(i);
+          auto res = (SymBitVectorAbstract*)state.lookup(operand_to).ptr;
+          // std::cout << "translate_max_register: " << operand_to << "\n\t" << res << "\n";
+          assert(operand_to.size() <= operand_from.size());
+          if (operand_to.size() < operand_from.size()) {
+            return transformer.make_bitvector_sign_extend(res, operand_from.size());
+          }
+          return res;
         }
       }
-    } else
 
       // same 256 bit register?
-      if (operand_from.type() == Type::YMM) {
-        if (is_sse_type(instr_from.type(i)) && operand_from == sse_to_ymm(instr_from.get_operand<Sse>(i))) {
-          assert(is_sse_type(instr_to.type(i)));
+    } else if (operand_from.type() == Type::YMM) {
+      if (is_sse_type(instr_from.type(i)) && operand_from == sse_to_ymm(instr_from.get_operand<Sse>(i))) {
+        if (is_sse_type(instr_to.type(i))) {
           auto translated_reg = sse_to_ymm(instr_to.get_operand<Sse>(i));
           return (SymBitVectorAbstract*)state.lookup(translated_reg).ptr;
+        } else {
+          auto operand_to = instr_to.get_operand<Operand>(i);
+          auto res = (SymBitVectorAbstract*)state.lookup(operand_to).ptr;
+          assert(operand_to.size() <= operand_from.size());
+          if (operand_to.size() < operand_from.size()) {
+            return transformer.make_bitvector_sign_extend(res, operand_from.size());
+          }
+          return res;
         }
       }
+    }
   }
   // no translation necessary
   return (SymBitVectorAbstract*)state.lookup(operand_from).ptr;
@@ -477,7 +501,27 @@ void StrataHandler::init() {
 }
 
 bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
-  return support_reason(opcode) != SupportReason::NONE;
+  // Generalization from statified instr is wrong for these instructions
+  if (opcode == MOVSD_XMM_M64
+      || opcode == MOVSS_XMM_M32
+      || opcode == XCHG_M8_R8
+      || opcode == XCHG_M8_RH
+      || opcode == XCHG_M16_R16
+      || opcode == XCHG_M32_R32
+      || opcode == XCHG_M64_R64
+      || opcode == XCHG_R8_M8
+      || opcode == XCHG_RH_M8
+      || opcode == XCHG_R16_M16
+      || opcode == XCHG_R32_M32
+      || opcode == XCHG_R64_M64
+     ) {
+    return false;
+  }
+
+  auto rs = support_reason(opcode);
+  // cout << "Opcode: " << opcode << " Reason: " << rs << "\n";
+
+  return rs != SupportReason::NONE;
 }
 
 SupportReason StrataHandler::support_reason(const x64asm::Opcode& opcode) {
@@ -509,7 +553,10 @@ SupportReason StrataHandler::support_reason(const x64asm::Opcode& opcode) {
   }
 
   if (found) {
-    if (specgen_is_base(alt)) return reason;
+    if (specgen_is_base(alt)) {
+      // std::cout << "Base Instruction!!\n";
+      return reason;
+    }
     if (is_supported(alt)) return reason;
   } else {
     // we have a learned circuit
@@ -642,6 +689,7 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
       return false;
     }
     if (actual != exptected_size) {
+      assert(false);
       stringstream ss;
       ss << "Expected " << exptected_size << " bits, but got " << actual << " instead for ";
       SymPrettyVisitor pretty(ss);
@@ -656,27 +704,40 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
 
   // keep a copy of the start state
   SymState start = final;
+  start.set_delete_memory(false);
 
   // the state which will be the circuit for our alternative instruction
   SymState tmp(opcode_str);
 
   Instruction specgen_instr(XOR_R8_R8);
   if (reg_only_alternative_.find(opcode) != reg_only_alternative_.end()) {
-    // handle imm instructions
+    // handle instructions with a direct register only alternative
     // get circuit for register only opcode
     specgen_instr = get_instruction(reg_only_alternative_[opcode]);
-    ch.build_circuit(specgen_instr, tmp);
+    build_circuit(specgen_instr, tmp);
     if (ch.has_error()) {
-      error_ = "StrataHandler encountered an error: " + ch.error();
+      std::cout << specgen_instr << "\n";
+      error_ = "StrataHandler (Direct) encountered an error: " + ch.error();
       return;
     }
   } else if (reg_only_alternative_extend_.find(opcode) != reg_only_alternative_extend_.end()) {
-    // handle imm instructions that need extending
+    // handle instructions that need extending
     // this is actually the same as above
     specgen_instr = get_instruction(reg_only_alternative_extend_[opcode]);
-    ch.build_circuit(specgen_instr, tmp);
+    build_circuit(specgen_instr, tmp);
     if (ch.has_error()) {
-      error_ = "StrataHandler encountered an error: " + ch.error();
+      std::cout << specgen_instr << "\n";
+      error_ = "StrataHandler (Extend) encountered an error: " + ch.error();
+      return;
+    }
+  } else if (reg_only_alternative_mem_reduce_.find(opcode) != reg_only_alternative_mem_reduce_.end()) {
+    // handle instructions that need extending
+    // this is actually the same as above
+    specgen_instr = get_instruction(reg_only_alternative_mem_reduce_[opcode]);
+    build_circuit(specgen_instr, tmp);
+    if (ch.has_error()) {
+      std::cout << specgen_instr << "\n";
+      error_ = "StrataHandler (Shrink) encountered an error: " + ch.error();
       return;
     }
   } else {
@@ -693,6 +754,13 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
       TUnit t;
       file >> t;
 
+      if (failed(file)) {
+        cerr << "INTERNAL STOKE ERROR, please report" << endl;
+        cerr << "Failed to parse " << candidate_file << endl;
+        cerr << "Message: " << fail_msg(file) << endl;
+        exit(1);
+      }
+
       // build formula for program
       auto code = t.get_code();
       assert(code[0].get_opcode() == Opcode::LABEL_DEFN);
@@ -706,19 +774,20 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
     }
   }
 
-#ifdef DEBUG_STRATA_HANDLER
-  cout << "=====================================" << endl;
-  cout << "Computing circuit for " << instr << endl << endl;
-  cout << t.get_code() << endl << endl;
-  cout << "Initial state:" << endl;
-  print_state(start, instr.maybe_write_set());
-  cout << "State for specgen instruction: " << specgen_instr << ":" << endl;
-  print_state(tmp, specgen_instr.maybe_write_set());
-#endif
+// #ifdef DEBUG_STRATA_HANDLER
+//   cout << "=====================================" << endl;
+//   cout << "Computing circuit for " << instr << endl << endl;
+//   cout << t.get_code() << endl << endl;
+//   cout << "Initial state:" << endl;
+//   print_state(start, instr.maybe_write_set());
+//   cout << "State for specgen instruction: " << specgen_instr << ":" << endl;
+//   print_state(tmp, specgen_instr.maybe_write_set());
+// #endif
 
   // take a formula for specgen_instr in state tmp, and convert it to one that
   // makes sense for instr in state
-  SymVarRenamer translate_circuit([&instr, &specgen_instr, &start, &opcode_str](SymBitVectorVar* var) -> SymBitVectorAbstract* {
+  SymVarRenamer translate_circuit(
+  [&instr, &specgen_instr, &start, &opcode_str](SymBitVectorVar* var) -> SymBitVectorAbstract* {
     auto name = var->name_;
     if (name.size() <= opcode_str.size() || name.substr(name.size() - opcode_str.size()) != opcode_str) {
       // no renaming for variable of unfamiliar names
@@ -734,7 +803,8 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
     }
     assert(false);
     return NULL;
-  }, [&start, &opcode_str](SymBoolVar* var) -> SymBoolAbstract* {
+  },
+  [&start, &opcode_str](SymBoolVar* var) -> SymBoolAbstract* {
     auto name = var->name_;
     if (name.size() <= opcode_str.size() || name.substr(name.size() - opcode_str.size()) != opcode_str) {
       // no renaming for variable of unfamiliar names
@@ -747,7 +817,18 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
     }
     assert(false);
     return NULL;
-  });
+  }
+  );
+
+  auto extend_or_shrink = [](auto& in, uint64_t size) {
+    if (in.width() > size) {
+      in = in[size-1][0];
+    }
+    if (in.width() < size) {
+      in = in.sign_extend(size);
+    }
+    return in;
+  };
 
   // loop over all live outs and update the final state
   auto liveouts = specgen_instr.maybe_write_set();
@@ -769,6 +850,7 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
       if (!typecheck(val, (iter).size())) return;
       // rename variables in the tmp state to the values in start
       auto val_renamed = simplify(translate_circuit(val));
+      val_renamed = extend_or_shrink(val_renamed, iter_translated.size());
       if (!typecheck(val_renamed, (iter).size())) return;
       // update the start state with the circuits from tmp
       final.set(iter_translated, val_renamed, false, true);
@@ -785,16 +867,18 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
       if (!typecheck(val, (*iter).size())) return;
       // rename variables in the tmp state to the values in start
       auto val_renamed = simplify(translate_circuit(val));
+      val_renamed = extend_or_shrink(val_renamed, iter_translated.size());
 #ifdef DEBUG_STRATA_HANDLER
       cout << "Value is               -> " << simplify(val) << endl;
       cout << "  after renaming it is => " << simplify(val_renamed) << endl;
       cout << endl;
 #endif
-      if (!typecheck(val_renamed, (*iter).size())) return;
+      if (!typecheck(val_renamed, iter_translated.size())) return;
       // update the start state with the circuits from tmp
       final.set(iter_translated, val_renamed, false, true);
     }
   }
+
   for (auto iter = liveouts.sse_begin(); iter != liveouts.sse_end(); ++iter) {
     auto iter_translated = translate_sse_register(*iter, specgen_instr, instr);
     // look up live out in tmp state (after translating operators as necessary)
@@ -802,20 +886,44 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
     if (!typecheck(val, (*iter).size())) return;
     // rename variables in the tmp state to the values in start
     auto val_renamed = simplify(translate_circuit(val));
-    if (!typecheck(val_renamed, (*iter).size())) return;
+    val_renamed = extend_or_shrink(val_renamed, iter_translated.size());
+    if (!typecheck(val_renamed, iter_translated.size())) return;
     // update the start state with the circuits from tmp
     final.set(iter_translated, val_renamed, false, true);
   }
   for (auto iter = liveouts.flags_begin(); iter != liveouts.flags_end(); ++iter) {
     auto iter_translated = *iter;
+
+    // cout << "Flag        -> " << (*iter) << endl;
+    // cout << "  translates to => " << iter_translated << endl;
+
     // look up live out in tmp state (no translation necessary for flags)
     auto val = tmp[*iter];
     if (!typecheck(val, 1)) return;
     // rename variables in the tmp state to the values in start
     auto val_renamed = simplifybool(translate_circuit(val));
+
+    // cout << "Value is               -> " << val << endl;
+    // cout << "  after renaming it is => " << val_renamed << endl;
+    // cout << endl;
+
     if (!typecheck(val_renamed, 1)) return;
     // update the start state with the circuits from tmp
     final.set(iter_translated, val_renamed);
+  }
+
+  // set all undefined outputs to a new temporary variable
+  auto undefs = instr.must_undef_set();
+  for (auto iter = undefs.gp_begin(); iter != undefs.gp_end(); ++iter) {
+    auto width = bit_width_of_type((*iter).type());
+    final.set(*iter, SymBitVector::tmp_var(width), false, true);
+  }
+  for (auto iter = undefs.sse_begin(); iter != undefs.sse_end(); ++iter) {
+    auto width = bit_width_of_type((*iter).type());
+    final.set(*iter, SymBitVector::tmp_var(width), false, true);
+  }
+  for (auto iter = undefs.flags_begin(); iter != undefs.flags_end(); ++iter) {
+    final.set(*iter, SymBool::tmp_var());
   }
 
 #ifdef DEBUG_STRATA_HANDLER
@@ -827,14 +935,11 @@ void StrataHandler::build_circuit(const x64asm::Instruction& instr, SymState& fi
 
 vector<x64asm::Opcode> StrataHandler::full_support_opcodes() {
   vector<x64asm::Opcode> res;
-  filesystem::directory_iterator itr(strata_path_);
-  filesystem::directory_iterator end_itr;
-  for (; itr != end_itr; itr++) {
-    auto file = itr->path().filename().string();
-    assert(file.size() > 2);
-    auto opcode_str = file.substr(0, file.size()-2);
-    auto instr = get_instruction_from_string(opcode_str);
-    res.push_back(instr.get_opcode());
+  for (size_t i = 0; i < X64ASM_NUM_OPCODES; ++i) {
+    auto opcode = (x64asm::Opcode)i;
+    if (is_supported(opcode)) {
+      res.push_back(opcode);
+    }
   }
   return res;
 }

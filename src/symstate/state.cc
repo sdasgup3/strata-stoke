@@ -42,6 +42,7 @@ void SymState::build_from_cpustate(const CpuState& cs) {
   set(eflags_sf, SymBool::constant(cs.rf.is_set(eflags_sf.index())));
   set(eflags_of, SymBool::constant(cs.rf.is_set(eflags_of.index())));
 
+  // auto fm = new FlatMemory(true);
   auto fm = new FlatMemory();
   fm->set_parent(this);
   memory = fm;
@@ -60,13 +61,14 @@ void SymState::build_from_cpustate(const CpuState& cs) {
       uint8_t value = mem[addr];
       auto addr_bv = SymBitVector::constant(64, addr);
       auto val_bv = SymBitVector::constant(8, value);
-      fm->write(addr_bv, val_bv, 1, 0);
+      fm->write(addr_bv, val_bv, 8, 0);
     }
   }
 
   sigbus = SymBool::_false();
   sigfpe = SymBool::_false();
   sigsegv = SymBool::_false();
+  rip = SymBitVector::constant(64, 0x0);
 }
 
 void SymState::build_with_suffix(const string& suffix, bool no_suffix) {
@@ -99,6 +101,13 @@ void SymState::build_with_suffix(const string& suffix, bool no_suffix) {
   sigbus = SymBool::var("sigbus" + (no_suffix ? "" : "_" + suffix));
   sigfpe = SymBool::var("sigfpe" + (no_suffix ? "" : "_" + suffix));
   sigsegv = SymBool::var("sigsegv" + (no_suffix ? "" : "_" + suffix));
+
+  stringstream name;
+  name << "rip";
+  if (!no_suffix) {
+    name << "_" << suffix;
+  }
+  rip = SymBitVector::var(64, name.str());
 }
 
 SymBool SymState::operator[](const Eflags f) const {
@@ -130,6 +139,7 @@ SymBitVector SymState::operator[](const Operand o) {
     if (memory) {
       auto p = memory->read(addr, size, lineno_);
       set_sigsegv(p.second);
+      // std::cout << "Log@operator::Addr::" << addr << "::OPerand::" << o << "::Val::" << p.first << "\n";
       return p.first;
     } else {
       set_sigsegv(SymBool::tmp_var());
@@ -143,6 +153,22 @@ SymBitVector SymState::operator[](const Operand o) {
 }
 
 SymBitVector SymState::lookup(const Operand o) const {
+  // Strata handler calls lookup in traslate_max
+  // for memory instrs.
+  if (o.is_typical_memory()) {
+    auto& m = reinterpret_cast<const M8&>(o);
+    uint16_t size = o.size();
+    auto addr = get_addr(m);
+
+    if (memory) {
+      auto p = memory->read(addr, size, lineno_);
+      // std::cout << "Log@lookup::Addr::" << addr << "::OPerand::" << o << "::Val::" << p.first << "\n";
+      return p.first;
+    } else {
+      return SymBitVector::tmp_var(size);
+    }
+  }
+
 
   if (o.type() == Type::RH) {
     auto& r = reinterpret_cast<const R&>(o);
@@ -335,6 +361,11 @@ template <typename T>
 SymBitVector SymState::get_addr(M<T> memory) const {
 
   SymBitVector address = SymBitVector::constant(32, memory.get_disp()).extend(64);
+
+  if (memory.rip_offset()) {
+    address = address + this->rip;
+    return address;
+  }
 
   if (memory.contains_base()) {
     address = address + lookup(memory.get_base());

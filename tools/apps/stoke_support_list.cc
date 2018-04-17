@@ -26,7 +26,8 @@ using namespace x64asm;
 int main(int argc, char** argv) {
 
   auto solver = new Z3Solver();
-  auto validator_ = new Validator(*solver);
+  string strata_path("/home/sdasgup3/Github/strata-data/circuits/");
+  auto validator_ = new Validator(*solver, strata_path);
   for (size_t i = 0; i < X64ASM_NUM_OPCODES; ++i) {
     auto op = (Opcode)i;
     string att_ = opcode_write_att(op);

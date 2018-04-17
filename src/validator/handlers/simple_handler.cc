@@ -406,7 +406,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] << amt;
@@ -436,7 +436,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] << amt;
@@ -467,7 +467,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] << amt;
@@ -497,7 +497,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] << amt;
@@ -528,7 +528,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] << amt;
@@ -558,7 +558,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] << amt;
@@ -590,7 +590,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] >> amt;
@@ -620,7 +620,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] >> amt;
@@ -651,7 +651,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0]  >> amt;
@@ -681,7 +681,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] >> amt;
@@ -712,7 +712,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] >> amt;
@@ -742,7 +742,7 @@ void SimpleHandler::add_all() {
     if (b.width() <  vec_len) {
       amt = SymBitVector::constant(vec_len - b.width(), 0) || b;
     } else {
-      amt = b[vec_len][0];
+      amt = b[vec_len-1][0];
     }
 
     auto result =  a[vec_len-1][0] >> amt;
@@ -884,7 +884,12 @@ void SimpleHandler::add_all() {
     uint64_t offset = constant & (128/vec_len - 1);
     auto dest_width = a.width();
 
-    ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
+    auto result = (b >> offset*vec_len)[vec_len-1][0];
+    if (dest_width > vec_len) {
+      result = SymBitVector::constant(dest_width - vec_len, 0) || result;
+    }
+
+    ss.set(dst, result);
   });
 
   add_opcode_str({"pextrb", "vpextrb"},
@@ -894,7 +899,12 @@ void SimpleHandler::add_all() {
     uint64_t offset = constant & (128/vec_len - 1);
     auto dest_width = a.width();
 
-    ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || (b >> offset*vec_len)[vec_len-1][0]);
+    auto result = (b >> offset*vec_len)[vec_len-1][0];
+    if (dest_width > vec_len) {
+      result = SymBitVector::constant(dest_width - vec_len, 0) || result;
+    }
+
+    ss.set(dst, result);
   });
 
   add_opcode_str({"pextrq", "vpextrq"},
@@ -1436,7 +1446,7 @@ void SimpleHandler::add_all() {
   // roundss
   add_opcode_str({"roundss"},
   [this] (Operand dst, Operand src, Operand imm_, SymBitVector d, SymBitVector s,  SymBitVector imm, SymState& ss) {
-    short unsigned int vec_len = 64;
+    short unsigned int vec_len = 32;
     SymFunction f("cvt_single_to_int32_rm", vec_len, {vec_len, 8});
     auto dest_width = d.width();
 
@@ -1447,7 +1457,7 @@ void SimpleHandler::add_all() {
   // vroundss
   add_opcode_str({"vroundss"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm_, SymBitVector d, SymBitVector s1, SymBitVector s2, SymBitVector imm, SymState& ss) {
-    short unsigned int vec_len = 64;
+    short unsigned int vec_len = 32;
     SymFunction f("cvt_single_to_int32_rm", vec_len, {vec_len, 8});
     auto dest_width = d.width();
 
@@ -1458,8 +1468,200 @@ void SimpleHandler::add_all() {
 
   // ENDExtend Immediate Instructions; Ungeneralized; Unstratified; Unstoked
 
-  // Extend Register Instructions; Unstratified; Unstoked
+  // Extend Register Instructions; Unstratified; Stoked by Master
+  // Hence borrowed here.
 
+  // Handle the BT, BTC, BTR, BTS family of instructions. Modify is true if the
+  // instruction is not BT, and "operation" combines a mask with a value to complement,
+  // set, or reset the bit as appropriate.
+  auto handle_bt_instr =
+    [this] (bool modify, std::function<SymBitVector(SymBitVector, SymBitVector)> operation,
+  Operand op_base, Operand op_offset, SymBitVector base_bvec, SymBitVector offset_bvec, SymState& ss) {
+    // in the immediate & register case, must mask offset by size of register
+    int width = op_base.size();
+    // Note: there is no byte width version of these instructions, so no width == 8
+    auto size_mask = width == 16 ? SymBitVector::constant(op_offset.size(), 0xF):
+                     width == 32 ? SymBitVector::constant(op_offset.size(), 0x1F):
+                     SymBitVector::constant(op_offset.size(), 0x3F);
+    if (!op_base.is_typical_memory()) {
+      // Register case.
+      auto shift_amount = (offset_bvec & size_mask).extend(base_bvec.width());
+      auto shifted = base_bvec >> shift_amount;
+      ss.set(eflags_cf, shifted[0]);
+      if (modify) {
+        auto mask = SymBitVector::constant(base_bvec.width(), 0x1) << shift_amount;
+        ss.set(op_base, operation(base_bvec, mask));
+      }
+    } else {
+      // Memory case. Immediates are masked to the lowest bits, registers are sign
+      // extended from their original width, and not masked.
+      auto bit_offset = op_offset.is_immediate() ? (SymBitVector::constant(56, 0) || (offset_bvec & size_mask)):
+                        offset_bvec.extend(64);
+
+      // Compute the byte offset to access with, and the bit within that byte
+      // TODO: add a zero extension convenience function
+      auto bit_offset_div_8 = (SymBitVector::constant(3, 0) || bit_offset[63][3]);
+      auto bit_offset_mod_8 = SymBitVector::constant(5, 0) || bit_offset[2][0];
+      auto addr = ss.get_addr(*(reinterpret_cast<M8*>(&op_base))) + bit_offset_div_8;
+      // Retrive byte and segfault flag from memory. We need to manually segfault
+      // because normally that is handled in SymState::operator[Operand] which we are bypassing.
+      auto byte_sigsev = ss.memory->read(addr, 8, ss.get_lineno());
+      ss.set_sigsegv(byte_sigsev.second);
+      ss.set(eflags_cf, (byte_sigsev.first >> bit_offset_mod_8)[0]);
+      if (modify) {
+        // Construct a mask with a 1 bit in the affected bit and 0's elsewhere
+        auto mask = SymBitVector::constant(8, 0x1) << bit_offset_mod_8;
+        auto write_byte = operation(byte_sigsev.first, mask);
+        auto sigsev = ss.memory->write(addr, write_byte, 8, ss.get_lineno());
+        ss.set_sigsegv(sigsev);
+      }
+    }
+
+    // Set other flags, doesn't depend on operation
+    // zflag explicitly preserved, others are undefined
+    ss.set(eflags_of, SymBool::tmp_var());
+    ss.set(eflags_sf, SymBool::tmp_var());
+    ss.set(eflags_af, SymBool::tmp_var());
+    ss.set(eflags_pf, SymBool::tmp_var());
+  };
+
+  // The actual operations for the BT* family. The size is encoded in the Operand
+  // so only the lambdas change for each case.
+  add_opcode_str({"btw", "btl", "btq"},
+  [this, handle_bt_instr] (Operand op_base, Operand op_offset, SymBitVector base_bvec, SymBitVector offset_bvec, SymState& ss) {
+    handle_bt_instr(false, [](SymBitVector v, SymBitVector mask) {
+      return v;
+    }, op_base, op_offset, base_bvec, offset_bvec, ss);
+  });
+  add_opcode_str({"btcw", "btcl", "btcq"},
+  [this, handle_bt_instr] (Operand op_base, Operand op_offset, SymBitVector base_bvec, SymBitVector offset_bvec, SymState& ss) {
+    handle_bt_instr(true, [](SymBitVector v, SymBitVector mask) {
+      return v ^ mask;
+    }, op_base, op_offset, base_bvec, offset_bvec, ss);
+  });
+  add_opcode_str({"btrw", "btrl", "btrq"},
+  [this, handle_bt_instr] (Operand op_base, Operand op_offset, SymBitVector base_bvec, SymBitVector offset_bvec, SymState& ss) {
+    handle_bt_instr(true, [](SymBitVector v, SymBitVector mask) {
+      return v & !mask;
+    }, op_base, op_offset, base_bvec, offset_bvec, ss);
+  });
+  add_opcode_str({"btsw", "btsl", "btsq"},
+  [this, handle_bt_instr] (Operand op_base, Operand op_offset, SymBitVector base_bvec, SymBitVector offset_bvec, SymState& ss) {
+    handle_bt_instr(true, [](SymBitVector v, SymBitVector mask) {
+      return v | mask;
+    }, op_base, op_offset, base_bvec, offset_bvec, ss);
+  });
+
+  add_opcode_str({"pmovmskb", "vpmovmskb"},
+  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    size_t dst_size = dst.size();
+    size_t src_size = src.size();
+
+    auto mask = SymBitVector::from_bool(b[7]);
+    for (size_t i = 1; i < src_size/8; ++i) {
+      mask = SymBitVector::from_bool(b[8*i+7]) || mask;
+    }
+
+    size_t pad = dst_size - src_size/8;
+    if (pad > 0)
+      ss.set(dst, SymBitVector::constant(pad, 0) || mask);
+    else
+      ss.set(dst, mask);
+
+  });
+
+  add_opcode_str({"vpsllvd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+    short unsigned int vec_len = 32;
+    auto index = dest_width/vec_len;
+
+    SymBitVector result;
+    for (uint16_t i = 0 ; i < index; i++) {
+      result = (a[vec_len-1 + i*vec_len][i*vec_len] << b[vec_len-1 + i*vec_len][i*vec_len]) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"vpsllvq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+    short unsigned int vec_len = 64;
+    auto index = dest_width/vec_len;
+
+    SymBitVector result;
+    for (uint16_t i = 0 ; i < index; i++) {
+      result = (a[vec_len-1 + i*vec_len][i*vec_len] << b[vec_len-1 + i*vec_len][i*vec_len]) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"vpsrlvd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+    short unsigned int vec_len = 32;
+    auto index = dest_width/vec_len;
+
+    SymBitVector result;
+    for (uint16_t i = 0 ; i < index; i++) {
+      result = (a[vec_len-1 + i*vec_len][i*vec_len] >> b[vec_len-1 + i*vec_len][i*vec_len]) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"vpsrlvq"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
+    auto dest_width = d.width();
+    short unsigned int vec_len = 64;
+    auto index = dest_width/vec_len;
+
+    SymBitVector result;
+    for (uint16_t i = 0 ; i < index; i++) {
+      result = (a[vec_len-1 + i*vec_len][i*vec_len] >> b[vec_len-1 + i*vec_len][i*vec_len]) || result;
+    }
+    ss.set(dst, result, true);
+  });
+
+  add_opcode_str({"vpshufb"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+
+    // lots of case splits, so may not be very efficient
+
+    // also, could be easily adapted to support non-v version of the instruction
+
+    auto select_byte = [](SymBitVector src, int n_bytes, SymBitVector idx) {
+      SymBitVector res = src[7][0];
+      for (int i = 1; i < n_bytes; i++) {
+        auto cond = idx == SymBitVector::constant(4, i);
+        res = cond.ite(src[i*8+7][i*8], res);
+      }
+      return res;
+    };
+
+    int n_bytes = src1.size()/8;
+    if (n_bytes > 16) n_bytes = 16;
+
+    SymBitVector result;
+    for (size_t i = 0; i < 16; ++i) {
+      auto cond = (c[i*8+7][i*8+7]) == SymBitVector::constant(1, 1);
+      auto idx = c[i*8+3][i*8+0]; // == SRC2[(i*8)+3 .. (i*8)+0]
+      auto byte = select_byte(b[127][0], n_bytes, idx);
+      result = cond.ite(SymBitVector::constant(8, 0), byte) || result;
+    }
+    if (dst.size() == 256) {
+      for (size_t i = 0; i < 16; ++i) {
+        auto cond = (c[128+i*8+7][128+i*8+7]) == SymBitVector::constant(1, 1);
+        auto idx = c[128+i*8+3][128+i*8+0]; // == SRC2[(i*8)+3 .. (i*8)+0]
+        auto byte = select_byte(b[128+127][128+0], n_bytes, idx);
+        result = cond.ite(SymBitVector::constant(8, 0), byte) || result;
+      }
+    }
+    ss.set(dst, result, true);
+  });
+
+  // END Extend Register Instructions; Unstratified; Stoked by Master
+
+  // Extend Register Instructions; Unstratified; Unstoked
   // vpermilps
   add_opcode_str({"vpermilps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector a, SymBitVector b, SymState& ss) {
@@ -2056,26 +2258,6 @@ void SimpleHandler::add_all() {
     ss.set(eflags_sf, SymBool::_false());
   });
 
-  /*
-  add_opcode_str({"pmovmskb", "vpmovmskb"},
-  [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    size_t dst_size = dst.size();
-    size_t src_size = src.size();
-
-    auto mask = SymBitVector::from_bool(b[7]);
-    for (size_t i = 1; i < src_size/8; ++i) {
-      mask = SymBitVector::from_bool(b[8*i+7]) || mask;
-    }
-
-    size_t pad = dst_size - src_size/8;
-    if (pad > 0)
-      ss.set(dst, SymBitVector::constant(pad, 0) || mask);
-    else
-      ss.set(dst, mask);
-
-  });
-  */
-
   // Extend Strata Base: pblendvb
   add_opcode_str({"pblendvb"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
@@ -2377,23 +2559,6 @@ void SimpleHandler::add_all() {
 
     ss.set(dst, result, true);
   });
-  /* vpshufb
-  add_opcode_str({"vpshufb"},
-  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    size_t dest_size = dst.size();
-
-    auto index = c[3][0];
-    auto shufResult = b[index*8+7][index*8];
-    auto result = (c[7][7] ==  SymBitVector::constant(1, 1)).ite(SymBitVector::constant(8, 0), shufResult);
-    for (size_t i = 1; i <= 15; ++i) {
-      auto index = c[(i*8)+3][i*8];
-      result =  (c[(i * 8)+7][(i * 8)+7] ==  SymBitVector::constant(1, 1)).ite(SymBitVector::constant(8, 0), shufResult) || result;
-    }
-
-    ss.set(dst, result, true);
-
-  });
-  */
 
   // END Extend Register Instructions; Unstratified; Unstoked
 
@@ -2504,6 +2669,44 @@ void SimpleHandler::add_all() {
     ss.set(dst, b[127][32] || (f(bb, cc)[0]).ite(bb, cc), true);
   });
 
+  // These are the memory instructions which have no regiter variant.
+  // Borrowed from master stoke.
+  add_opcode_str({"movlpd", "movlps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    if (dst.size() > 64)
+      ss.set(dst, a[dst.size() - 1][64] || b[63][0]);
+    else
+      ss.set(dst, b[63][0]);
+  });
+
+  add_opcode_str({"vmovlpd", "vmovlps"},
+  [] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    ss.set(dst, b[127][64] || c[63][0], true);
+  });
+
+  add_opcode_str({"vmovlpd", "vmovlps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    ss.set(dst, b[63][0], true);
+  });
+
+  add_opcode_str({"movhpd", "movhps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    if (dst.size() > 64)
+      ss.set(dst, b[63][0] || a[63][0]);
+    else
+      ss.set(dst, b[127][64]);
+  });
+
+  add_opcode_str({"vmovhpd", "vmovhps"},
+  [] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    ss.set(dst, c[63][0] || b[63][0], true);
+  });
+
+  add_opcode_str({"vmovhpd", "vmovhps"},
+  [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
+    ss.set(dst, b[127][64], true);
+  });
+
   // can't be done with packed handler because of special case for memory
   add_opcode_str({"movsd"},
   [] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
@@ -2586,8 +2789,11 @@ void SimpleHandler::add_all() {
     ss.set_szp_flags(-a);
   });
 
-  add_opcode_str({"nop", "nopb", "nopw", "nopl", "nopq"},
+  add_opcode_str({"nop", "nopb", "nopq"},
   [] (SymState& ss) {});
+
+  add_opcode_str({"nopw", "nopl"},
+  [] (Operand dst, SymBitVector a, SymState& ss) {});
 
   add_opcode_str({"notb", "notw", "notl", "notq"},
   [] (Operand dst, SymBitVector a, SymState& ss) {
@@ -2816,8 +3022,13 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"xchgb", "xchgw", "xchgl", "xchgq"},
   [this] (Operand dst, Operand src, SymBitVector a, SymBitVector b, SymState& ss) {
-    ss.set(dst, b);
-    ss.set(src, a);
+    if (src.is_typical_memory()) {
+      ss.set(src, a);
+      ss.set(dst, b);
+    } else {
+      ss.set(dst, b);
+      ss.set(src, a);
+    }
   });
 
   add_opcode_str({"xorb", "xorw", "xorl", "xorq"},

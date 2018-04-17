@@ -158,7 +158,7 @@ public:
   SymBitVectorAbstract* visit(const SymBitVectorFunction * const bv) {
     if (is_cached(bv)) return get_cached(bv);
 
-    // add/subtract of 0 or a-a
+    // add/subtract of 0
     // multiply of 0
     auto& f = bv->f_;
     if (f.args.size() == 2) {
@@ -186,7 +186,7 @@ public:
       auto a = (*this)(bv->args_[0]);
       auto b = (*this)(bv->args_[1]);
       auto c = (*this)(bv->args_[2]);
-      if ((f.name == "vfmsub132_double" || f.name == "vfmsub132_double") && (is_zero(a) && is_zero(b) && is_zero(c))) {
+      if ((f.name == "vfmsub132_double" || f.name == "vfmsub132_single") && (is_zero(a) && is_zero(b) && is_zero(c))) {
         return cache(bv, make_constant(bv->width_, 0));
       }
     }
@@ -313,6 +313,14 @@ public:
     if (bv->type() == SymBitVector::MINUS && is_zero(rhs)) {
       return cache(bv, lhs);
     }
+    /*
+    if (bv->type() == SymBitVector::CONCAT && (0 == lhs->width_)) {
+      return cache(bv, rhs);
+    }
+    if (bv->type() == SymBitVector::CONCAT && (0 == rhs->width_)) {
+      return cache(bv, lhs);
+    }
+    */
 
     // move binop over ite
     if (lhs->type() == SymBitVector::ITE) {
@@ -581,6 +589,25 @@ SymBool SymSimplify::simplify(const SymBool& b) {
   }
 
   return SymBool(ptr);
+}
+
+SymArray SymSimplify::simplify(const SymArray& b) {
+  auto ptr = b.ptr;
+
+  SymMergeExtracts merger(cache_bool1_, cache_bits1_, cache_array1_);
+  SymMoveExtractsInside mover(cache_bool2_, cache_bits2_, cache_array2_);
+  SymConstProp constprop(cache_bool3_, cache_bits3_, cache_array3_);
+
+  // apply transformations until no further simplifications are possible
+  while (true) {
+    auto old = ptr;
+    ptr = mover(ptr);
+    ptr = merger(ptr);
+    ptr = constprop(ptr);
+    if (old == ptr) break;
+  }
+
+  return SymArray(ptr);
 }
 
 } // namespace stoke

@@ -54,16 +54,12 @@ public:
     add_opcode("addsubpd", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("add_double", 64, {64, 64});
       SymFunction g("sub_double", 64, {64, 64});
-      //Bug: Wrong Order
-      //return g(a[63][0], b[63][0]) || f(a[127][64], b[127][64]);
       return f(a[127][64], b[127][64]) || g(a[63][0], b[63][0]);
     }, 128, 128, true);
 
     add_opcode("addsubps", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("add_single", 32, {32, 32});
       SymFunction g("sub_single", 32, {32, 32});
-      //Bug: Wrong Order
-      //return g(a[31][0], b[31][0]) || f(a[63][32], b[63][32]);
       return f(a[63][32], b[63][32]) || g(a[31][0], b[31][0]);
     }, 64, 64, true);
 
@@ -142,32 +138,6 @@ public:
       SymFunction f("cvt_double_to_single", 32, {64});
       return f(b);
     }, 64, 32, true, true);
-
-    /*
-    // Strata Bug: Correct implementation is in simple_handler
-    add_opcode("cvtsi2sdl", [] (SymBitVector a, SymBitVector b) {
-      SymFunction f("cvt_int32_to_double", 64, {32});
-      return f(b);
-    }, 32, 64, true, true);
-
-    // Strata Bug
-    add_opcode("cvtsi2sdq", [] (SymBitVector a, SymBitVector b) {
-      SymFunction f("cvt_int64_to_double", 64, {64});
-      return f(b);
-    }, 64, 64, true, true);
-
-    // Strata Bug
-    add_opcode("cvtsi2ssl", [] (SymBitVector a, SymBitVector b) {
-      SymFunction f("cvt_int32_to_single", 32, {32});
-      return f(b);
-    }, 32, 32, true, true);
-
-    // Strata Bug
-    add_opcode("cvtsi2ssq", [] (SymBitVector a, SymBitVector b) {
-      SymFunction f("cvt_int64_to_single", 32, {64});
-      return f(b);
-    }, 64, 32, true, true);
-    */
 
     add_opcode("cvtss2sd", [] (SymBitVector a, SymBitVector b) {
       SymFunction f("cvt_single_to_double", 64, {32});
@@ -455,7 +425,7 @@ public:
     // pshufhw
     add_opcode("pshufhw", [] (SymBitVector a, SymBitVector b, SymBitVector c, uint16_t k) {
       auto dest_width = a.width();
-      uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+      // uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
       auto result = SymBitVector::constant(128, 0);
 
       for (size_t k = 0 ; k < dest_width/128; k++) {
@@ -1582,17 +1552,17 @@ private:
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, SymState& ss) {
-      //assert(!has_constant_);
+      assert(!has_constant_);
       return binop_(bv1, bv2);
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, x64asm::Operand arg3, SymBitVector bv3, SymState& ss) {
-      //assert(!has_constant_);
+      assert(!has_constant_);
       return ternaryop_(bv1, bv2, bv3);
     }
 
     SymBitVector operator()(x64asm::Operand arg1, SymBitVector bv1, x64asm::Operand arg2, SymBitVector bv2, SymState& ss, SymBitVector imm, uint16_t k) {
-      //assert(has_constant_);
+      assert(has_constant_);
       return binop_with_constant_(bv1, bv2, imm, k);
     }
 
