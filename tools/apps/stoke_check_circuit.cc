@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  delete(dummy);
+  delete (dummy);
 
   return 0;
 }

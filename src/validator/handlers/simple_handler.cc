@@ -394,23 +394,23 @@ void SimpleHandler::add_all() {
   [this] (Operand dst, SymBitVector dest_bv, SymState& ss) {
     auto width = dest_bv.width();
 
-    if(128 == width) {
+    if (128 == width) {
       auto temp128 = dest_bv;
       auto rdx_rax =  ss[Constants::rdx()] || ss[Constants::rax()];
       auto rcx_rbx =  ss[Constants::rcx()] || ss[Constants::rbx()];
 
       ss.set(eflags_zf, temp128 == rdx_rax);
-      ss.set(rdx, (rdx_rax == temp128).ite(ss[Constants::rdx()] , temp128[127][64]));
-      ss.set(rax, (rdx_rax == temp128).ite(ss[Constants::rax()] , temp128[63][0]));
+      ss.set(rdx, (rdx_rax == temp128).ite(ss[Constants::rdx()], temp128[127][64]));
+      ss.set(rax, (rdx_rax == temp128).ite(ss[Constants::rax()], temp128[63][0]));
       ss.set(dst, (rdx_rax == temp128).ite(rcx_rbx, temp128));
-    } else if(64 == width) {
+    } else if (64 == width) {
       auto temp64 = dest_bv;
       auto edx_eax =  ss[Constants::edx()] || ss[Constants::eax()];
       auto ecx_ebx =  ss[Constants::ecx()] || ss[Constants::ebx()];
 
       ss.set(eflags_zf, edx_eax == temp64);
-      ss.set(rdx, (edx_eax == temp64).ite(ss[Constants::rdx()] , SymBitVector::constant(32, 0) || temp64[63][32]));
-      ss.set(rax, (edx_eax == temp64).ite(ss[Constants::rax()] , SymBitVector::constant(32, 0) || temp64[31][0] ));
+      ss.set(rdx, (edx_eax == temp64).ite(ss[Constants::rdx()], SymBitVector::constant(32, 0) || temp64[63][32]));
+      ss.set(rax, (edx_eax == temp64).ite(ss[Constants::rax()], SymBitVector::constant(32, 0) || temp64[31][0] ));
       ss.set(dst, (edx_eax == temp64).ite(ecx_ebx, temp64));
     } else {
       assert(0);
@@ -426,7 +426,7 @@ void SimpleHandler::add_all() {
 
     // For accumulator == a; rax should remain unchanged
     // For accumulator != a; rax  == 0 || a
-    // Where as for dst, while accumulator != a; the ppoer bits need to be preserved even if 
+    // Where as for dst, while accumulator != a; the ppoer bits need to be preserved even if
     // the witdth of dest is 32 bits.
 
     ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  SymBitVector::constant(32, 0) || a));
@@ -446,18 +446,18 @@ void SimpleHandler::add_all() {
     ss.set(eflags_cf, !total[width]);
     ss.set_szp_flags(total[width-1][0]);
   });
- 
+
   add_opcode_str({"movbel", "movbeq", "movbew"},
   [this] (Operand dst, Operand src, SymBitVector d, SymBitVector s, SymState& ss) {
     auto dest_width = d.width();
 
-    if(16 == dest_width) {
+    if (16 == dest_width) {
       ss.set(dst, s[7][0] || s[15][8]);
-    } else if(32 == dest_width) {
+    } else if (32 == dest_width) {
       ss.set(dst, s[7][0] || s[15][8] || s[23][16] || s[31][24]);
-    } else if(64 == dest_width){
+    } else if (64 == dest_width) {
       ss.set(dst, s[7][0] || s[15][8] || s[23][16] || s[31][24] || s[39][32] || s[47][40]
-          || s[55][48] || s[63][56]);
+             || s[55][48] || s[63][56]);
     } else {
       assert(0);
     }
@@ -486,7 +486,7 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     SymBitVector result = s;
-    for(size_t i = 1 ; i < dest_width/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result = s || result;
     }
     ss.set(dst, result, true);
@@ -498,7 +498,7 @@ void SimpleHandler::add_all() {
     auto dest_width = d.width();
 
     SymBitVector result = s;
-    for(size_t i = 1 ; i < dest_width/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result = s || result;
     }
     ss.set(dst, result, true);
@@ -515,13 +515,13 @@ void SimpleHandler::add_all() {
     short unsigned int vec_len = 32;
     auto dest_width = d.width();
     SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
-        s2[vec_len-1][0], SymBitVector::constant(vec_len, 0)
-        );
+                            s2[vec_len-1][0], SymBitVector::constant(vec_len, 0)
+                          );
 
-    for(size_t i = 1 ; i < dest_width/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
-        s2[(vec_len-1) + vec_len*i][vec_len*i], SymBitVector::constant(vec_len, 0)
-        ) || result;
+                 s2[(vec_len-1) + vec_len*i][vec_len*i], SymBitVector::constant(vec_len, 0)
+               ) || result;
     }
     ss.set(dst, result, true);
   });
@@ -531,13 +531,13 @@ void SimpleHandler::add_all() {
     short unsigned int vec_len = 64;
     auto dest_width = d.width();
     SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
-        s2[vec_len-1][0], SymBitVector::constant(vec_len, 0)
-        );
+                            s2[vec_len-1][0], SymBitVector::constant(vec_len, 0)
+                          );
 
-    for(size_t i = 1 ; i < dest_width/vec_len; i++) {
+    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
       result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
-        s2[(vec_len-1) + vec_len*i][vec_len*i], SymBitVector::constant(vec_len, 0)
-        ) || result;
+                 s2[(vec_len-1) + vec_len*i][vec_len*i], SymBitVector::constant(vec_len, 0)
+               ) || result;
     }
     ss.set(dst, result, true);
   });
