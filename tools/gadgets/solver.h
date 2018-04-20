@@ -41,6 +41,10 @@ public:
     set_timeout(timeout_arg);
   }
 
+  ~SolverGadget() {
+    delete solver_;
+  }
+
   SMTSolver& set_timeout(uint64_t ms) {
     solver_->set_timeout(ms);
     return *this;
