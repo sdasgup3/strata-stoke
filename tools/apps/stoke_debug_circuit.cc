@@ -323,16 +323,16 @@ int main(int argc, char** argv) {
             firstInstance = false;
           } else {
             if (loc.size != sZ) {
-              std::cout << "\ninfo: Loc Size Mismatch\n\n";
+              std::cout << "info: Loc Size Mismatch\n\n";
             }
             stringstream ss;
             if (!is_eq(sA, loc.address, ss)) {
-              std::cout << "\ninfo: Loc Address Mismatch\n\n";
+              std::cout << "info: Loc Address Mismatch\n\n";
             }
           }
         }
         cout << " (" << loc.size << " bytes)" << endl;
-        cout << "    was read at address\n";
+        cout << "    was read at address ";
         print(loc.address);
         cout << "." << endl;
       }

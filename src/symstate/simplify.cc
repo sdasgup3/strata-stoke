@@ -179,6 +179,10 @@ public:
         return cache(bv, (SymBitVectorAbstract*) b);
       }
       */
+      if ((f.name == "sub_single" || f.name == "sub_double" || f.name == "add_single" || f.name == "add_double") && is_zero(a) && is_zero(b)) {
+        return cache(bv, make_constant(bv->width_, 0));
+      }
+
       // Strata Bug
       //if ((f.name == "sub_single" || f.name == "sub_double") && a->equals(b)) {
       //  return cache(bv, make_constant(bv->width_, 0));
