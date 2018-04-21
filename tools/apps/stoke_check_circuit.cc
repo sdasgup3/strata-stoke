@@ -118,12 +118,24 @@ int main(int argc, char** argv) {
   }
 
   // check equivalence of two symbolic states for a given register
-  auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
-    SymBool eq = a == b;
+  auto is_eq = [&](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
+    //SymBool eq = a == b;
+    // At times simplification is requires as the sym to z3 transformer might crash.
+    SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
 
     // cout <<  "\n\n" << *reg << ":\n";
-    // cout << solver.getZ3Formula(SymSimplify().simplify(a)) << "\n";
-    // cout << solver.getZ3Formula(SymSimplify().simplify(b)) << "\n";
+    // SImplified
+    // cout << SymSimplify().simplify(a) << "\n";
+    // cout << SymSimplify().simplify(b) << "\n\n\n";
+
+    // Not simplified
+    // cout << a << "\n";
+    // cout << b << "\n";
+
+    //cout << solver.getZ3Formula(SymSimplify().simplify(a)) << std::flush << "\n";
+    //cout << solver.getZ3Formula(SymSimplify().simplify(b)) << std::flush << "\n";
+    //cout << solver.getZ3Formula(a) << "\n";
+    //cout << solver.getZ3Formula(b) << "\n";
 
     //bool res = solver.is_sat({ !eq });
     bool res = solver.is_sat({ eq });
@@ -179,9 +191,14 @@ int main(int argc, char** argv) {
   cout << "Check Equivalence\n";
   int i = 0;
   RegSet *dummy = new RegSet();
+  int count = 0;
 
   for (const auto& cs : test_set) {
+    std::cout << count++ << std::flush << "\n";
+
+
     // Create a formula with initial state as the test input
+
     SymState sym_validator(cs);
     ch.build_circuit(instr, sym_validator);
     if (ch.has_error()) {
@@ -222,6 +239,9 @@ int main(int argc, char** argv) {
     if (i%1000 == 0 ) {
       cout << "Completed " <<i << "cases" <<  endl;
     }
+
+    sym_validator.clearSymRegs();
+    sb_validator.clearSymRegs();
   }
 
   delete (dummy);

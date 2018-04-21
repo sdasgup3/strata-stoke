@@ -45,6 +45,21 @@ public:
     return contents_[i];
   }
 
+  std::vector<stoke::SymBitVector>& getcontents () {
+    return contents_;
+  }
+
+
+  /*
+  ~SymRegs() {
+    for (auto& elem: contents_) {
+      if(elem.ptr) {
+        delete elem.ptr;
+      }
+    }
+  }
+  */
+
 private:
   /** Symbolic register contents. */
   std::vector<stoke::SymBitVector> contents_;

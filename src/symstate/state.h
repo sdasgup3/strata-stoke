@@ -49,6 +49,33 @@ public:
       delete memory;
   }
 
+  void clearSymRegs()  {
+    return;
+    auto gpcontents = gp.getcontents();
+    for (auto& elem: gpcontents) {
+      if (elem.ptr) {
+        delete elem.ptr;
+      }
+    }
+    auto ssecontents = sse.getcontents();
+    for (auto& elem: ssecontents) {
+      if (elem.ptr) {
+        delete elem.ptr;
+      }
+    }
+
+    for (auto& elem: rf) {
+      if (elem.ptr) {
+        delete elem.ptr;
+      }
+    }
+
+    delete sigbus.ptr;
+    delete sigfpe.ptr;
+    delete sigsegv.ptr;
+    delete rip.ptr;
+  }
+
   /** Flag to print ims as symbolic values */
   bool keep_imm_symbolic;
   /** Symbolic general purpose registers */

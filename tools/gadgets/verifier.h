@@ -25,10 +25,10 @@
 #include "src/verifier/sequence.h"
 #include "src/verifier/verifier.h"
 #include "src/validator/bounded.h"
-//#include "src/validator/ddec.h"
+#include "src/validator/ddec.h"
 
 #include "tools/args/bounded_validator.inc"
-//#include "tools/args/ddec_validator.inc"
+#include "tools/args/ddec_validator.inc"
 #include "tools/args/in_out.inc"
 #include "tools/args/testcases.inc"
 #include "tools/args/verifier.inc"
@@ -111,7 +111,6 @@ private:
       bv->set_no_bailout(no_bailout_arg.value());
       bv->set_nacl(verify_nacl_arg);
       return bv;
-      /*
     } else if (s == "ddec") {
       auto ddec = new DdecValidator(*solver_);
       std::cout << "no try sign extend arg: " << no_try_sign_extend_arg.value() << std::endl;
@@ -122,7 +121,6 @@ private:
       ddec->set_bound(bound_arg.value());
       ddec->set_nacl(verify_nacl_arg);
       return ddec;
-      */
     } else if (s == "hold_out") {
       return new HoldOutVerifier(fxn);
     } else if (s == "none") {

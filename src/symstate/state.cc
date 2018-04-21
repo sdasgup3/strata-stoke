@@ -61,7 +61,8 @@ void SymState::build_from_cpustate(const CpuState& cs) {
       uint8_t value = mem[addr];
       auto addr_bv = SymBitVector::constant(64, addr);
       auto val_bv = SymBitVector::constant(8, value);
-      fm->write(addr_bv, val_bv, 8, 0);
+      auto segv = fm->write(addr_bv, val_bv, 8, 0);
+      delete segv.ptr;
     }
   }
 

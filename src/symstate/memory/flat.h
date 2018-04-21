@@ -36,6 +36,36 @@ public:
     no_constraints_ = no_constraints;
   }
 
+  ~FlatMemory() {
+    for (auto& constrain: constraints_) {
+      delete constrain.ptr;
+    }
+
+    for (auto& access_var: access_list_) {
+      delete access_var.first;
+    }
+
+    deleteR(heap_.ptr);
+
+  }
+
+  void deleteR(const SymArrayAbstract* delptr) {
+    if (NULL == delptr) {
+      return;
+    }
+
+    if (auto ptr = dynamic_cast<const SymArrayStore*>(delptr)) {
+      delete ptr->key_;
+      delete ptr->value_;
+      deleteR(ptr->a_);
+      delete ptr;
+    } else if (auto ptr = dynamic_cast<const SymArrayVar*>(delptr)) {
+      delete ptr;
+    }
+    return;
+
+  }
+
   /** Updates the memory with a write.
    *  Returns condition for segmentation fault */
   SymBool write(SymBitVector address, SymBitVector value, uint16_t size, size_t line_no);
