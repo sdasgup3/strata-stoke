@@ -164,6 +164,11 @@ public:
     if (f.args.size() == 2) {
       auto a = (*this)(bv->args_[0]);
       auto b = (*this)(bv->args_[1]);
+
+      //This seems wrong as 
+      // -0.0 + 0.0 = 0.0
+      // -0.0 - 0.0 = 0.0
+      /*
       if ((f.name == "sub_single" || f.name == "sub_double") && is_zero(b)) {
         return cache(bv, (SymBitVectorAbstract*) a);
       }
@@ -173,6 +178,7 @@ public:
       if ((f.name == "add_single" || f.name == "add_double") && is_zero(a)) {
         return cache(bv, (SymBitVectorAbstract*) b);
       }
+      */
       // Strata Bug
       //if ((f.name == "sub_single" || f.name == "sub_double") && a->equals(b)) {
       //  return cache(bv, make_constant(bv->width_, 0));

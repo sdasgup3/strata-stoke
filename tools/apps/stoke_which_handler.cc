@@ -73,7 +73,7 @@ auto& opc_arg = ValueArg<string>::create("opc")
 int main(int argc, char** argv) {
 
   // not actually required here
-  strata_path_arg.required(true);
+  //strata_path_arg.required(true);
   target_arg.required(false);
 
   CommandLineConfig::strict_with_convenience(argc, argv);
@@ -123,34 +123,34 @@ int main(int argc, char** argv) {
 
     auto h = ch.get_handler(it, level) ;
     if (dynamic_cast<StrataHandler *>(h)) {
-      std::cout << "StrataHandler" << "\n";
+      std::cout << opc_arg.value() << ":StrataHandler" << "\n";
     }
     if (dynamic_cast<PackedHandler *>(h)) {
-      std::cout << "PackedHandler" << "\n";
+      std::cout << opc_arg.value()  << ":PackedHandler" << "\n";
     }
     if (dynamic_cast<SimpleHandler *>(h)) {
-      std::cout << "SimpleHandler" << "\n";
+      std::cout << opc_arg.value() <<":SimpleHandler" << "\n";
     }
     if (dynamic_cast<AddHandler *>(h)) {
-      std::cout << "AddHandler" << "\n";
+      std::cout << opc_arg.value() <<":AddHandler" << "\n";
     }
     if (dynamic_cast<ConditionalHandler *>(h)) {
-      std::cout << "ConditionalHandler" << "\n";
+      std::cout << opc_arg.value() << ":ConditionalHandler" << "\n";
     }
     if (dynamic_cast<LeaHandler *>(h)) {
-      std::cout << "LeaHandler" << "\n";
+      std::cout << opc_arg.value() << ":LeaHandler" << "\n";
     }
     if (dynamic_cast<MoveHandler *>(h)) {
-      std::cout << "MoveHandler" << "\n";
+      std::cout << opc_arg.value() << ":MoveHandler" << "\n";
     }
     if (dynamic_cast<PunpckHandler *>(h)) {
-      std::cout << "PunpckHandler" << "\n";
+      std::cout << opc_arg.value() << ":PunpckHandler" << "\n";
     }
     if (dynamic_cast<ShiftHandler *>(h)) {
-      std::cout << "ShiftHandler" << "\n";
+      std::cout << opc_arg.value() <<":ShiftHandler" << "\n";
     }
     if (dynamic_cast<PseudoHandler *>(h)) {
-      std::cout << "PseudoHandler" << "\n";
+      std::cout << opc_arg.value() << ":PseudoHandler" << "\n";
     }
   }
 

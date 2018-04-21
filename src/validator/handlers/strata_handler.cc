@@ -514,6 +514,16 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == XCHG_R16_M16
       || opcode == XCHG_R32_M32
       || opcode == XCHG_R64_M64
+      || opcode == XADD_M32_R32 // The generalization from reg -> mem is buggy
+      || opcode == VCVTPD2DQ_XMM_M256 // The generalization of vcvtpd2dq_xmm_m256 from reg -> mem is buggy is master/strata branch
+      || opcode == BT_M16_IMM8 // https://github.com/sdasgup3/binary-decompilation/wiki/Bugs-Found#self-goal
+      || opcode == BT_M16_R16
+      || opcode == BT_M32_IMM8
+      || opcode == BT_M32_R32
+      || opcode == BT_M64_IMM8
+      || opcode == BT_M64_R64
+      || opcode == CMP_M8_IMM8 || opcode == CMP_M8_RH || opcode == CMP_M8_R8 || opcode == CMP_RH_M8 || opcode == CMP_R8_M8 || opcode == CMP_M32_IMM32 || opcode == CMP_M32_IMM8 || opcode == CMP_M32_R32 || opcode == CMP_M64_IMM32 || opcode == CMP_R32_M32 || opcode == CMP_M64_IMM8 || opcode == CMP_M64_R64 || opcode == CMP_R64_M64 || opcode == CMP_M16_IMM16 || opcode == CMP_M16_IMM8 || opcode == CMP_M16_R16 || opcode == CMP_R16_M16 || opcode == DEC_M8 || opcode == DEC_M32 || opcode == DEC_M64 || opcode == DEC_M16 || opcode == INC_M16 || opcode == NEG_M8 || opcode == NEG_M32 || opcode == NEG_M16 || opcode == NEG_M64 || opcode == SBB_M8_IMM8 || opcode == SBB_M8_RH || opcode == SBB_M8_R8 || opcode == SBB_M32_IMM32 || opcode == SBB_M32_IMM8 || opcode == SBB_RH_M8 || opcode == SBB_R8_M8 || opcode == SBB_M64_IMM8 || opcode == SBB_M64_IMM32 || opcode == SBB_M32_R32 || opcode == SBB_M16_IMM16 || opcode == SBB_M16_IMM8 || opcode == SBB_R32_M32 || opcode == SBB_M16_R16 || opcode == SBB_R16_M16 || opcode == SBB_M64_R64 || opcode == SBB_R64_M64 || opcode == SUB_M8_IMM8 || opcode == SUB_M8_R8 || opcode == SUB_M8_RH || opcode == SUB_R8_M8 || opcode == SUB_RH_M8 || opcode == SUB_M32_IMM32 || opcode == SUB_M32_IMM8 || opcode == SUB_M32_R32 || opcode == SUB_R32_M32 || opcode == SUB_M64_IMM8 || opcode == SUB_M64_IMM32 || opcode == SUB_M64_R64 || opcode == SUB_R64_M64 || opcode == SUB_M16_IMM16 || opcode == SUB_M16_IMM8 || opcode == SUB_M16_R16 || opcode == SUB_R16_M16 // The strata formula for af is not equivalent to non-strata handler's. Also the other formulas for register/flags could be much simple is we use the non-strata handler instead. 
+   //   || opcode == HADDPS_XMM_XMM
      ) {
     return false;
   }

@@ -49,6 +49,33 @@ public:
       delete memory;
   }
 
+  void clearSymRegs()  {
+    return;
+    auto gpcontents = gp.getcontents();
+    for (auto& elem: gpcontents) {
+     if(elem.ptr) {  
+       delete elem.ptr;
+     }
+    }
+    auto ssecontents = sse.getcontents();
+    for (auto& elem: ssecontents) {
+     if(elem.ptr) {  
+       delete elem.ptr;
+     }
+    }
+
+    for (auto& elem: rf) {
+     if(elem.ptr) {  
+       delete elem.ptr;
+     }
+    }
+
+    delete sigbus.ptr;
+    delete sigfpe.ptr;
+    delete sigsegv.ptr;
+    delete rip.ptr;
+  }
+
   /** Flag to print ims as symbolic values */
   bool keep_imm_symbolic;
   /** Symbolic general purpose registers */
@@ -109,15 +136,15 @@ public:
   /** Mark that a #DE, #MF or #XM exception conditionally occurs */
   //TODO: check for identically false for simplification purposes
   inline void set_sigfpe(SymBool b) {
-    sigfpe = sigfpe | (!sigbus & !sigsegv & b);
+    //sigfpe = sigfpe | (!sigbus & !sigsegv & b);
   }
   /** Mark that a #NP, #SS or #AC exception conditionally occurs. */
   inline void set_sigbus(SymBool b) {
-    sigbus = sigbus | (!sigfpe & !sigsegv & b);
+    //sigbus = sigbus | (!sigfpe & !sigsegv & b);
   }
   /** Mark that a #OF, #BR, #TS, #GP or #PF exception conditionally occurs. */
   inline void set_sigsegv(SymBool b) {
-    sigsegv = sigsegv | (!sigfpe & !sigbus & b);
+    //sigsegv = sigsegv | (!sigfpe & !sigbus & b);
   }
 
   /** Set the SF/PF/ZF flags according to a given value.  If width

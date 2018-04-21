@@ -510,37 +510,57 @@ void SimpleHandler::add_all() {
   });
 
 
+  // Bug: Discovered while tesing the values stored in memory. Load and store has different semantics 
   add_opcode_str({"vpmaskmovd", "vmaskmovps"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector s1, SymBitVector s2, SymState& ss) {
     short unsigned int vec_len = 32;
     auto dest_width = d.width();
-    SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
-                            s2[vec_len-1][0], SymBitVector::constant(vec_len, 0)
-                          );
 
-    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
-      result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
+    if (!dst.is_typical_memory()) { // Load
+      SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
+        s2[vec_len-1][0], SymBitVector::constant(vec_len, 0));
+      for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+        result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
                  s2[(vec_len-1) + vec_len*i][vec_len*i], SymBitVector::constant(vec_len, 0)
                ) || result;
+      }
+      ss.set(dst, result, true);
+    } else { //Store
+      SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
+        s2[vec_len-1][0], d[vec_len-1][0]);
+      for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+        result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
+                 s2[(vec_len-1) + vec_len*i][vec_len*i], d[(vec_len-1) + vec_len*i][vec_len*i]) || result;
+      }
+      ss.set(dst, result);
     }
-    ss.set(dst, result, true);
   });
 
   add_opcode_str({"vpmaskmovq", "vmaskmovpd"},
   [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector s1, SymBitVector s2, SymState& ss) {
     short unsigned int vec_len = 64;
     auto dest_width = d.width();
-    SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
-                            s2[vec_len-1][0], SymBitVector::constant(vec_len, 0)
-                          );
 
-    for (size_t i = 1 ; i < dest_width/vec_len; i++) {
-      result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
+    if (!dst.is_typical_memory()) { // Load
+      SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
+        s2[vec_len-1][0], SymBitVector::constant(vec_len, 0));
+      for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+        result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
                  s2[(vec_len-1) + vec_len*i][vec_len*i], SymBitVector::constant(vec_len, 0)
                ) || result;
+      }
+      ss.set(dst, result, true);
+    } else { //Store
+      SymBitVector result = (s1[vec_len-1][vec_len-1] == SymBitVector::constant(1, 0x1)).ite(
+        s2[vec_len-1][0], d[vec_len-1][0]);
+      for (size_t i = 1 ; i < dest_width/vec_len; i++) {
+        result = (s1[(vec_len-1) + vec_len*i][(vec_len-1) + vec_len*i] == SymBitVector::constant(1, 0x1)).ite(
+                 s2[(vec_len-1) + vec_len*i][vec_len*i], d[(vec_len-1) + vec_len*i][vec_len*i]) || result;
+      }
+      ss.set(dst, result);
     }
-    ss.set(dst, result, true);
-  });
+
+    });
   // END Extend Memory Instructions; Ungeneralized; Stratified; UnStoked
 
 
@@ -3218,6 +3238,12 @@ void SimpleHandler::add_all() {
 
 
   add_opcode({VCVTPD2DQ_XMM_YMM},
+  [this] (Operand dst, Operand src1, SymBitVector a, SymBitVector b, SymState& ss) {
+    SymFunction f("cvt_double_to_int32", 32, {64});
+    ss.set(dst, vectorize(f, a, b, a), true);
+  });
+
+  add_opcode({VCVTPD2DQ_XMM_M256},
   [this] (Operand dst, Operand src1, SymBitVector a, SymBitVector b, SymState& ss) {
     SymFunction f("cvt_double_to_int32", 32, {64});
     ss.set(dst, vectorize(f, a, b, a), true);

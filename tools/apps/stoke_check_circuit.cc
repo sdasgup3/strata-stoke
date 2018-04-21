@@ -106,9 +106,11 @@ int main(int argc, char** argv) {
   }
 
   // Build the sym formula of the circuit
-  cout << "Build Strata Combo Handler\n";
-  ComboHandler ch("/home/sdasgup3/Github/strata-data/circuits/");
-  // ComboHandler ch;
+  //cout << "Build Strata Combo Handler\n";
+  // ComboHandler ch("/home/sdasgup3/Github/strata-data/circuits/");
+  //  ComboHandler ch;
+  ComboHandler ch(strata_path_arg.value());
+
   if (ch.get_support(instr) == Handler::SupportLevel::NONE) {
     //cout << "\033[1;31mNot supported\033[0m\n";
     cout << "Not Supported (" <<  opcode << ")\n";
@@ -116,21 +118,32 @@ int main(int argc, char** argv) {
   }
 
   // check equivalence of two symbolic states for a given register
-  auto is_eq = [&solver](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
-    SymBool eq = a == b;
+  auto is_eq = [&](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
+    //SymBool eq = a == b;
+    // At times simplification is requires as the sym to z3 transformer might crash.
+    SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
 
     // cout <<  "\n\n" << *reg << ":\n";
+    // SImplified
     // cout << SymSimplify().simplify(a) << "\n";
-    // cout << b << "\n";
-    // cout << solver.getZ3Formula(a) << "\n";
-    // cout << solver.getZ3Formula(b) << "\n";
+    // cout << SymSimplify().simplify(b) << "\n\n\n";
 
-    // bool res = solver.is_sat({ !eq });
+    // Not simplified
+    // cout << a << "\n";
+    // cout << b << "\n";
+
+    //cout << solver.getZ3Formula(SymSimplify().simplify(a)) << std::flush << "\n";
+    //cout << solver.getZ3Formula(SymSimplify().simplify(b)) << std::flush << "\n";
+    //cout << solver.getZ3Formula(a) << "\n";
+    //cout << solver.getZ3Formula(b) << "\n";
+
+    //bool res = solver.is_sat({ !eq });
     bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
       return false;
     }
+
     //if (res) {
     if (!res) {
       cout << cs << "\n";
@@ -146,7 +159,7 @@ int main(int argc, char** argv) {
       }
       */
       explanation << "    validator: " << solver.getZ3Formula(SymSimplify().simplify(a)) << endl;
-      explanation << "    sandbox:   " << b << endl;
+      explanation << "    sandbox:   " << solver.getZ3Formula(SymSimplify().simplify(b)) << endl;
       return false;
     } else {
       return true;
@@ -178,9 +191,14 @@ int main(int argc, char** argv) {
   cout << "Check Equivalence\n";
   int i = 0;
   RegSet *dummy = new RegSet();
+  int count = 0;
 
   for (const auto& cs : test_set) {
+    std::cout << count++ << std::flush << "\n";
+    
+
     // Create a formula with initial state as the test input
+
     SymState sym_validator(cs);
     ch.build_circuit(instr, sym_validator);
     if (ch.has_error()) {
@@ -221,6 +239,9 @@ int main(int argc, char** argv) {
     if (i%1000 == 0 ) {
       cout << "Completed " <<i << "cases" <<  endl;
     }
+
+    sym_validator.clearSymRegs();
+    sb_validator.clearSymRegs();
   }
 
   delete (dummy);
