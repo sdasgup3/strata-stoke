@@ -37,11 +37,11 @@ public:
   }
 
   ~FlatMemory() {
-    for(auto& constrain: constraints_) {
+    for (auto& constrain: constraints_) {
       delete constrain.ptr;
     }
 
-    for(auto& access_var: access_list_) {
+    for (auto& access_var: access_list_) {
       delete access_var.first;
     }
 
@@ -50,16 +50,16 @@ public:
   }
 
   void deleteR(const SymArrayAbstract* delptr) {
-    if(NULL == delptr) {
+    if (NULL == delptr) {
       return;
     }
 
-    if(auto ptr = dynamic_cast<const SymArrayStore*>(delptr)) {
+    if (auto ptr = dynamic_cast<const SymArrayStore*>(delptr)) {
       delete ptr->key_;
       delete ptr->value_;
       deleteR(ptr->a_);
       delete ptr;
-    } else if(auto ptr = dynamic_cast<const SymArrayVar*>(delptr)) {
+    } else if (auto ptr = dynamic_cast<const SymArrayVar*>(delptr)) {
       delete ptr;
     }
     return;

@@ -48,12 +48,12 @@ public:
   std::vector<stoke::SymBitVector>& getcontents () {
     return contents_;
   }
-    
+
 
   /*
   ~SymRegs() {
     for (auto& elem: contents_) {
-      if(elem.ptr) {  
+      if(elem.ptr) {
         delete elem.ptr;
       }
     }

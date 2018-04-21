@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
 
   for (const auto& cs : test_set) {
     std::cout << count++ << std::flush << "\n";
-    
+
 
     // Create a formula with initial state as the test input
 

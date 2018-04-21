@@ -53,21 +53,21 @@ public:
     return;
     auto gpcontents = gp.getcontents();
     for (auto& elem: gpcontents) {
-     if(elem.ptr) {  
-       delete elem.ptr;
-     }
+      if (elem.ptr) {
+        delete elem.ptr;
+      }
     }
     auto ssecontents = sse.getcontents();
     for (auto& elem: ssecontents) {
-     if(elem.ptr) {  
-       delete elem.ptr;
-     }
+      if (elem.ptr) {
+        delete elem.ptr;
+      }
     }
 
     for (auto& elem: rf) {
-     if(elem.ptr) {  
-       delete elem.ptr;
-     }
+      if (elem.ptr) {
+        delete elem.ptr;
+      }
     }
 
     delete sigbus.ptr;

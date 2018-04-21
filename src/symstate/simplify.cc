@@ -165,7 +165,7 @@ public:
       auto a = (*this)(bv->args_[0]);
       auto b = (*this)(bv->args_[1]);
 
-      //This seems wrong as 
+      //This seems wrong as
       // -0.0 + 0.0 = 0.0
       // -0.0 - 0.0 = 0.0
       /*
