@@ -561,6 +561,54 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == VFMSUBADD132PD_XMM_XMM_M128
       || opcode == VFMSUBADD231PD_XMM_XMM_M128
       || opcode == VFMADDSUB231PS_XMM_XMM_M128 // <-- END: This particula one has a huge formula otherwise; check master strata to reproduce
+      || opcode == CMOVO_R64_M64
+      || opcode == HSUBPS_XMM_M128
+      || opcode == CMOVL_R64_M64
+      || opcode == VPADDD_XMM_XMM_M128
+      || opcode == CMOVNP_R64_M64
+      || opcode == VPHADDD_YMM_YMM_M256
+      || opcode == AND_R16_M16
+      || opcode == CMOVNS_R64_M64
+      || opcode == AND_M16_IMM16
+      || opcode == BLSI_R32_M32
+      || opcode == VPUNPCKLDQ_YMM_YMM_M256
+      || opcode == VPMADDWD_YMM_YMM_M256
+      || opcode == VHSUBPS_XMM_XMM_M128
+      || opcode == PSUBQ_XMM_M128
+      || opcode == VPSUBD_YMM_YMM_M256
+      || opcode == TZCNT_R16_M16
+      || opcode == ROR_M16_ONE
+      || opcode == CMOVAE_R64_M64
+      || opcode == VPHSUBD_YMM_YMM_M256
+      || opcode == VPMADDWD_XMM_XMM_M128
+      || opcode == VHADDPS_YMM_YMM_M256
+      || opcode == VUNPCKLPS_YMM_YMM_M256
+      || opcode == PADDD_XMM_M128
+      || opcode == VPSUBQ_XMM_XMM_M128
+      || opcode == VHADDPS_XMM_XMM_M128
+      || opcode == VXORPS_YMM_YMM_M256
+      || opcode == AND_M16_R16
+      || opcode == PSUBD_XMM_M128
+      || opcode == AND_M16_IMM8
+      || opcode == CMOVNC_R64_M64
+      || opcode == VUNPCKLPS_XMM_XMM_M128
+      || opcode == VHSUBPS_YMM_YMM_M256
+      || opcode == CMOVNGE_R64_M64
+      || opcode == VPUNPCKLDQ_XMM_XMM_M128
+      || opcode == VPADDD_YMM_YMM_M256
+      || opcode == VPSUBD_XMM_XMM_M128
+      || opcode == CMOVNO_R64_M64
+      || opcode == CMOVNB_R64_M64
+      || opcode == VPXOR_YMM_YMM_M256
+      || opcode == HADDPS_XMM_M128
+      || opcode == CMOVPO_R64_M64
+      || opcode == VXORPD_YMM_YMM_M256
+      || opcode == PHSUBD_XMM_M128
+      || opcode == CMOVNL_R64_M64
+      || opcode == CMOVS_R64_M64
+      || opcode == CMOVGE_R64_M64
+      || opcode == VPMOVSXDQ_YMM_M128
+      || opcode == VPHSUBD_XMM_XMM_M128
      ) {
     return false;
   }
