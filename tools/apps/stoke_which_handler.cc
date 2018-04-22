@@ -124,34 +124,28 @@ int main(int argc, char** argv) {
     auto h = ch.get_handler(it, level) ;
     if (dynamic_cast<StrataHandler *>(h)) {
       std::cout << opc_arg.value() << ":StrataHandler" << "\n";
-    }
-    if (dynamic_cast<PackedHandler *>(h)) {
+    } else if (dynamic_cast<PackedHandler *>(h)) {
       std::cout << opc_arg.value()  << ":PackedHandler" << "\n";
-    }
-    if (dynamic_cast<SimpleHandler *>(h)) {
+    } else if (dynamic_cast<SimpleHandler *>(h)) {
       std::cout << opc_arg.value() <<":SimpleHandler" << "\n";
-    }
-    if (dynamic_cast<AddHandler *>(h)) {
+    } else if (dynamic_cast<AddHandler *>(h)) {
       std::cout << opc_arg.value() <<":AddHandler" << "\n";
-    }
-    if (dynamic_cast<ConditionalHandler *>(h)) {
+    } else if (dynamic_cast<ConditionalHandler *>(h)) {
       std::cout << opc_arg.value() << ":ConditionalHandler" << "\n";
-    }
-    if (dynamic_cast<LeaHandler *>(h)) {
+    } else if (dynamic_cast<LeaHandler *>(h)) {
       std::cout << opc_arg.value() << ":LeaHandler" << "\n";
-    }
-    if (dynamic_cast<MoveHandler *>(h)) {
+    } else if (dynamic_cast<MoveHandler *>(h)) {
       std::cout << opc_arg.value() << ":MoveHandler" << "\n";
-    }
-    if (dynamic_cast<PunpckHandler *>(h)) {
+    } else if (dynamic_cast<PunpckHandler *>(h)) {
       std::cout << opc_arg.value() << ":PunpckHandler" << "\n";
-    }
-    if (dynamic_cast<ShiftHandler *>(h)) {
+    } else if (dynamic_cast<ShiftHandler *>(h)) {
       std::cout << opc_arg.value() <<":ShiftHandler" << "\n";
-    }
-    if (dynamic_cast<PseudoHandler *>(h)) {
+    } else if (dynamic_cast<PseudoHandler *>(h)) {
       std::cout << opc_arg.value() << ":PseudoHandler" << "\n";
+    } else {
+      std::cout << opc_arg.value() << ":None" << "\n";
     }
+
   }
 
   return 0;

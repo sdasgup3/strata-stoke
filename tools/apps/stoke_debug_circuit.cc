@@ -193,6 +193,7 @@ int main(int argc, char** argv) {
     if (it.get_opcode() == Opcode::RET) break; // only go until first break
     if (ch.get_support(it) == Handler::SupportLevel::NONE) {
       Console::error() << "Instruction unsupported: " << it << endl;
+      exit(0);
     }
   }
 
