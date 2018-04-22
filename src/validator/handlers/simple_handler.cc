@@ -389,6 +389,17 @@ void SimpleHandler::add_all() {
   });
 
 
+  // Extend Memory Instructions; Stratified ones are too complex; the following are the simpler rules proved equiv to those.
+  add_opcode_str({"shrxl"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector d, SymBitVector s1, SymBitVector s2, SymState& ss) {
+    auto width = d.width();
+
+    auto count  = s2 & SymBitVector::constant(32, 31);
+    ss.set(dst, s1 >> count);
+  });
+
+
+
   // Extend Memory Instructions; Ungeneralized; Stratified; UnStoked
   add_opcode_str({"cmpxchg8b", "cmpxchg16b"},
   [this] (Operand dst, SymBitVector dest_bv, SymState& ss) {
@@ -418,18 +429,36 @@ void SimpleHandler::add_all() {
 
   });
 
-  add_opcode_str({"cmpxchgl"},
+  add_opcode_str({"cmpxchgl", "cmpxchgb", "cmpxchgq", "cmpxchgw"},
   [this] (Operand dst, Operand src,  SymBitVector a, SymBitVector b,  SymState& ss) {
     auto width = a.width();
 
-    SymBitVector accumulator = ss[Constants::eax()];
+    SymBitVector accumulator;
+    if(32 == width) {
+      accumulator = ss[Constants::eax()];
+    } else if(16 == width) {
+      accumulator = ss[Constants::ax()];
+    } else if(8 == width ) {
+      accumulator = ss[Constants::al()];
+    } else if(64 == width) {
+      accumulator = ss[Constants::rax()];
+    } else {
+      assert(0);
+    }
 
     // For accumulator == a; rax should remain unchanged
     // For accumulator != a; rax  == 0 || a
     // Where as for dst, while accumulator != a; the ppoer bits need to be preserved even if
     // the witdth of dest is 32 bits.
 
-    ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  SymBitVector::constant(32, 0) || a));
+    if(32 == width) {
+      ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  SymBitVector::constant(64 - width, 0) || a));
+    } else if (64 == width){
+      ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  a));
+    } else {
+      ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  ss[Constants::rax()][63][width] || a));
+    }
+
     ss.set(dst, (accumulator == a).ite(b, a), false, true);
 
 
