@@ -549,10 +549,10 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == VPUNPCKHWD_XMM_XMM_M128
       || opcode == VPUNPCKHWD_YMM_YMM_M256
       || opcode == VPUNPCKLWD_XMM_XMM_M128
-      || opcode == VPUNPCKLWD_YMM_YMM_M256 
-      || opcode == VFMADD132SD_XMM_XMM_M64 
-      || opcode == VFNMADD132SS_XMM_XMM_M32 
-      || opcode == VFMSUBADD132PS_XMM_XMM_M128 
+      || opcode == VPUNPCKLWD_YMM_YMM_M256
+      || opcode == VFMADD132SD_XMM_XMM_M64
+      || opcode == VFNMADD132SS_XMM_XMM_M32
+      || opcode == VFMSUBADD132PS_XMM_XMM_M128
       || opcode == VFMADDSUB213PS_XMM_XMM_M128 // <-- END
      ) {
     return false;
