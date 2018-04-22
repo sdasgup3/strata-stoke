@@ -608,7 +608,7 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == CMOVS_R64_M64
       || opcode == CMOVGE_R64_M64
       || opcode == VPMOVSXDQ_YMM_M128
-      || opcode == VPHSUBD_XMM_XMM_M128    
+      || opcode == VPHSUBD_XMM_XMM_M128
      ) {
     return false;
   }
