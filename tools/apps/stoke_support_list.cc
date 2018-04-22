@@ -22,12 +22,17 @@ using namespace std;
 using namespace stoke;
 using namespace x64asm;
 
+cpputil::ValueArg<std::string>& strata_path_arg =
+  cpputil::ValueArg<std::string>::create("strata_path")
+  .usage("<path/to/dir>")
+  .description("The path to the directory with the strata circuits (a collection of .s files)")
+  .default_val("");
 
 int main(int argc, char** argv) {
 
   auto solver = new Z3Solver();
-  string strata_path("/home/sdasgup3/Github/strata-data/circuits/");
-  auto validator_ = new Validator(*solver, strata_path);
+  //string strata_path("/home/sdasgup3/Github/strata-data/circuits/");
+  auto validator_ = new Validator(*solver, strata_path_arg.value());
   for (size_t i = 0; i < X64ASM_NUM_OPCODES; ++i) {
     auto op = (Opcode)i;
     string att_ = opcode_write_att(op);
@@ -38,6 +43,9 @@ int main(int argc, char** argv) {
 
     std::cout << i << ":" << att_ << ":" << intel_ << ":" << ss.str() << ":" << validator_->is_supported(op) << "\n";
   }
+
+
+  std::cout << " Strata Path: " << strata_path_arg.value() << "\n";
 
   return 0;
 }
