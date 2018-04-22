@@ -537,7 +537,6 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == PMOVZXWD_XMM_M64
       || opcode == PUNPCKHWD_XMM_M128
       || opcode == PUNPCKLWD_XMM_M128
-      || opcode == VFMSUB213SS_XMM_XMM_M32
       || opcode == VFMSUBADD132PS_XMM_XMM_M128
       || opcode == VFMSUBADD213PS_XMM_XMM_M128
       || opcode == VFMSUBADD231PS_XMM_XMM_M128
