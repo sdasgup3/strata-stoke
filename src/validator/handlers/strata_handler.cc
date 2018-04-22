@@ -553,6 +553,14 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == VFNMADD132SS_XMM_XMM_M32
       || opcode == VFMSUBADD132PS_XMM_XMM_M128
       || opcode == VFMADDSUB213PS_XMM_XMM_M128 // <-- END
+      || opcode == VFMADDSUB132PD_XMM_XMM_M128 // <- Both stata and master branch yeilds formula for these using strata handler, but I write simple formula
+      || opcode == VFMADDSUB213PD_XMM_XMM_M128 // for those for regosters, which can now be generalized to registers; Get rid of complex formula
+      || opcode == VFMADDSUB132PS_XMM_XMM_M128
+      || opcode == VFMSUBADD213PD_XMM_XMM_M128
+      || opcode == VFMADDSUB231PD_XMM_XMM_M128
+      || opcode == VFMSUBADD132PD_XMM_XMM_M128
+      || opcode == VFMSUBADD231PD_XMM_XMM_M128
+      || opcode == VFMADDSUB231PS_XMM_XMM_M128 // <-- END: This particula one has a huge formula otherwise; check master strata to reproduce
      ) {
     return false;
   }
