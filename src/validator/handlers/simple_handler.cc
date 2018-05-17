@@ -488,13 +488,13 @@ void SimpleHandler::add_all() {
     auto width = a.width();
 
     SymBitVector accumulator;
-    if(32 == width) {
+    if (32 == width) {
       accumulator = ss[Constants::eax()];
-    } else if(16 == width) {
+    } else if (16 == width) {
       accumulator = ss[Constants::ax()];
-    } else if(8 == width ) {
+    } else if (8 == width ) {
       accumulator = ss[Constants::al()];
-    } else if(64 == width) {
+    } else if (64 == width) {
       accumulator = ss[Constants::rax()];
     } else {
       assert(0);
@@ -505,9 +505,9 @@ void SimpleHandler::add_all() {
     // Where as for dst, while accumulator != a; the ppoer bits need to be preserved even if
     // the witdth of dest is 32 bits.
 
-    if(32 == width) {
+    if (32 == width) {
       ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  SymBitVector::constant(64 - width, 0) || a));
-    } else if (64 == width){
+    } else if (64 == width) {
       ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  a));
     } else {
       ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  ss[Constants::rax()][63][width] || a));
@@ -585,7 +585,7 @@ void SimpleHandler::add_all() {
       result = s[vec_len-1][0] || result;
     }
     ss.set(dst, result, true);
-   });
+  });
 
   add_opcode_str({"vpbroadcasti128"},
   [this] (Operand dst, Operand src, SymBitVector d, SymBitVector s, SymState& ss) {

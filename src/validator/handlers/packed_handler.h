@@ -1442,15 +1442,15 @@ private:
     // , x64asm::Opcode::ADDSUBPD_XMM_M128
     // , x64asm::Opcode::ADDSUBPS_XMM_M128
     x64asm::Opcode::CVTPD2DQ_XMM_M128
-     , x64asm::Opcode::CVTPD2DQ_XMM_XMM
+    , x64asm::Opcode::CVTPD2DQ_XMM_XMM
     , x64asm::Opcode::CVTPD2PS_XMM_M128
-     , x64asm::Opcode::CVTPD2PS_XMM_XMM
+    , x64asm::Opcode::CVTPD2PS_XMM_XMM
     , x64asm::Opcode::CVTTPD2DQ_XMM_M128
-     , x64asm::Opcode::CVTTPD2DQ_XMM_XMM
+    , x64asm::Opcode::CVTTPD2DQ_XMM_XMM
     , x64asm::Opcode::VADDSD_XMM_XMM_M64
-     , x64asm::Opcode::VADDSD_XMM_XMM_XMM
+    , x64asm::Opcode::VADDSD_XMM_XMM_XMM
     , x64asm::Opcode::VADDSS_XMM_XMM_M32
-     , x64asm::Opcode::VADDSS_XMM_XMM_XMM
+    , x64asm::Opcode::VADDSS_XMM_XMM_XMM
     // , x64asm::Opcode::VADDSUBPD_XMM_XMM_XMM
     // , x64asm::Opcode::VADDSUBPD_YMM_YMM_YMM
     // , x64asm::Opcode::VADDSUBPS_XMM_XMM_XMM
@@ -1463,10 +1463,10 @@ private:
     // , x64asm::Opcode::VCVTPD2DQ_XMM_YMM
     , x64asm::Opcode::VCVTPD2PS_XMM_M128
     , x64asm::Opcode::VCVTPD2PS_XMM_M256
-     , x64asm::Opcode::VCVTPD2PS_XMM_XMM
+    , x64asm::Opcode::VCVTPD2PS_XMM_XMM
     // , x64asm::Opcode::VCVTPD2PS_XMM_YMM
     , x64asm::Opcode::VCVTSD2SS_XMM_XMM_M64
-     , x64asm::Opcode::VCVTSD2SS_XMM_XMM_XMM
+    , x64asm::Opcode::VCVTSD2SS_XMM_XMM_XMM
     // , x64asm::Opcode::VCVTSI2SD_XMM_XMM_M32
     // , x64asm::Opcode::VCVTSI2SD_XMM_XMM_R32
     // , x64asm::Opcode::VCVTSI2SD_XMM_XMM_M64
@@ -1476,27 +1476,27 @@ private:
     // , x64asm::Opcode::VCVTSI2SS_XMM_XMM_M64
     // , x64asm::Opcode::VCVTSI2SS_XMM_XMM_R64
     , x64asm::Opcode::VCVTSS2SD_XMM_XMM_M32
-     , x64asm::Opcode::VCVTSS2SD_XMM_XMM_XMM
+    , x64asm::Opcode::VCVTSS2SD_XMM_XMM_XMM
     , x64asm::Opcode::VCVTTPD2DQ_XMM_M128
     , x64asm::Opcode::VCVTTPD2DQ_XMM_M256
-     , x64asm::Opcode::VCVTTPD2DQ_XMM_XMM
+    , x64asm::Opcode::VCVTTPD2DQ_XMM_XMM
     // , x64asm::Opcode::VCVTTPD2DQ_XMM_YMM
     , x64asm::Opcode::VDIVSD_XMM_XMM_M64
-     , x64asm::Opcode::VDIVSD_XMM_XMM_XMM
+    , x64asm::Opcode::VDIVSD_XMM_XMM_XMM
     , x64asm::Opcode::VDIVSS_XMM_XMM_M32
-     , x64asm::Opcode::VDIVSS_XMM_XMM_XMM
+    , x64asm::Opcode::VDIVSS_XMM_XMM_XMM
     , x64asm::Opcode::VMULSD_XMM_XMM_M64
-     , x64asm::Opcode::VMULSD_XMM_XMM_XMM
+    , x64asm::Opcode::VMULSD_XMM_XMM_XMM
     , x64asm::Opcode::VMULSS_XMM_XMM_M32
-     , x64asm::Opcode::VMULSS_XMM_XMM_XMM
+    , x64asm::Opcode::VMULSS_XMM_XMM_XMM
     , x64asm::Opcode::VRCPSS_XMM_XMM_M32
-     , x64asm::Opcode::VRCPSS_XMM_XMM_XMM
+    , x64asm::Opcode::VRCPSS_XMM_XMM_XMM
     , x64asm::Opcode::VRSQRTSS_XMM_XMM_M32
-     , x64asm::Opcode::VRSQRTSS_XMM_XMM_XMM
+    , x64asm::Opcode::VRSQRTSS_XMM_XMM_XMM
     , x64asm::Opcode::VSQRTSD_XMM_XMM_M64
-     , x64asm::Opcode::VSQRTSD_XMM_XMM_XMM
+    , x64asm::Opcode::VSQRTSD_XMM_XMM_XMM
     , x64asm::Opcode::VSQRTSS_XMM_XMM_M32
-     , x64asm::Opcode::VSQRTSS_XMM_XMM_XMM
+    , x64asm::Opcode::VSQRTSS_XMM_XMM_XMM
     , x64asm::Opcode::VSUBSD_XMM_XMM_M64
     , x64asm::Opcode::VSUBSD_XMM_XMM_XMM
     , x64asm::Opcode::VSUBSS_XMM_XMM_M32
