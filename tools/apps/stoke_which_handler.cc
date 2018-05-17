@@ -113,39 +113,104 @@ int main(int argc, char** argv) {
   mem = new TrivialMemory();
   state.memory = mem;
 
+  std::string strata_path_included_h("");
+  std::string strata_path_non_included_h("");
 
-  ComboHandler ch(strata_path_arg.value());
-  Handler::SupportLevel level;
+  //ComboHandler ch(strata_path_arg.value());
+  ComboHandler ch1("/home/sdasgup3/Github/strata-data/circuits");
+  ComboHandler ch2("");
+
+  Handler::SupportLevel level1;
+  Handler::SupportLevel level2;
   for (auto it : code) {
     if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
     if (it.get_opcode() == Opcode::RET) break;
 
 
-    auto h = ch.get_handler(it, level) ;
+    auto h = ch1.get_handler(it, level1) ;
+
     if (dynamic_cast<StrataHandler *>(h)) {
-      std::cout << opc_arg.value() << ":StrataHandler" << "\n";
+      //std::cout << opc_arg.value() << ":StrataHandler" << "\n";
+      strata_path_included_h = string("StrataHandler");
     } else if (dynamic_cast<PackedHandler *>(h)) {
-      std::cout << opc_arg.value()  << ":PackedHandler" << "\n";
+      //std::cout << opc_arg.value()  << ":PackedHandler" << "\n";
+      strata_path_included_h = string("PackedHandler");
     } else if (dynamic_cast<SimpleHandler *>(h)) {
-      std::cout << opc_arg.value() <<":SimpleHandler" << "\n";
+      //std::cout << opc_arg.value() <<":SimpleHandler" << "\n";
+      strata_path_included_h = string("SimpleHandler");
     } else if (dynamic_cast<AddHandler *>(h)) {
-      std::cout << opc_arg.value() <<":AddHandler" << "\n";
+      //std::cout << opc_arg.value() <<":AddHandler" << "\n";
+      strata_path_included_h = string("AddHandler");
     } else if (dynamic_cast<ConditionalHandler *>(h)) {
-      std::cout << opc_arg.value() << ":ConditionalHandler" << "\n";
+      //std::cout << opc_arg.value() << ":ConditionalHandler" << "\n";
+      strata_path_included_h = string("ConditionalHandler");
     } else if (dynamic_cast<LeaHandler *>(h)) {
-      std::cout << opc_arg.value() << ":LeaHandler" << "\n";
+      //std::cout << opc_arg.value() << ":LeaHandler" << "\n";
+      strata_path_included_h = string("LeaHandler");
     } else if (dynamic_cast<MoveHandler *>(h)) {
-      std::cout << opc_arg.value() << ":MoveHandler" << "\n";
+      //std::cout << opc_arg.value() << ":MoveHandler" << "\n";
+      strata_path_included_h = string("MoveHandler");
     } else if (dynamic_cast<PunpckHandler *>(h)) {
-      std::cout << opc_arg.value() << ":PunpckHandler" << "\n";
+      //std::cout << opc_arg.value() << ":PunpckHandler" << "\n";
+      strata_path_included_h = string("PunpckHandler");
     } else if (dynamic_cast<ShiftHandler *>(h)) {
-      std::cout << opc_arg.value() <<":ShiftHandler" << "\n";
+      //std::cout << opc_arg.value() <<":ShiftHandler" << "\n";
+      strata_path_included_h = string("ShiftHandler");
     } else if (dynamic_cast<PseudoHandler *>(h)) {
-      std::cout << opc_arg.value() << ":PseudoHandler" << "\n";
+      //std::cout << opc_arg.value() << ":PseudoHandler" << "\n";
+      strata_path_included_h = string("PseudoHandler");
     } else {
-      std::cout << opc_arg.value() << ":None" << "\n";
+      //std::cout << opc_arg.value() << ":None" << "\n";
+      strata_path_included_h = string("None");
     }
 
+  }
+
+  for (auto it : code) {
+    if (it.get_opcode() == Opcode::LABEL_DEFN) continue;
+    if (it.get_opcode() == Opcode::RET) break;
+
+
+    auto h = ch2.get_handler(it, level2) ;
+    if (dynamic_cast<PackedHandler *>(h)) {
+      //std::cout << opc_arg.value()  << ":PackedHandler" << "\n";
+      strata_path_non_included_h = string("PackedHandler");
+    } else if (dynamic_cast<SimpleHandler *>(h)) {
+      //std::cout << opc_arg.value() <<":SimpleHandler" << "\n";
+      strata_path_non_included_h = string("SimpleHandler");
+    } else if (dynamic_cast<AddHandler *>(h)) {
+      //std::cout << opc_arg.value() <<":AddHandler" << "\n";
+      strata_path_non_included_h = string("AddHandler");
+    } else if (dynamic_cast<ConditionalHandler *>(h)) {
+      //std::cout << opc_arg.value() << ":ConditionalHandler" << "\n";
+      strata_path_non_included_h = string("ConditionalHandler");
+    } else if (dynamic_cast<LeaHandler *>(h)) {
+      //std::cout << opc_arg.value() << ":LeaHandler" << "\n";
+      strata_path_non_included_h = string("LeaHandler");
+    } else if (dynamic_cast<MoveHandler *>(h)) {
+      //std::cout << opc_arg.value() << ":MoveHandler" << "\n";
+      strata_path_non_included_h = string("MoveHandler");
+    } else if (dynamic_cast<PunpckHandler *>(h)) {
+      //std::cout << opc_arg.value() << ":PunpckHandler" << "\n";
+      strata_path_non_included_h = string("PunpckHandler");
+    } else if (dynamic_cast<ShiftHandler *>(h)) {
+      //std::cout << opc_arg.value() <<":ShiftHandler" << "\n";
+      strata_path_non_included_h = string("ShiftHandler");
+    } else if (dynamic_cast<PseudoHandler *>(h)) {
+      //std::cout << opc_arg.value() << ":PseudoHandler" << "\n";
+      strata_path_non_included_h = string("PseudoHandler");
+    } else {
+      //std::cout << opc_arg.value() << ":None" << "\n";
+      strata_path_non_included_h = string("None");
+    }
+
+  }
+
+
+  if (strata_path_non_included_h == strata_path_included_h) {
+    std::cout << opc_arg.value() << ":Equal:"<< strata_path_included_h << "\n";
+  } else {
+    std::cout << opc_arg.value() << ":"<< strata_path_included_h << ":"<< strata_path_non_included_h << "\n";
   }
 
   return 0;
