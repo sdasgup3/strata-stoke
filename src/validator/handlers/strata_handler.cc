@@ -561,7 +561,7 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == VFMSUBADD132PD_XMM_XMM_M128
       || opcode == VFMSUBADD231PD_XMM_XMM_M128
       || opcode == VFMADDSUB231PS_XMM_XMM_M128 // <-- END: This particula one has a huge formula otherwise; check master strata to reproduce
-      || opcode == CMOVO_R64_M64
+      || opcode == CMOVO_R64_M64 // <- Adding simple but equiv formulas from other handlers  
       || opcode == HSUBPS_XMM_M128
       || opcode == CMOVL_R64_M64
       || opcode == VPADDD_XMM_XMM_M128
@@ -608,7 +608,20 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == CMOVS_R64_M64
       || opcode == CMOVGE_R64_M64
       || opcode == VPMOVSXDQ_YMM_M128
-      || opcode == VPHSUBD_XMM_XMM_M128
+      || opcode == VPHSUBD_XMM_XMM_M128 // <-- END
+      || opcode == SHRX_R32_M32_R32 // <-- FOr the same purpose, but manually added these formula in other handler to keep the formula simpler, otherwise the strata formula is too complex
+      || opcode == CMPXCHG_M16_R16
+      || opcode == CMPXCHG_M64_R64
+      || opcode == CMPXCHG_M8_RH
+      || opcode == CMPXCHG_M8_R8 
+      || opcode == VFNMADD231SD_XMM_XMM_M64
+      || opcode == VFMADD132PS_XMM_XMM_M128
+      || opcode == VFNMADD213SS_XMM_XMM_M32
+      || opcode == VFNMADD132PD_XMM_XMM_M128
+      || opcode == VFNMSUB213SD_XMM_XMM_M64
+      || opcode == VFMADD213SD_XMM_XMM_M64
+      || opcode == VFNMADD213SD_XMM_XMM_M64
+      || opcode == VFMSUB213SS_XMM_XMM_M32    // <-- END
      ) {
     return false;
   }

@@ -14,6 +14,10 @@
 
 #include <iostream>
 
+#include "src/ext/cpputil/include/command_line/command_line.h"
+#include "src/ext/cpputil/include/signal/debug_handler.h"
+#include "src/ext/cpputil/include/io/filterstream.h"
+#include "src/ext/cpputil/include/io/column.h"
 #include "tools/gadgets/solver.h"
 #include "tools/gadgets/validator.h"
 
@@ -29,6 +33,10 @@ cpputil::ValueArg<std::string>& strata_path_arg =
   .default_val("");
 
 int main(int argc, char** argv) {
+
+  CommandLineConfig::strict_with_convenience(argc, argv);
+    DebugHandler::install_sigsegv();
+  DebugHandler::install_sigill();
 
   auto solver = new Z3Solver();
   //string strata_path("/home/sdasgup3/Github/strata-data/circuits/");
