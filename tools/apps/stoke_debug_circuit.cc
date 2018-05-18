@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
     if (use_smtlib_format_arg.value()) {
       std::cout << solver.getZ3Formula(c);
       std::cout << "\n";
-    } else if (use_prefix_format_arg.value()) { 
+    } else if (use_prefix_format_arg.value()) {
       smtlib((c));
     } else {
       pretty((c));
