@@ -63,6 +63,8 @@ auto& show_unchanged_arg = FlagArg::create("show_unchanged")
                            .description("Show the formula for unchanged registers");
 auto& use_smtlib_format_arg = FlagArg::create("smtlib_format")
                               .description("Show formula in smtlib format");
+auto& use_prefix_format_arg = FlagArg::create("prefix_format")
+                              .description("Show formula in prefix format");
 auto& no_simplify_arg = FlagArg::create("no_simplify")
                         .description("Don't simplify formulas before printing them.");
 
@@ -235,8 +237,10 @@ int main(int argc, char** argv) {
       c = cc;
     }
     if (use_smtlib_format_arg.value()) {
-      //smtlib((c));
       std::cout << solver.getZ3Formula(c);
+      std::cout << "\n";
+    } else if (use_prefix_format_arg.value()) {
+      smtlib((c));
     } else {
       pretty((c));
     }
