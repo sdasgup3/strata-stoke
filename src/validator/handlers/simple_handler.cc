@@ -398,6 +398,60 @@ void SimpleHandler::add_all() {
     ss.set(dst, s1 >> count);
   });
 
+  add_opcode_str({"vfmsub213ss"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfmsub213_single", 32, {32, 32, 32});
+    auto res = f(a[31][0], b[31][0], c[31][0]);
+    ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][32] || res, true);
+  });
+
+  add_opcode_str({"vfnmadd213sd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfnmadd213_double", 64, {64, 64, 64});
+    auto res = f(a[63][0], b[63][0], c[63][0]);
+    ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][64] || res, true);
+  });
+
+  add_opcode_str({"vfnmadd231sd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfnmadd231_double", 64, {64, 64, 64});
+    auto res = f(a[63][0], b[63][0], c[63][0]);
+    ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][64] || res, true);
+  });
+
+  add_opcode_str({"vfnmsub213sd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfnmsub213_double", 64, {64, 64, 64});
+    auto res = f(a[63][0], b[63][0], c[63][0]);
+    ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][64] || res, true);
+  });
+
+  add_opcode_str({"vfmadd213sd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfmadd213_double", 64, {64, 64, 64});
+    auto res = f(a[63][0], b[63][0], c[63][0]);
+    ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][64] || res, true);
+  });
+
+  add_opcode_str({"vfmadd132ps"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfmadd132_single", 32, {32, 32, 32});
+    ss.set(dst, vectorize(f, a, b, c), true);
+  });
+
+  add_opcode_str({"vfnmadd132pd"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfnmadd132_double", 64, {64, 64, 64});
+    ss.set(dst, vectorize(f, a, b, c), true);
+  });
+
+  add_opcode_str({"vfnmadd213ss"},
+  [this] (Operand dst, Operand src1, Operand src2, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    SymFunction f("vfnmadd213_single", 32, {32, 32, 32});
+    auto res = f(a[31][0], b[31][0], c[31][0]);
+    ss.set(dst, SymBitVector::constant(128, 0) || ss[dst][127][32] || res, true);
+  });
+  // END
 
 
   // Extend Memory Instructions; Ungeneralized; Stratified; UnStoked
@@ -434,13 +488,13 @@ void SimpleHandler::add_all() {
     auto width = a.width();
 
     SymBitVector accumulator;
-    if(32 == width) {
+    if (32 == width) {
       accumulator = ss[Constants::eax()];
-    } else if(16 == width) {
+    } else if (16 == width) {
       accumulator = ss[Constants::ax()];
-    } else if(8 == width ) {
+    } else if (8 == width ) {
       accumulator = ss[Constants::al()];
-    } else if(64 == width) {
+    } else if (64 == width) {
       accumulator = ss[Constants::rax()];
     } else {
       assert(0);
@@ -451,9 +505,9 @@ void SimpleHandler::add_all() {
     // Where as for dst, while accumulator != a; the ppoer bits need to be preserved even if
     // the witdth of dest is 32 bits.
 
-    if(32 == width) {
+    if (32 == width) {
       ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  SymBitVector::constant(64 - width, 0) || a));
-    } else if (64 == width){
+    } else if (64 == width) {
       ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  a));
     } else {
       ss.set(rax, (accumulator == a).ite(ss[Constants::rax()],  ss[Constants::rax()][63][width] || a));
@@ -514,9 +568,9 @@ void SimpleHandler::add_all() {
     short unsigned int vec_len = 8;
     auto dest_width = d.width();
 
-    SymBitVector result = s;
+    SymBitVector result = s[vec_len-1][0];
     for (size_t i = 1 ; i < dest_width/vec_len; i++) {
-      result = s || result;
+      result = s[vec_len-1][0] || result;
     }
     ss.set(dst, result, true);
   });
@@ -526,9 +580,9 @@ void SimpleHandler::add_all() {
     short unsigned int vec_len = 16;
     auto dest_width = d.width();
 
-    SymBitVector result = s;
+    SymBitVector result = s[vec_len-1][0];
     for (size_t i = 1 ; i < dest_width/vec_len; i++) {
-      result = s || result;
+      result = s[vec_len-1][0] || result;
     }
     ss.set(dst, result, true);
   });

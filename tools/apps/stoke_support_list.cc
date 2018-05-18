@@ -35,7 +35,7 @@ cpputil::ValueArg<std::string>& strata_path_arg =
 int main(int argc, char** argv) {
 
   CommandLineConfig::strict_with_convenience(argc, argv);
-    DebugHandler::install_sigsegv();
+  DebugHandler::install_sigsegv();
   DebugHandler::install_sigill();
 
   auto solver = new Z3Solver();
