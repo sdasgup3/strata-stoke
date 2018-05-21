@@ -38,7 +38,7 @@ public:
       assert(false);
       break;
     }
-    
+
   }
 
   /* Visit a binop on a bool */
@@ -107,7 +107,7 @@ public:
 
   /** Visit a bit-vector function */
   uint16_t visit(const SymBitVectorFunction * const bv) {
-    return bv->f_.return_type; 
+    return bv->f_.return_type;
   }
 
   /** Visit a bit-vector if-then-else */

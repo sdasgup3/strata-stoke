@@ -67,7 +67,7 @@ auto& use_smtlib_format_arg = FlagArg::create("smtlib_format")
 auto& use_prefix_format_arg = FlagArg::create("prefix_format")
                               .description("Show formula in prefix format");
 auto& use_k_format_arg = FlagArg::create("k_format")
-                              .description("Show formula in K format");
+                         .description("Show formula in K format");
 auto& no_simplify_arg = FlagArg::create("no_simplify")
                         .description("Don't simplify formulas before printing them.");
 

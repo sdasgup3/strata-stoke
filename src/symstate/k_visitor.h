@@ -173,7 +173,7 @@ public:
 
   /** Visit a bit-vector constant */
   void visit(const SymBitVectorConstant * const bv) {
-    os_ << "mi(" << std::dec << bv->size_ << ", " << bv->constant_  << ")"; 
+    os_ << "mi(" << std::dec << bv->size_ << ", " << bv->constant_  << ")";
   }
 
   /** Visit a bit-vector extract */
@@ -182,7 +182,7 @@ public:
     os_ << "extractMInt( ";
     (*this)(bv->bv_);
     os_ << ", " << std::dec <<  sz - bv->high_bit_ - 1 << ", " <<
-      sz - bv->low_bit_  << ")";
+        sz - bv->low_bit_  << ")";
   }
 
   /** Visit a bit-vector function */
@@ -211,7 +211,7 @@ public:
 
   /** Visit a bit-vector sign-extend */
   void visit(const SymBitVectorSignExtend * const bv) {
-    os_ << "signExtend( ";  
+    os_ << "signExtend( ";
     (*this)(bv->bv_);
     os_ << ", " << bv->size_ << ")";
   }

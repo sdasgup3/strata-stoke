@@ -538,16 +538,16 @@ public:
     // If(A == mi(1, 1)) then mi(1, 1) else mi(1, 0) => A
     // If(C1 == C2) then lhs else rhs
     switch (c->type()) {
-      case SymBool::EQ: {
-        SymBoolCompare* binop = (SymBoolCompare*)c;
-        auto c1 = (*this)(binop->a_);
-        auto c2 = (*this)(binop->b_);
-        if(is_one(lhs) && is_zero(rhs) && (1 == c1->width_) && is_one(c2)) {
-          return cache(bv, c1);
-        }
+    case SymBool::EQ: {
+      SymBoolCompare* binop = (SymBoolCompare*)c;
+      auto c1 = (*this)(binop->a_);
+      auto c2 = (*this)(binop->b_);
+      if (is_one(lhs) && is_zero(rhs) && (1 == c1->width_) && is_one(c2)) {
+        return cache(bv, c1);
       }
-      default:
-        break;
+    }
+    default:
+      break;
     }
 
 
