@@ -146,6 +146,11 @@ SymBitVector SymBitVector::operator^(const SymBitVector& other) const {
 /* Parity */
 SymBool SymBitVector::parity() const {
 
+  SymFunction f("getParity", 1, {8});
+  return f(*this) == SymBitVector::constant(1, 1);
+  
+  /*
+
   // Step 1: get my size
   uint16_t size = (*this).width();
 
@@ -157,6 +162,7 @@ SymBool SymBitVector::parity() const {
 
   // Step 3: flip
   return !parity;
+  */
 }
 
 /* Indexing */

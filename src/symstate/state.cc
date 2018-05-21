@@ -16,6 +16,8 @@
 #include "src/symstate/state.h"
 #include "src/symstate/memory/flat.h"
 #include "src/ext/x64asm/include/x64asm.h"
+#include "src/symstate/bitvector.h"
+
 
 using namespace std;
 using namespace stoke;
@@ -128,6 +130,25 @@ SymBool SymState::operator[](const Eflags f) const {
 
   assert(false);
   return SymBool(); //keep compiler happy
+}
+
+SymBitVector SymState::lookup_bv_flags(const Eflags f) const {
+
+  if (f.index() == 0) //CF
+    return bv_rf[0];
+  if (f.index() == 2) //PF
+    return bv_rf[1];
+  if (f.index() == 4) //AF
+    return bv_rf[2];
+  if (f.index() == 6) //ZF
+    return bv_rf[3];
+  if (f.index() == 7) //SF
+    return bv_rf[4];
+  if (f.index() == 11) //OF
+    return bv_rf[5];
+
+  assert(false);
+  return SymBitVector(); //keep compiler happy
 }
 
 SymBitVector SymState::operator[](const Operand o) {
@@ -287,26 +308,32 @@ void SymState::set(const Eflags f, SymBool b) {
   switch (f.index()) {
   case 0: { //CF
     rf[0] = b;
+    bv_rf[0] = SymBitVector::from_bool(b);
     return;
   }
   case 2: { //PF
     rf[1] = b;
+    bv_rf[1] = SymBitVector::from_bool(b);
     return;
   }
   case 4: { //AF
     rf[2] = b;
+    bv_rf[2] = SymBitVector::from_bool(b);
     return;
   }
   case 6: { //ZF
     rf[3] = b;
+    bv_rf[3] = SymBitVector::from_bool(b);
     return;
   }
   case 7: { //SF
     rf[4] = b;
+    bv_rf[4] = SymBitVector::from_bool(b);
     return;
   }
   case 11: { //OF
     rf[5] = b;
+    bv_rf[5] = SymBitVector::from_bool(b);
     return;
   }
   default:

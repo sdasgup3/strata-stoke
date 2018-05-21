@@ -86,6 +86,8 @@ public:
   SymMemory* memory;
   /** Symbolic rflags: CF, PF, AF, ZF, SF, OF */
   std::array<SymBool, 6> rf;
+  std::array<SymBitVector, 6> bv_rf;
+
   /** Has a #NP, #SS or #AC exception occurred? (These trigger SIGBUG on linux)*/
   SymBool sigbus;
   /** Has a #DE, #MF or #XM exception occurred? (These trigger SIGFPE on linux) */
@@ -113,6 +115,8 @@ public:
   SymBitVector operator[](const x64asm::Operand o);
   /** Lookup the symbolic representation of a particular flag */
   SymBool operator[](const x64asm::Eflags rf) const;
+
+  SymBitVector lookup_bv_flags(const x64asm::Eflags rf) const;
   /** Lookup the symbolic representation of a generic operand.
     * Will not trigger symbolic segfaults.  Cannot be used to do memory. */
   SymBitVector lookup(const x64asm::Operand o) const;
