@@ -23,6 +23,7 @@
 #include "src/symstate/simplify.h"
 #include "src/symstate/pretty_visitor.h"
 #include "src/symstate/print_visitor.h"
+#include "src/symstate/k_visitor.h"
 #include "src/symstate/memory/trivial.h"
 #include "src/validator/handlers/combo_handler.h"
 
@@ -65,6 +66,8 @@ auto& use_smtlib_format_arg = FlagArg::create("smtlib_format")
                               .description("Show formula in smtlib format");
 auto& use_prefix_format_arg = FlagArg::create("prefix_format")
                               .description("Show formula in prefix format");
+auto& use_k_format_arg = FlagArg::create("k_format")
+                         .description("Show formula in K format");
 auto& no_simplify_arg = FlagArg::create("no_simplify")
                         .description("Don't simplify formulas before printing them.");
 
@@ -229,9 +232,10 @@ int main(int argc, char** argv) {
 
   SymPrettyVisitor pretty(Console::msg());
   SymPrintVisitor smtlib(Console::msg());
+  SymKVisitor kformat(Console::msg());
 
   SolverGadget solver;
-  auto print = [&solver, &smtlib, &pretty](const auto cc) {
+  auto print = [&solver, &smtlib, &pretty, &kformat](const auto cc) {
     auto c = SymSimplify().simplify(cc);
     if (no_simplify_arg.value()) {
       c = cc;
@@ -241,6 +245,8 @@ int main(int argc, char** argv) {
       std::cout << "\n";
     } else if (use_prefix_format_arg.value()) {
       smtlib((c));
+    } else if (use_k_format_arg.value()) {
+      kformat((c));
     } else {
       pretty((c));
     }
@@ -279,7 +285,8 @@ int main(int argc, char** argv) {
   if (printed) cout << endl;
   printed = false;
   for (auto flag_it = rs.flags_begin(); flag_it != rs.flags_end(); ++flag_it) {
-    SymBool val = state[*flag_it];
+    // SymBool val = state[*flag_it];
+    auto val = state.lookup_bv_flags(*flag_it);
     if (!show_unchanged_arg.value() && !has_changed(flag_it, val)) continue;
     Console::msg() << out_padded(flag_it, 7) << ": ";
     print(val);

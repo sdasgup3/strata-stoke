@@ -146,6 +146,46 @@ public:
 
 };
 
+/*
+class SymITESimplify : public SymTransformVisitor {
+
+public:
+
+  SymITESimplify(map<SymBoolAbstract*, SymBoolAbstract*>& cache_bool, map<SymBitVectorAbstract*, SymBitVectorAbstract*>& cache_bits, map<SymArrayAbstract*, SymArrayAbstract*>& cache_array) : SymTransformVisitor(cache_bool, cache_bits, cache_array) {}
+
+  SymBitVectorAbstract* visit(const SymBitVectorIte * const bv) {
+    if (is_cached(bv)) return get_cached(bv);
+    auto inner = (*this)(bv->cond_);
+    auto a = (*this)(bv->a_);
+    auto b = (*this)(bv->b_);
+
+    // If(C) then A else A => A
+    if(a->equals(b)) {
+      return cache(bv, a);
+    }
+
+    // If(A == mi(1, 1)) then mi(1, 1) else mi(1, 0) => A
+    switch (inner->type()) {
+      case SymBool::EQ: {
+        SymBoolCompare* binop = (SymBoolCompare*)inner;
+        auto lhs = (*this)(binop->a_);
+        auto rhs = (*this)(binop->b_);
+        if(is_one(a) && is_zero(b) && (1 == lhs->width_) && is_one(rhs)) {
+          return cache(bv, lhs);
+        }
+      }
+      default:
+        break;
+    }
+    if (inner == bv->cond_) {
+      return cache(bv, (*SymBitVectorIte)bv);
+    }
+    return cache(bv, make_bitvector_ite(inner, bv->a_, bv->b_));
+  }
+
+};
+*/
+
 /**
  * Constant propagation.
  */
@@ -495,6 +535,22 @@ public:
       return cache(bv, lhs);
     }
 
+    // If(A == mi(1, 1)) then mi(1, 1) else mi(1, 0) => A
+    // If(C1 == C2) then lhs else rhs
+    switch (c->type()) {
+    case SymBool::EQ: {
+      SymBoolCompare* binop = (SymBoolCompare*)c;
+      auto c1 = (*this)(binop->a_);
+      auto c2 = (*this)(binop->b_);
+      if (is_one(lhs) && is_zero(rhs) && (1 == c1->width_) && is_one(c2)) {
+        return cache(bv, c1);
+      }
+    }
+    default:
+      break;
+    }
+
+
     if (lhs == bv->a_ && rhs == bv->b_ && c == bv->cond_) {
       return cache(bv, (SymBitVectorIte*)bv);
     }
@@ -514,6 +570,10 @@ private:
 
   bool is_zero(const SymBitVectorAbstract* const b) {
     return is_const(b) && read_const(b) == 0;
+  }
+
+  bool is_one(const SymBitVectorAbstract* const b) {
+    return is_const(b) && read_const(b) == 1;
   }
 
   /** Returns bit pattern consisting of 0s and ending with 'ones' many 1s. */
