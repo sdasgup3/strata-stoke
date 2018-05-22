@@ -137,15 +137,15 @@ int main(int argc, char** argv) {
     //cout << solver.getZ3Formula(a) << "\n";
     //cout << solver.getZ3Formula(b) << "\n";
 
-    //bool res = solver.is_sat({ !eq });
-    bool res = solver.is_sat({ eq });
+    bool res = solver.is_sat({ !eq });
+    // bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
       return false;
     }
 
-    //if (res) {
-    if (!res) {
+    if (res) {
+    // if (!res) {
       cout << cs << "\n";
       cout << "\n\n";
 
