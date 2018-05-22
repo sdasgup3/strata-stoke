@@ -58,11 +58,36 @@ public:
     if (is_cached(bv)) return get_cached(bv);
     auto lhs = (*this)(bv->a_);
     auto rhs = (*this)(bv->b_);
+
+    // std::cout << "\n\nSymBitVectorConcat simplify:\n" << SymBitVector(bv) << "\n";
+
     if (lhs->type() == SymBitVector::EXTRACT && rhs->type() == SymBitVector::EXTRACT) {
       auto l = static_cast<const SymBitVectorExtract * const>(lhs);
       auto r = static_cast<const SymBitVectorExtract * const>(rhs);
       if (l->bv_->equals(r->bv_) && l->low_bit_ == r->high_bit_+1) {
         return cache(bv, make_bitvector_extract(l->bv_, l->high_bit_, r->low_bit_));
+      }
+    }
+
+    /*
+    ** Concatenation of non-consecutive extracts.
+    */
+    // E.g., a[63:32] || (a[31:0] || X) becomes (a[63:0] || X)
+    if (lhs->type() == SymBitVector::EXTRACT && rhs->type() ==
+        SymBitVector::CONCAT) {
+      auto l = static_cast<const SymBitVectorExtract * const>(lhs);
+      auto r = static_cast<const SymBitVectorConcat * const>(rhs);
+
+      auto r_lhs = (*this)(r->a_);
+      auto r_rhs = (*this)(r->b_);
+
+      if (r_lhs->type() == SymBitVector::EXTRACT) {
+        auto r_lhs_extract = static_cast<const SymBitVectorExtract * const>(r_lhs);
+        if (l->bv_->equals(r_lhs_extract->bv_) && l->low_bit_ == r_lhs_extract->high_bit_+1) {
+          return cache(bv, make_binop(SymBitVector::CONCAT,
+                                      make_bitvector_extract(l->bv_, l->high_bit_,
+                                          r_lhs_extract->low_bit_), r_rhs));
+        }
       }
     }
     if (lhs == bv->a_ && rhs == bv->b_) {
@@ -124,6 +149,10 @@ public:
       // TODO: there are some more cases that could be handled
       break;
     }
+
+    /*
+    ** Distribute Extract over ITE
+    */
     case SymBitVector::ITE: {
       SymBitVectorIte* ite = (SymBitVectorIte*)inner;
       auto a = make_bitvector_extract(ite->a_, bv->high_bit_, bv->low_bit_);
@@ -145,46 +174,6 @@ public:
   }
 
 };
-
-/*
-class SymITESimplify : public SymTransformVisitor {
-
-public:
-
-  SymITESimplify(map<SymBoolAbstract*, SymBoolAbstract*>& cache_bool, map<SymBitVectorAbstract*, SymBitVectorAbstract*>& cache_bits, map<SymArrayAbstract*, SymArrayAbstract*>& cache_array) : SymTransformVisitor(cache_bool, cache_bits, cache_array) {}
-
-  SymBitVectorAbstract* visit(const SymBitVectorIte * const bv) {
-    if (is_cached(bv)) return get_cached(bv);
-    auto inner = (*this)(bv->cond_);
-    auto a = (*this)(bv->a_);
-    auto b = (*this)(bv->b_);
-
-    // If(C) then A else A => A
-    if(a->equals(b)) {
-      return cache(bv, a);
-    }
-
-    // If(A == mi(1, 1)) then mi(1, 1) else mi(1, 0) => A
-    switch (inner->type()) {
-      case SymBool::EQ: {
-        SymBoolCompare* binop = (SymBoolCompare*)inner;
-        auto lhs = (*this)(binop->a_);
-        auto rhs = (*this)(binop->b_);
-        if(is_one(a) && is_zero(b) && (1 == lhs->width_) && is_one(rhs)) {
-          return cache(bv, lhs);
-        }
-      }
-      default:
-        break;
-    }
-    if (inner == bv->cond_) {
-      return cache(bv, (*SymBitVectorIte)bv);
-    }
-    return cache(bv, make_bitvector_ite(inner, bv->a_, bv->b_));
-  }
-
-};
-*/
 
 /**
  * Constant propagation.
@@ -372,6 +361,18 @@ public:
     }
     */
 
+    // 0 || (0 || X) ==> 0 || X
+    if (bv->type() == SymBitVector::CONCAT && is_zero(lhs) && rhs->type() ==
+        SymBitVector::CONCAT) {
+      auto r = (SymBitVectorConcat*)(rhs);
+      auto rhs_a = (SymBitVectorAbstract*)r->a_;
+      auto rhs_b = (SymBitVectorAbstract*)r->b_;
+      if (is_zero(rhs_a)) {
+        return cache(bv, make_binop(bv->type(), make_constant(lhs->width_ +
+                                    rhs_a->width_, 0), rhs_b));
+      }
+    }
+
     // move binop over ite
     if (lhs->type() == SymBitVector::ITE) {
       SymBitVectorIte* ite = (SymBitVectorIte*)lhs;
@@ -387,6 +388,41 @@ public:
         auto a = make_binop(bv->type(), lhs, (SymBitVectorAbstract*)ite->a_);
         auto b = make_binop(bv->type(), lhs, (SymBitVectorAbstract*)ite->b_);
         return cache(bv, make_bitvector_ite(ite->cond_, a, b));
+      }
+    }
+
+    /* move concat over ite
+    if(bv->type() == SymBitVector::CONCAT) {
+        if (lhs->type() == SymBitVector::ITE) {
+          SymBitVectorIte* ite = (SymBitVectorIte*)lhs;
+          auto a = make_binop(bv->type(), (SymBitVectorAbstract*)ite->a_, rhs);
+          auto b = make_binop(bv->type(), (SymBitVectorAbstract*)ite->b_, rhs);
+          return cache(bv, make_bitvector_ite(ite->cond_, a, b));
+        }
+
+        if (rhs->type() == SymBitVector::ITE) {
+          SymBitVectorIte* ite = (SymBitVectorIte*)rhs;
+          auto a = make_binop(bv->type(), lhs, (SymBitVectorAbstract*)ite->a_);
+          auto b = make_binop(bv->type(), lhs, (SymBitVectorAbstract*)ite->b_);
+          return cache(bv, make_bitvector_ite(ite->cond_, a, b));
+        }
+    }
+    */
+
+    /*
+    ** Distribute add/xor/or/and over ITE
+    */
+    if (bv->type() == SymBitVector::XOR || bv->type() == SymBitVector::OR ||
+        bv->type() == SymBitVector::AND || bv->type() == SymBitVector::PLUS) {
+      if (lhs->type() == SymBitVector::ITE && rhs->type() == SymBitVector::ITE) {
+        SymBitVectorIte* l = (SymBitVectorIte*)lhs;
+        SymBitVectorIte* r = (SymBitVectorIte*)rhs;
+
+        if (l->cond_->equals(r->cond_)) {
+          auto a = make_binop(bv->type(), (SymBitVectorAbstract*)l->a_, (SymBitVectorAbstract*)r->a_);
+          auto b = make_binop(bv->type(), (SymBitVectorAbstract*)l->b_, (SymBitVectorAbstract*)r->b_);
+          return cache(bv, make_bitvector_ite(l->cond_, a, b));
+        }
       }
     }
 
@@ -445,6 +481,34 @@ public:
       }
     }
 
+    /*
+    ** Distribute eqMInt over ITE
+    rule
+    eqMInt
+    (
+    (#ifMInt B:Bool #then MIA:MInt #else MIB:MInt #fi),
+    MIC:MInt
+    )
+    =>
+    (#ifBool B:Bool
+      #then eqMInt(MIA:MInt, MIC:MInt)
+      #else eqMInt(MIB:MInt, MIC:MInt)
+    #fi)
+
+    if(bv->type() == SymBool::EQ) {
+      auto lhs = (*this)(bv->a_);
+      auto rhs = (*this)(bv->b_);
+
+      if(lhs->type() == SymBitVector::ITE) {
+        SymBitVectorIte* l = (SymBitVectorIte*)lhs;
+        return cache(bv, make_bitvector_ite(l->cond_, make_compare(bv->type(),
+                (SymBitVectorAbstract*)l->a_, rhs), make_compare(bv->type(), (SymBitVectorAbstract*)l->b_, rhs)));
+      }
+    }
+    */
+
+
+
     if (lhs == bv->a_ && rhs == bv->b_) {
       return cache(bv, (SymBoolCompare*)bv);
     }
@@ -499,7 +563,6 @@ public:
     if (is_cached(bv)) return get_cached(bv);
     auto lhs = (*this)(bv->bv_);
     auto width = bv->width_;
-
     if (is_const(lhs) && width <= 64) {
       uint64_t l = read_const(lhs);
       int64_t ls = read_sconst(lhs);
@@ -531,6 +594,7 @@ public:
       return cache(bv, read_const(c) ? lhs : rhs);
     }
 
+    // Both then/else same
     if (lhs->equals(rhs)) {
       return cache(bv, lhs);
     }

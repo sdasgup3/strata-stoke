@@ -107,6 +107,18 @@ bool has_changed(T reg, SymBitVector& sym) {
     const SymBitVectorVar* const var = static_cast<const SymBitVectorVar* const>(sym.ptr);
     if (var->get_name() == ss.str()) return false;
   }
+
+  if (sym.type() == SymBitVector::Type::ITE) {
+    const SymBitVectorIte* const ite = static_cast<const SymBitVectorIte*
+                                       const>(sym.ptr) ;
+    const SymBoolAbstract* const cond = ite->cond_;
+    if (auto var = dynamic_cast<const SymBoolVar* const>(cond)) {
+      if (var->get_name() == ss.str()) {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 

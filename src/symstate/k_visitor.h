@@ -15,67 +15,121 @@ public:
     switch (bv->type()) {
     case SymBitVector::AND:
       os_ << "andMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::CONCAT:
       os_ << "concatenateMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::DIV:
       os_ << "udivMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::MINUS:
       os_ << "subMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::MOD:
       os_ << "uremMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::MULT:
       os_ << "mulMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::OR:
       os_ << "orMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::PLUS:
       os_ << "addMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::ROTATE_LEFT:
       os_ << "rol( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::ROTATE_RIGHT:
       os_ << "ror( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::SHIFT_LEFT:
       os_ << "shlMInt( ";
+      (*this)(bv->a_);
+      os_ << ", uvalueMInt(";
+      (*this)(bv->b_);
+      os_ << "))";
       break;
     case SymBitVector::SHIFT_RIGHT:
       os_ << "lshrMInt( ";
+      (*this)(bv->a_);
+      os_ << ", uvalueMInt(";
+      (*this)(bv->b_);
+      os_ << "))";
       break;
     case SymBitVector::SIGN_DIV:
       os_ << "sdivMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::SIGN_MOD:
       os_ << "sremMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     case SymBitVector::SIGN_SHIFT_RIGHT:
       os_ << "ashrMInt( ";
+      (*this)(bv->a_);
+      os_ << ", uvalueMInt(";
+      (*this)(bv->b_);
+      os_ << "))";
       break;
     case SymBitVector::XOR:
       os_ << "xorMInt( ";
+      (*this)(bv->a_);
+      os_ << ", ";
+      (*this)(bv->b_);
+      os_ << ")";
       break;
     default:
       os_ << "(UNHANDLED_BINOP" << bv->type() << " ";
       assert(false);
     }
 
-    (*this)(bv->a_);
-    os_ << ", ";
-    (*this)(bv->b_);
-    os_ << ")";
-    /*
-    (*this)(bv->a_);
-    os_ << ", ";
-    (*this)(bv->b_);
-    os_ << ")";
-    */
   }
 
   /* Visit a binop on a bool */
@@ -206,14 +260,17 @@ public:
     (*this)(bv->a_);
     os_ << " #else ";
     (*this)(bv->b_);
-    os_ << "#fi)";
+    os_ << " #fi)";
   }
 
   /** Visit a bit-vector sign-extend */
   void visit(const SymBitVectorSignExtend * const bv) {
-    os_ << "signExtend( ";
+    //os_ << "signExtend( ";
+    //(*this)(bv->bv_);
+    //os_ << ", " << bv->size_ << ")";
+    os_ << "mi(" << bv->size_ << ", svalueMInt(";
     (*this)(bv->bv_);
-    os_ << ", " << bv->size_ << ")";
+    os_ << "))";
   }
 
   /** Visit a bit-vector variable */
