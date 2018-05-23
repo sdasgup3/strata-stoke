@@ -107,6 +107,18 @@ bool has_changed(T reg, SymBitVector& sym) {
     const SymBitVectorVar* const var = static_cast<const SymBitVectorVar* const>(sym.ptr);
     if (var->get_name() == ss.str()) return false;
   }
+
+  if (sym.type() == SymBitVector::Type::ITE) {
+    const SymBitVectorIte* const ite = static_cast<const SymBitVectorIte*
+                                       const>(sym.ptr) ;
+    const SymBoolAbstract* const cond = ite->cond_;
+    if (auto var = dynamic_cast<const SymBoolVar* const>(cond)) {
+      if (var->get_name() == ss.str()) {
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 
@@ -286,6 +298,7 @@ int main(int argc, char** argv) {
   printed = false;
   for (auto flag_it = rs.flags_begin(); flag_it != rs.flags_end(); ++flag_it) {
     // SymBool val = state[*flag_it];
+
     auto val = state.lookup_bv_flags(*flag_it);
     if (!show_unchanged_arg.value() && !has_changed(flag_it, val)) continue;
     Console::msg() << out_padded(flag_it, 7) << ": ";
