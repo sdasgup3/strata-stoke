@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 
   // check equivalence of two symbolic states for a given register
   auto is_eq = [&](auto& reg, auto a, auto b, stringstream& explanation, auto& cs) {
-    //SymBool eq = a == b;
+    // SymBool eq = a == b;
     // At times simplification is requires as the sym to z3 transformer might crash.
     SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
 
@@ -132,10 +132,16 @@ int main(int argc, char** argv) {
     // cout << a << "\n";
     // cout << b << "\n";
 
-    //cout << solver.getZ3Formula(SymSimplify().simplify(a)) << std::flush << "\n";
-    //cout << solver.getZ3Formula(SymSimplify().simplify(b)) << std::flush << "\n";
-    //cout << solver.getZ3Formula(a) << "\n";
-    //cout << solver.getZ3Formula(b) << "\n";
+    /*
+    cout << "Simplified a" << "\n";
+    cout << solver.getZ3Formula(SymSimplify().simplify(a)) << std::flush << "\n";
+    cout << "Simplified b" << "\n";
+    cout << solver.getZ3Formula(SymSimplify().simplify(b)) << std::flush << "\n";
+    cout << "Non-Simplified a" << "\n";
+    cout << solver.getZ3Formula(a) << "\n";
+    cout << "Non-Simplified b" << "\n";
+    cout << solver.getZ3Formula(b) << "\n";
+    */
 
     //bool res = solver.is_sat({ !eq });
     bool res = solver.is_sat({ eq });
