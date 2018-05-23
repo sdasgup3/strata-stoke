@@ -361,7 +361,7 @@ public:
     }
     */
 
-    // 0 || (0 || X) ==> 0 || X
+    // DSAND: 0 || (0 || X) ==> 0 || X
     if (bv->type() == SymBitVector::CONCAT && is_zero(lhs) && rhs->type() ==
         SymBitVector::CONCAT) {
       auto r = (SymBitVectorConcat*)(rhs);
@@ -410,7 +410,8 @@ public:
     */
 
     /*
-    ** Distribute add/xor/or/and over ITE
+    ** DSAND: Distribute add/xor/or/and over ITE
+    ite(C, A1, B1) + ite(C, A2, B2)
     */
     if (bv->type() == SymBitVector::XOR || bv->type() == SymBitVector::OR ||
         bv->type() == SymBitVector::AND || bv->type() == SymBitVector::PLUS) {
@@ -599,14 +600,15 @@ public:
       return cache(bv, lhs);
     }
 
-    // If(A == mi(1, 1)) then mi(1, 1) else mi(1, 0) => A
+    // DSAND: If(cf == mi(1, 1)) then mi(1, 1) else mi(1, 0) => cf
     // If(C1 == C2) then lhs else rhs
     switch (c->type()) {
     case SymBool::EQ: {
       SymBoolCompare* binop = (SymBoolCompare*)c;
       auto c1 = (*this)(binop->a_);
       auto c2 = (*this)(binop->b_);
-      if (is_one(lhs) && is_zero(rhs) && (1 == c1->width_) && is_one(c2)) {
+      if ((1 == c1->width_) && is_one(c2) && ( 1 == lhs->width_ && is_one(lhs))
+            && (1 == rhs->width_ && is_zero(rhs))) { 
         return cache(bv, c1);
       }
     }
