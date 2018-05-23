@@ -608,7 +608,7 @@ public:
       auto c1 = (*this)(binop->a_);
       auto c2 = (*this)(binop->b_);
       if ((1 == c1->width_) && is_one(c2) && ( 1 == lhs->width_ && is_one(lhs))
-            && (1 == rhs->width_ && is_zero(rhs))) { 
+          && (1 == rhs->width_ && is_zero(rhs))) {
         return cache(bv, c1);
       }
     }
