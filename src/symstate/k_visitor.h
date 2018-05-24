@@ -173,8 +173,13 @@ public:
       os_ << ")";
       break;
     case SymBitVector::U_MINUS:
-      assert(false);
+    {
+      uint16_t sz = bitwidthMInt((bv->bv_));
+      os_ << "addMInt(mi("<< sz  << ", 1), negMInt( ";
+      (*this)(bv->bv_);
+      os_ << "))";
       break;
+    }
     default:
       os_ << "UNHANDLED_UNOP" << bv->type() << " ";
       assert(false);
