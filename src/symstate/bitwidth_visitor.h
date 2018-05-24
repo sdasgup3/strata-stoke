@@ -64,7 +64,7 @@ public:
       return (*this)(bv->bv_);
       break;
     case SymBitVector::U_MINUS:
-      assert(false);
+      return (*this)(bv->bv_);
       break;
     default:
       os_ << "UNHANDLED_UNOP" << bv->type() << " ";
