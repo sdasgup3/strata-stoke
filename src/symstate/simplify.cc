@@ -224,13 +224,13 @@ public:
       //DSAND: +-( a_lhs || a_rhs, b  ) and b == 0 and a_lhs == 0 (means a is
       // NOT NaN)
       if ((f.name == "sub_single" || f.name == "sub_double" || f.name == "add_single" || f.name == "add_double") && is_zero(b)) {
-        if(a->type() == SymBitVector::CONCAT) {
+        if (a->type() == SymBitVector::CONCAT) {
           auto concat = (SymBitVectorConcat*)(a);
           auto a_lhs = (SymBitVectorAbstract*)concat->a_;
           auto a_rhs = (SymBitVectorAbstract*)concat->b_;
 
-          if(is_zero(a_lhs)) {
-            return cache(bv, (SymBitVectorAbstract*) a);  
+          if (is_zero(a_lhs)) {
+            return cache(bv, (SymBitVectorAbstract*) a);
           }
         }
       }
@@ -238,13 +238,13 @@ public:
       //DSAND: +(a,  b_lhs || b_rhs) and a == 0 and b_lhs == 0 (means b is
       // NOT NaN)
       if ((f.name == "add_single" || f.name == "add_double") && is_zero(a)) {
-        if(b->type() == SymBitVector::CONCAT) {
+        if (b->type() == SymBitVector::CONCAT) {
           auto concat = (SymBitVectorConcat*)(b);
           auto b_lhs = (SymBitVectorAbstract*)concat->a_;
           auto b_rhs = (SymBitVectorAbstract*)concat->b_;
 
-          if(is_zero(b_lhs)) {
-            return cache(bv, (SymBitVectorAbstract*) b);  
+          if (is_zero(b_lhs)) {
+            return cache(bv, (SymBitVectorAbstract*) b);
           }
         }
       }

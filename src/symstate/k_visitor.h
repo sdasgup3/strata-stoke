@@ -173,7 +173,7 @@ public:
       os_ << ")";
       break;
     case SymBitVector::U_MINUS:
-    {  
+    {
       uint16_t sz = bitwidthMInt((bv->bv_));
       os_ << "addMInt(mi("<< sz  << ", 1), negMInt( ";
       (*this)(bv->bv_);
