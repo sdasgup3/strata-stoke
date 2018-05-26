@@ -77,9 +77,11 @@ int main(int argc, char** argv) {
     //cout << instr << ": " << live_out << " / " << instr.maybe_undef_set() << endl;
   }
 
-  auto af = RegSet::empty() + Constants::eflags_af();
-  auto def_in_formal = def_in - af;
-  auto live_out_formal = live_out - af;
+  //auto af = RegSet::empty() + Constants::eflags_af();
+  //auto def_in_formal = def_in - af;
+  //auto live_out_formal = live_out - af;
+  auto def_in_formal = def_in;
+  auto live_out_formal = live_out;
 
   auto full_opc_str = opc_arg.value();
   auto out = workdir + "/instructions/" + full_opc_str;
