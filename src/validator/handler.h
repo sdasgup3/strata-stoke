@@ -151,8 +151,8 @@ protected:
   SymBool minus_of(SymBool msb1, SymBool msb2, SymBool total_msb) const;
 
   SymBool makeAF(SymBitVector arg1, SymBitVector arg2, SymBitVector
-      total) const;
-  
+                 total) const;
+
 
 
 };

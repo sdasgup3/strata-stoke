@@ -134,7 +134,7 @@ void AddHandler::build_circuit(const x64asm::Instruction& instr, SymState& state
   //SymBitVector aux = (SymBitVector::constant(1, 0) || state[src][3][0]) +
   //                   (SymBitVector::constant(1, 0) || dst_bv[3][0]);
   SymBitVector aux =  (SymBitVector::constant(1, 0) || ext_src[3][0]) +
-                            (SymBitVector::constant(1, 0) || dst_bv[3][0]);
+                      (SymBitVector::constant(1, 0) || dst_bv[3][0]);
 
   if (exchange) {
     // Swap and set

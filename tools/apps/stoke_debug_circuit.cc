@@ -100,15 +100,15 @@ string out_padded(T t, size_t min_length, char pad = ' ') {
 }
 
 /** Returns bit pattern consisting of 0s and ending with 'ones' many 1s. */
-  uint64_t mask(uint16_t ones) {
-    if (ones == 0) return 0;
-    if (ones == 64) return -1;
-    return (1ULL << ones) - 1;
-  }
+uint64_t mask(uint16_t ones) {
+  if (ones == 0) return 0;
+  if (ones == 64) return -1;
+  return (1ULL << ones) - 1;
+}
 
 uint64_t read_const(const SymBitVectorAbstract* const s) {
-    auto c = (SymBitVectorConstant*)s;
-    return c->constant_ & mask(c->size_);
+  auto c = (SymBitVectorConstant*)s;
+  return c->constant_ & mask(c->size_);
 }
 
 bool is_zero(const SymBitVectorAbstract* const b) {
