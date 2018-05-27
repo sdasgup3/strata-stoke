@@ -150,6 +150,10 @@ protected:
   /** Returns the overflow flag given the MSB of the two arguments and total for a minus operation */
   SymBool minus_of(SymBool msb1, SymBool msb2, SymBool total_msb) const;
 
+  SymBool makeAF(SymBitVector arg1, SymBitVector arg2, SymBitVector
+                 total) const;
+
+
 
 };
 

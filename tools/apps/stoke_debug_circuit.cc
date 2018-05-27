@@ -99,6 +99,26 @@ string out_padded(T t, size_t min_length, char pad = ' ') {
   return ss.str();
 }
 
+/** Returns bit pattern consisting of 0s and ending with 'ones' many 1s. */
+uint64_t mask(uint16_t ones) {
+  if (ones == 0) return 0;
+  if (ones == 64) return -1;
+  return (1ULL << ones) - 1;
+}
+
+uint64_t read_const(const SymBitVectorAbstract* const s) {
+  auto c = (SymBitVectorConstant*)s;
+  return c->constant_ & mask(c->size_);
+}
+
+bool is_zero(const SymBitVectorAbstract* const b) {
+  return (b->type() == SymBitVector::CONSTANT) && read_const(b) == 0;
+}
+
+bool is_one(const SymBitVectorAbstract* const b) {
+  return  (b->type() == SymBitVector::CONSTANT) && read_const(b) == 1;
+}
+
 template <typename T>
 bool has_changed(T reg, SymBitVector& sym) {
   stringstream ss;
@@ -112,8 +132,10 @@ bool has_changed(T reg, SymBitVector& sym) {
     const SymBitVectorIte* const ite = static_cast<const SymBitVectorIte*
                                        const>(sym.ptr) ;
     const SymBoolAbstract* const cond = ite->cond_;
-    if (auto var = dynamic_cast<const SymBoolVar* const>(cond)) {
-      if (var->get_name() == ss.str()) {
+    auto var =  dynamic_cast<const SymBoolVar* const>(cond);
+    if (NULL != var && is_one(ite->a_) && is_zero(ite->b_)) {
+      //if ((var->get_name() == ss.str()) || (std::string::npos != ss.str().find("TMP_BOOL"))) {
+      if ((var->get_name() == ss.str())) {
         return false;
       }
     }
@@ -297,7 +319,7 @@ int main(int argc, char** argv) {
   if (printed) cout << endl;
   printed = false;
   for (auto flag_it = rs.flags_begin(); flag_it != rs.flags_end(); ++flag_it) {
-    // SymBool val = state[*flag_it];
+    //SymBool val = state[*flag_it];
 
     auto val = state.lookup_bv_flags(*flag_it);
     if (!show_unchanged_arg.value() && !has_changed(flag_it, val)) continue;

@@ -99,6 +99,8 @@ void AddHandler::build_circuit(const x64asm::Instruction& instr, SymState& state
     src_bv = src_bv.extend(dest.size());
   }
 
+  SymBitVector unmod_src_bv = src_bv;
+
   if (subtract) {
     src_bv = !src_bv;
   }
