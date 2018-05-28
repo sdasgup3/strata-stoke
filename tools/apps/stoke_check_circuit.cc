@@ -237,22 +237,22 @@ int main(int argc, char** argv) {
     }
 
 
-    // Test for maybe undefs 
+    // Test for maybe undefs
     auto eq_undef = true;
     stringstream ss_undef;
-    ss_undef << "[Undef Test] Sandbox and validator do not agree for '" << instr 
-          << "' (opcode " << opcode << ")" << endl;
+    ss_undef << "[Undef Test] Sandbox and validator do not agree for '" << instr
+             << "' (opcode " << opcode << ")" << endl;
     for (auto gp_it = maybe_undef_rs.gp_begin(); gp_it != maybe_undef_rs.gp_end(); ++gp_it) {
       eq_undef = eq_undef && is_eq(gp_it, sym_validator.lookup(*gp_it),
-          sb_validator.lookup(*gp_it), ss_undef, cs);
+                                   sb_validator.lookup(*gp_it), ss_undef, cs);
     }
     for (auto sse_it = maybe_undef_rs.sse_begin(); sse_it != maybe_undef_rs.sse_end(); ++sse_it) {
       eq_undef = eq_undef && is_eq(sse_it, sym_validator.lookup(*sse_it),
-          sb_validator.lookup(*sse_it), ss_undef, cs);
+                                   sb_validator.lookup(*sse_it), ss_undef, cs);
     }
     for (auto flag_it = maybe_undef_rs.flags_begin(); flag_it != maybe_undef_rs.flags_end(); ++flag_it) {
       eq_undef = eq_undef && is_eq(flag_it, sym_validator[*flag_it],
-          sb_validator[*flag_it], ss_undef, cs);
+                                   sb_validator[*flag_it], ss_undef, cs);
     }
 
     if (!eq_undef) {
