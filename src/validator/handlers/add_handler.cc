@@ -131,8 +131,10 @@ void AddHandler::build_circuit(const x64asm::Instruction& instr, SymState& state
   // Compute the final values
   SymBitVector total = ext_src + ext_dst;
   // Compute auxiliary carry
-  SymBitVector aux = (SymBitVector::constant(1, 0) || state[src][3][0]) +
-                     (SymBitVector::constant(1, 0) || dst_bv[3][0]);
+  //SymBitVector aux = (SymBitVector::constant(1, 0) || state[src][3][0]) +
+  //                   (SymBitVector::constant(1, 0) || dst_bv[3][0]);
+  SymBitVector aux =  (SymBitVector::constant(1, 0) || ext_src[3][0]) +
+                      (SymBitVector::constant(1, 0) || dst_bv[3][0]);
 
   if (exchange) {
     // Swap and set
@@ -157,7 +159,8 @@ void AddHandler::build_circuit(const x64asm::Instruction& instr, SymState& state
   else
     state.set(eflags_cf, !total[width]);
 
-  state.set(eflags_af, aux[4]);
+  //state.set(eflags_af, aux[4]);
+  state.set(eflags_af, makeAF(unmod_src_bv, dst_bv, total[width-1][0]));
   state.set_szp_flags(total[width-1][0]);
 }
 
