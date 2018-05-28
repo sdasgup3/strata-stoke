@@ -518,6 +518,7 @@ void SimpleHandler::add_all() {
 
     SymBitVector src_bv = a;
     SymBitVector dst_bv = accumulator;
+    SymBitVector unmodified_src = src_bv;
 
     src_bv = !src_bv;
     SymBitVector ext_src = SymBitVector::constant(1, 0) || src_bv;
@@ -527,6 +528,7 @@ void SimpleHandler::add_all() {
 
     ss.set(eflags_of, plus_of(src_bv[width-1], dst_bv[width-1], total[width-1]));
     ss.set(eflags_cf, !total[width]);
+    ss.set(eflags_af, makeAF(unmodified_src, dst_bv, total));
     ss.set_szp_flags(total[width-1][0]);
   });
 
@@ -3045,7 +3047,7 @@ void SimpleHandler::add_all() {
     ss.set(dst, -a);
     ss.set(eflags_cf, a != SymBitVector::constant(dst.size(), 0));
     ss.set(eflags_of, a[dst.size()-1] & (-a)[dst.size()-1]);
-    ss.set(eflags_af, a[3] & (-a)[3]);
+    ss.set(eflags_af, a[4]  ^ (-a)[4]);
     ss.set_szp_flags(-a);
   });
 
