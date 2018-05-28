@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
       cout << ss_undef.str() << endl;
     }
 
-    if(!eq or !eq_undef) {
+    if (!eq or !eq_undef) {
       return 1;
     }
 
