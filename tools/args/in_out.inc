@@ -41,6 +41,12 @@ cpputil::ValueArg<x64asm::RegSet, RegSetReader, RegSetWriter>& live_out_arg =
   .description("Registers live on exit")
   .default_val(x64asm::RegSet::linux_call_return());
 
+cpputil::ValueArg<x64asm::RegSet, RegSetReader, RegSetWriter>& maybe_undef_out_arg =
+  cpputil::ValueArg<x64asm::RegSet, RegSetReader, RegSetWriter>::create("maybe_undef_out")
+  .alternate("uo")
+  .usage("{ %af %cf ... }")
+  .description("Flags maybe undefs on exit");
+
 cpputil::FlagArg& stack_out_arg =
   cpputil::FlagArg::create("stack_out")
   .description("Is stack defined on exit?");
