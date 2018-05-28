@@ -66,6 +66,8 @@ int main(int argc, char** argv) {
 
   auto def_in = instr.maybe_read_set();
   auto live_out = instr.maybe_write_set();
+  auto maybe_undef = instr.maybe_undef_set();
+
   if (live_out != instr.must_write_set()) {
     // this affects the following instructions: blsil,blsiq,blsmskl,blsmskq,blsrl,blsrq,bsfl,bsfq,bsrw,bsrl,bsrq,cmovaw,cmoval,cmovaq,cmovaew,cmovael,cmovaeq,cmovbw,cmovbl,cmovbq,cmovbew,cmovbel,cmovbeq,cmovcw,cmovcl,cmovcq,cmovew,cmovel,cmoveq,cmovgw,cmovgl,cmovgq,cmovgew,cmovgel,cmovgeq,cmovlw,cmovll,cmovlq,cmovlew,cmovlel,cmovleq,cmovnaw,cmovnal,cmovnaq,cmovnaew,cmovnael,cmovnaeq,cmovnbw,cmovnbl,cmovnbq,cmovnbew,cmovnbel,cmovnbeq,cmovncw,cmovncl,cmovncq,cmovnew,cmovnel,cmovneq,cmovngw,cmovngl,cmovngq,cmovngew,cmovngel,cmovngeq,cmovnlw,cmovnll,cmovnlq,cmovnlew,cmovnlel,cmovnleq,cmovnow,cmovnol,cmovnoq,cmovnpw,cmovnpl,cmovnpq,cmovnsw,cmovnsl,cmovnsq,cmovnzw,cmovnzl,cmovnzq,cmovow,cmovol,cmovoq,cmovpw,cmovpl,cmovpq,cmovpew,cmovpel,cmovpeq,cmovpow,cmovpol,cmovpoq,cmovsw,cmovsl,cmovsq,cmovzw,cmovzl,cmovzq,cmpxchgw,cmpxchgl,cmpxchgq,cmpxchgb,cmpxchgb,cmpxchgb,cmpxchgb,cmpxchgb,cmpxchgb,cmpxchgb,sti
     def_in |= live_out;
@@ -100,6 +102,7 @@ int main(int argc, char** argv) {
   f_meta << "{" << endl;
   f_meta << "  \"def_in\": \"" << def_in_formal << "\"," << endl;
   f_meta << "  \"live_out\": \"" << live_out_formal << "\"," << endl;
+  f_meta << "  \"maybe_undef_out\": \"" << maybe_undef << "\"," << endl;
   f_meta << "  \"def_in_formal\": \"" << def_in_formal << "\"," << endl;
   f_meta << "  \"live_out_formal\": \"" << live_out_formal << "\"," << endl;
   f_meta << "  \"search_without_uif\": false," << endl;
