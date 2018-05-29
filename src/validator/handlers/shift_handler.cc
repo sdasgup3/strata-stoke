@@ -155,7 +155,8 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     // If shift is length 1, OF is MSB of *original* operand
     state.set(eflags_of, set_of.ite(
                 extended_src[dest.size()],
-                state[eflags_of]
+                // state[eflags_of]
+                operand_nonzero.ite(SymBool::tmp_var(), state[eflags_of])
               ));
 
   } else if (!rotate && right && sign) {
@@ -173,7 +174,8 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     // The OF bit is set to 0 if this is a shift of length 1, otherwise left alone
     state.set(eflags_of, set_of.ite(
                 SymBool::_false(),
-                state[eflags_of]
+                // state[eflags_of]
+                operand_nonzero.ite(SymBool::tmp_var(), state[eflags_of])
               ));
 
   } else if (!rotate && !right) {
@@ -190,8 +192,10 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
 
     // The OF bit is 0 <=> MSB of result is same as carry flag (unless left alone)
     state.set(eflags_of, set_of.ite(
-                state[eflags_cf] != result[dest.size() - 1],
-                state[eflags_of]
+                // state[eflags_cf] != result[dest.size() - 1],
+                //state[eflags_of]
+                state[eflags_cf] ^ result[dest.size() - 1],
+                operand_nonzero.ite(SymBool::tmp_var(), state[eflags_of])
               ));
   } else if (rotate && !rotate_cf) {
 
@@ -218,10 +222,14 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     if (right) {
       of = temp_dest[dest.size() - 1] ^ temp_dest[dest.size() - 2];
     } else {
-      of = temp_dest[dest.size() - 1] ^ temp_dest[0];
+      // of = temp_dest[dest.size() - 1] ^ temp_dest[0];
+      of = temp_dest[dest.size() - 1] ^ state[eflags_cf];
     }
 
-    state.set(eflags_of, set_of.ite(of, SymBool::tmp_var()));
+    // state.set(eflags_of, set_of.ite(of, SymBool::tmp_var()));
+    state.set(eflags_of, set_of.ite(of, 
+                operand_nonzero.ite(SymBool::tmp_var(), state[eflags_of])
+          ));
 
   } else if (rotate && rotate_cf) {
 
@@ -242,11 +250,14 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     //   (i.e. xor two MSB when shifting right, or
     //         xor MSB, LSB when shifting left)
     // Otherwise, OF is undefined.
+    /*
     SymBool of;
     if (right)
       of = temp_dest[dest.size() - 1] ^ temp_dest[dest.size() - 2];
     else
       of = temp_dest[dest.size()] ^ temp_dest[dest.size() - 1];
+    */
+    SymBool of = temp_dest[dest.size() - 1] ^ state[eflags_cf];
 
     state.set(eflags_of, set_of.ite(
                 of,
