@@ -222,8 +222,7 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     if (right) {
       of = temp_dest[dest.size() - 1] ^ temp_dest[dest.size() - 2];
     } else {
-      // of = temp_dest[dest.size() - 1] ^ temp_dest[0];
-      of = temp_dest[dest.size() - 1] ^ state[eflags_cf];
+      of = temp_dest[dest.size() - 1] ^ temp_dest[0];
     }
 
     // state.set(eflags_of, set_of.ite(of, SymBool::tmp_var()));
@@ -250,18 +249,16 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     //   (i.e. xor two MSB when shifting right, or
     //         xor MSB, LSB when shifting left)
     // Otherwise, OF is undefined.
-    /*
     SymBool of;
     if (right)
       of = temp_dest[dest.size() - 1] ^ temp_dest[dest.size() - 2];
     else
       of = temp_dest[dest.size()] ^ temp_dest[dest.size() - 1];
-    */
-    SymBool of = temp_dest[dest.size() - 1] ^ state[eflags_cf];
+    // SymBool of = temp_dest[dest.size() - 1] ^ state[eflags_cf];
 
     state.set(eflags_of, set_of.ite(
                 of,
-                operand_nonzero.ite( state[eflags_of], SymBool::tmp_var())
+                operand_nonzero.ite( SymBool::tmp_var(), state[eflags_of])
               ));
   }
 
