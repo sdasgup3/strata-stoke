@@ -49,6 +49,11 @@ auto& opc_arg = ValueArg<string>::create("opc")
                 .description("The opcode to consider;  use opcode_number to indicate an imm8 argument")
                 .required();
 
+
+auto& samereg =
+  FlagArg::create("samereg")
+  .description("keep the same registers");
+
 void write_file(string fname, string content) {
   ofstream f;
   f.open(fname);
@@ -60,7 +65,7 @@ int main(int argc, char** argv) {
   ostringstream stream;
   CommandLineConfig::strict_with_convenience(argc, argv);
 
-  auto instr = get_instruction_from_string(opc_arg);
+  auto instr = get_instruction_from_string(opc_arg, samereg);
 
   string workdir = workdir_arg.value();
 
@@ -86,6 +91,9 @@ int main(int argc, char** argv) {
   auto live_out_formal = live_out;
 
   auto full_opc_str = opc_arg.value();
+  if (samereg) {
+    full_opc_str = full_opc_str + ".samereg";
+  }
   auto out = workdir + "/instructions/" + full_opc_str;
   boost::filesystem::path dir(out);
   boost::filesystem::create_directories(dir);

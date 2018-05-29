@@ -346,7 +346,7 @@ std::map<x64asm::Type, std::vector<x64asm::Operand>> operands_ = {
 std::map<x64asm::Type, int> operands_idx_ = {
 };
 
-x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
+x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val, bool samereg) {
   // std::cout << "Type: " << t << "\n";
   /*
   if (t == x64asm::Type::M_8) {
@@ -414,6 +414,25 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
     std::cout << "ERROR: unsupported operand: " << t << std::endl;
     exit(1);
   }
+
+  if (samereg) {
+    if (t == x64asm::Type::R_8) {
+      return x64asm::Constants::al();
+    }
+    if (t == x64asm::Type::RH) {
+      return x64asm::Constants::ah();
+    }
+    if (t == x64asm::Type::R_16) {
+      return x64asm::Constants::ax();
+    }
+    if (t == x64asm::Type::R_32) {
+      return x64asm::Constants::eax();
+    }
+    if (t == x64asm::Type::R_64) {
+      return x64asm::Constants::rax();
+    }
+  }
+
   if (operands_idx_.find(t) == operands_idx_.end()) {
     operands_idx_[t] = 0;
   }
@@ -511,7 +530,8 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val) {
   return operands_[t][operands_idx_[t] - 1];
 }
 
-x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val) {
+x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool
+                                    samereg) {
   operands_idx_ = {};
   x64asm::Instruction instr(opc);
   // std::cout << instr << std::endl;
@@ -556,14 +576,29 @@ x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val) {
 
   // special case for cmpxchg with an RH register
   else if (opc == CMPXCHG_R8_RH) {
-    instr.set_operand(0, Constants::cl());
-    instr.set_operand(1, Constants::bh());
+    if (samereg) {
+      instr.set_operand(0, Constants::al());
+      instr.set_operand(1, Constants::ah());
+    } else {
+      instr.set_operand(0, Constants::cl());
+      instr.set_operand(1, Constants::bh());
+    }
   } else if (opc == CMPXCHG_RH_RH) {
-    instr.set_operand(0, Constants::bh());
-    instr.set_operand(1, Constants::ch());
+    if (samereg) {
+      instr.set_operand(0, Constants::ah());
+      instr.set_operand(1, Constants::ah());
+    } else {
+      instr.set_operand(0, Constants::bh());
+      instr.set_operand(1, Constants::ch());
+    }
   } else if (opc == CMPXCHG_RH_R8) {
-    instr.set_operand(0, Constants::bh());
-    instr.set_operand(1, Constants::cl());
+    if (samereg) {
+      instr.set_operand(0, Constants::ah());
+      instr.set_operand(1, Constants::al());
+    } else {
+      instr.set_operand(0, Constants::bh());
+      instr.set_operand(1, Constants::cl());
+    }
   }
 
   // special case for mulx
@@ -587,7 +622,7 @@ x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val) {
           || is_supported_type_reason(t) == SupportedReason::MM
           || is_supported_type_reason(t) == SupportedReason::IMMEDIATE
           || is_supported_type_reason(t) == SupportedReason::MEMORY) {
-        instr.set_operand(i, get_next_operand(t, imm8_val));
+        instr.set_operand(i, get_next_operand(t, imm8_val, samereg));
       } else {
         std::cout << "unsupported type: " << t << std::endl;
         std::cout << (int) opc << std::endl;
@@ -736,7 +771,8 @@ x64asm::Instruction get_random_instruction(x64asm::Opcode opc, default_random_en
   return get_random_instruction_helper(opc, gen, 200);
 }
 
-x64asm::Instruction get_instruction_from_string(std::string xopcode) {
+x64asm::Instruction get_instruction_from_string(std::string xopcode, bool
+    samereg) {
   // parse opcode
   // we use opc_8 to indicate that we want to use 8 as the imm8 argument
   smatch result;
@@ -761,7 +797,7 @@ x64asm::Instruction get_instruction_from_string(std::string xopcode) {
     cerr << "ERROR: could not parse the extended opcoce: " << xopcode << endl;
     exit(1);
   }
-  return get_instruction(opc, num);
+  return get_instruction(opc, num, samereg);
 }
 
 } // namespace stoke
