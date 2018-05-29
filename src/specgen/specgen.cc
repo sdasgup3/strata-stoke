@@ -415,7 +415,7 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val, bool samereg)
     exit(1);
   }
 
-  if(samereg) {
+  if (samereg) {
     if (t == x64asm::Type::R_8) {
       return x64asm::Constants::al();
     }
@@ -531,7 +531,7 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val, bool samereg)
 }
 
 x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool
-    samereg) {
+                                    samereg) {
   operands_idx_ = {};
   x64asm::Instruction instr(opc);
   // std::cout << instr << std::endl;
@@ -576,7 +576,7 @@ x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool
 
   // special case for cmpxchg with an RH register
   else if (opc == CMPXCHG_R8_RH) {
-    if(samereg) {
+    if (samereg) {
       instr.set_operand(0, Constants::al());
       instr.set_operand(1, Constants::ah());
     } else {
@@ -584,7 +584,7 @@ x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool
       instr.set_operand(1, Constants::bh());
     }
   } else if (opc == CMPXCHG_RH_RH) {
-    if(samereg) {
+    if (samereg) {
       instr.set_operand(0, Constants::ah());
       instr.set_operand(1, Constants::ah());
     } else {
@@ -592,7 +592,7 @@ x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool
       instr.set_operand(1, Constants::ch());
     }
   } else if (opc == CMPXCHG_RH_R8) {
-    if(samereg) {
+    if (samereg) {
       instr.set_operand(0, Constants::ah());
       instr.set_operand(1, Constants::al());
     } else {

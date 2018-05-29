@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
   auto live_out_formal = live_out;
 
   auto full_opc_str = opc_arg.value();
-  if(samereg) {
+  if (samereg) {
     full_opc_str = full_opc_str + ".samereg";
   }
   auto out = workdir + "/instructions/" + full_opc_str;
