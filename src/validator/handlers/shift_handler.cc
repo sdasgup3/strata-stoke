@@ -227,9 +227,9 @@ void ShiftHandler::build_circuit(const x64asm::Instruction& instr, SymState& sta
     }
 
     // state.set(eflags_of, set_of.ite(of, SymBool::tmp_var()));
-    state.set(eflags_of, set_of.ite(of, 
-                operand_nonzero.ite(SymBool::tmp_var(), state[eflags_of])
-          ));
+    state.set(eflags_of, set_of.ite(of,
+                                    operand_nonzero.ite(SymBool::tmp_var(), state[eflags_of])
+                                   ));
 
   } else if (rotate && rotate_cf) {
 
