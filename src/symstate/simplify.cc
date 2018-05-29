@@ -593,33 +593,33 @@ public:
 
     // DSAND
     // Only the left is given prec.
-    if(is_const(lhs) && 0 == read_const(lhs)) {
+    if (is_const(lhs) && 0 == read_const(lhs)) {
       switch (bv->type()) {
-        case SymBool::AND:
-          return cache(bv, make_constant(false));
-        case SymBool::OR:
-          return cache(bv, (SymBoolAbstract *)rhs);
-        default:
-          break;
+      case SymBool::AND:
+        return cache(bv, make_constant(false));
+      case SymBool::OR:
+        return cache(bv, (SymBoolAbstract *)rhs);
+      default:
+        break;
       }
     }
 
-    if(is_const(lhs) && 1 == read_const(lhs)) {
+    if (is_const(lhs) && 1 == read_const(lhs)) {
       switch (bv->type()) {
-        case SymBool::AND:
-          return cache(bv, (SymBoolAbstract *)rhs);
-        case SymBool::OR:
-          return cache(bv, make_constant(true));
-        default:
-          break;
+      case SymBool::AND:
+        return cache(bv, (SymBoolAbstract *)rhs);
+      case SymBool::OR:
+        return cache(bv, make_constant(true));
+      default:
+        break;
       }
     }
 
-    if(is_const(rhs) && 0 == read_const(rhs) && SymBool::OR == bv->type()) {
+    if (is_const(rhs) && 0 == read_const(rhs) && SymBool::OR == bv->type()) {
       return cache(bv, (SymBoolAbstract *)lhs);
     }
 
-    if(is_const(rhs) && 1 == read_const(rhs) && SymBool::AND == bv->type()) {
+    if (is_const(rhs) && 1 == read_const(rhs) && SymBool::AND == bv->type()) {
       return cache(bv, (SymBoolAbstract *)lhs);
     }
     // DSAND end
