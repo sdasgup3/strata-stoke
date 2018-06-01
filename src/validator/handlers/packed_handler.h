@@ -391,7 +391,7 @@ public:
     // dpps
     add_opcode("dpps", [] (SymBitVector a, SymBitVector b, SymBitVector c, uint16_t k) {
       SymFunction f("mul_single", 32, {32, 32});
-      SymFunction g("add_double", 32, {32, 32});
+      SymFunction g("add_single", 32, {32, 32});
       auto dest_width = a.width();
       short unsigned int vec_len = 128;
 

@@ -1119,16 +1119,23 @@ void SimpleHandler::add_all() {
   // extractps/vextractps
   add_opcode_str({"extractps", "vextractps"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    //if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+    //  assert(false);
+    //}
+    //uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+
     short unsigned int vec_len = 32;
     auto src_width = b.width();
     auto dest_width = a.width();
-    uint64_t offset = constant & (src_width/vec_len - 1);
+    auto c_width = c.width();
+    auto offset = (SymBitVector::constant(b.width() - 2, 0) || c[1][0]) << 5;
 
     if (64 == dest_width) {
-      ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || ((b >> (offset*vec_len))[vec_len-1][0]) );
+      ss.set(dst, SymBitVector::constant(dest_width - vec_len, 0) || ((b >>
+             offset)[vec_len-1][0]) );
     } else {
-      ss.set(dst, (b >> (offset*vec_len))[vec_len-1][0]);
+      //ss.set(dst, (b >> (offset*vec_len))[vec_len-1][0]);
+      ss.set(dst, (b >> offset)[vec_len-1][0]);
     }
   });
 
@@ -1146,12 +1153,20 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"pextrw", "vpextrw"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 16;
-    uint64_t offset = constant & (128/vec_len - 1);
+    auto c_width = c.width();
+    // uint64_t off = (128/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c_width, off*vec_len);
     auto dest_width = a.width();
+    auto offset =  (SymBitVector::constant(b.width() - 3, 0)  || c[2][0]) << 4;
 
-    auto result = (b >> offset*vec_len)[vec_len-1][0];
+    auto result = (b >> offset)[vec_len-1][0];
     if (dest_width > vec_len) {
       result = SymBitVector::constant(dest_width - vec_len, 0) || result;
     }
@@ -1161,12 +1176,21 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"pextrb", "vpextrb"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
+    auto c_width = c.width();
     short unsigned int vec_len = 8;
-    uint64_t offset = constant & (128/vec_len - 1);
+    //uint64_t off =  (128/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c_width, off*vec_len);
+
+    auto offset =  (SymBitVector::constant(b.width() - 4, 0)  || c[3][0]) << 3;
     auto dest_width = a.width();
 
-    auto result = (b >> offset*vec_len)[vec_len-1][0];
+    auto result = (b >> offset)[vec_len-1][0];
     if (dest_width > vec_len) {
       result = SymBitVector::constant(dest_width - vec_len, 0) || result;
     }
@@ -1176,35 +1200,60 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"pextrq", "vpextrq"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 64;
-    uint64_t offset = constant & (128/vec_len - 1);
+    // uint64_t off = (128/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
     auto dest_width = a.width();
 
-    ss.set(dst, (b >> offset*vec_len)[vec_len-1][0]);
+    auto offset =  (SymBitVector::constant(b.width() - 1, 0)  || c[0][0]) << 6;
+
+    ss.set(dst, (b >> offset)[vec_len-1][0]);
   });
 
   add_opcode_str({"pextrd", "vpextrd"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
-    short unsigned int vec_len = 32;
-    uint64_t offset = constant & (128/vec_len - 1);
-    auto dest_width = a.width();
 
-    ss.set(dst, (b >> offset*vec_len)[vec_len-1][0]);
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
+    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
+    short unsigned int vec_len = 32;
+    // uint64_t off = (128/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
+    auto dest_width = a.width();
+    auto offset =  (SymBitVector::constant(b.width() - 2, 0)  || c[1][0]) << 5;
+
+    ss.set(dst, (b >> offset)[vec_len-1][0]);
   });
 
   // pinsrb
   add_opcode_str({"pinsrb"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 8;
+    auto c_width = c.width();
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    // uint64_t off = (dest_width/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c_width, off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 4, 0)  || c[3][0]) << 3;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset)) & mask);
 
     ss.set(dst, (a & !mask) | temp);
   });
@@ -1212,14 +1261,22 @@ void SimpleHandler::add_all() {
   // vpinsrb
   add_opcode_str({"vpinsrb"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 8;
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    //uint64_t off = (dest_width/vec_len - 1);
+    //auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 4, 0)  || c[3][0]) << 3;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset)) & mask);
 
     ss.set(dst, (a & !mask) | temp, true);
   });
@@ -1227,14 +1284,22 @@ void SimpleHandler::add_all() {
   // pinsrw
   add_opcode_str({"pinsrw"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 16;
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    // uint64_t off = (dest_width/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xffff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 3, 0)  || c[2][0]) << 4;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset)) & mask);
 
     ss.set(dst, (a & !mask) | temp);
   });
@@ -1242,14 +1307,22 @@ void SimpleHandler::add_all() {
   // vpinsrw
   add_opcode_str({"vpinsrw"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 16;
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    // uint64_t off = (dest_width/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xffff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 3, 0)  || c[2][0]) << 4;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset)) & mask);
 
     ss.set(dst, (a & !mask) | temp, true);
   });
@@ -1257,14 +1330,22 @@ void SimpleHandler::add_all() {
   // pinsrd
   add_opcode_str({"pinsrd"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    /*
+      if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+        assert(false);
+      }
+      uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+      */
     short unsigned int vec_len = 32;
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    // uint64_t off =  (dest_width/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xffffffff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 2, 0)  || c[1][0]) << 5;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffffffff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset )) & mask);
 
     ss.set(dst, (a & !mask) | temp);
   });
@@ -1272,14 +1353,22 @@ void SimpleHandler::add_all() {
   // vpinsrd
   add_opcode_str({"vpinsrd"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 32;
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    // uint64_t off =  (dest_width/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xffffffff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 2, 0)  || c[1][0]) << 5;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffffffff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset)) & mask);
 
     ss.set(dst, (a & !mask) | temp, true);
   });
@@ -1287,14 +1376,22 @@ void SimpleHandler::add_all() {
   // vpinsrq
   add_opcode_str({"vpinsrq"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector d, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+    */
     short unsigned int vec_len = 64;
     auto dest_width = a.width();
     auto src_width = b.width();
-    uint64_t offset = constant & (dest_width/vec_len - 1);
+    // uint64_t off = (dest_width/vec_len - 1);
+    // auto offset = c & SymBitVector::constant(c.width(), off*vec_len);
 
-    auto mask = (SymBitVector::constant(dest_width, 0xffffffffffffffff) << offset*vec_len);
-    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset *vec_len)) & mask);
+    auto offset =  (SymBitVector::constant(a.width() - 1, 0)  || c[0][0]) << 6;
+
+    auto mask = (SymBitVector::constant(dest_width, 0xffffffffffffffff) << offset);
+    auto temp = (((SymBitVector::constant(dest_width - src_width, 0x0) || b) << (offset)) & mask);
 
     ss.set(dst, (a & !mask) | temp, true);
   });
@@ -1305,28 +1402,47 @@ void SimpleHandler::add_all() {
   // The following are borrowed from master stoke
   add_opcode_str({"palignr"},
   [this] (Operand dst, Operand src, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymState& ss) {
-    uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
-    ss.set(dst, ((a || b) >> (constant*8))[dst.size()-1][0]);
+    /*
+      if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+        assert(false);
+      }
+      uint64_t constant = (static_cast<const SymBitVectorConstant*>(c.ptr))->constant_;
+      */
+    auto  offset = (SymBitVector::constant(a.width() + b.width() - c.width(), 0)
+                    || c) << 3;
+    ss.set(dst, ((a || b) >> offset)[dst.size()-1][0]);
   });
 
   add_opcode_str({"vpalignr"},
   [this] (Operand dst, Operand src1, Operand src2, Operand imm, SymBitVector a, SymBitVector b, SymBitVector c, SymBitVector d, SymState& ss) {
-    uint64_t constant = (static_cast<const SymBitVectorConstant*>(d.ptr))->constant_;
+    /*
+      if(!dynamic_cast<const SymBitVectorConstant*>(c.ptr)) {
+        assert(false);
+      }
+      uint64_t constant = (static_cast<const SymBitVectorConstant*>(d.ptr))->constant_;
+      */
+    auto  offset = (SymBitVector::constant(256 - d.width(), 0) || d) << 3;
     if (dst.size() == 128) {
-      ss.set(dst, ((b || c) >> (constant*8))[127][0], true);
+      ss.set(dst, ((b || c) >> offset)[127][0], true);
     } else {
-      ss.set(dst, (((b[255][128] || c[255][128]) >> (constant*8))[127][0]) ||
-             (((b[127][0] || c[127][0]) >> (constant*8))[127][0]), true);
+      ss.set(dst, (((b[255][128] || c[255][128]) >> offset)[127][0]) || (((b[127][0] || c[127][0]) >> offset)[127][0]), true);
     }
 
   });
 
   add_opcode_str({"pshufd"},
   [this] (Operand dst, Operand src, Operand i, SymBitVector a, SymBitVector b, SymBitVector imm, SymState &ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(imm.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
+    */
     SymBitVector result;
     for (size_t i = 0; i < 4; ++i) {
-      auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 5);
+      //auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 5);
+
+      auto amt =  (SymBitVector::constant(b.width() - 2, 0) || imm[2*i+1][2*i]) << 5;
       result = (b >> amt)[31][0] || result;
     }
     ss.set(dst, result);
@@ -1334,15 +1450,22 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"vpshufd"},
   [this] (Operand dst, Operand src, Operand i, SymBitVector a, SymBitVector b, SymBitVector imm, SymState &ss) {
-    uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
+    /*
+      if(!dynamic_cast<const SymBitVectorConstant*>(imm.ptr)) {
+        assert(false);
+      }
+      uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
+      */
     SymBitVector result;
     for (size_t i = 0; i < 4; ++i) {
-      auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 5);
+      // auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 5);
+      auto amt = (SymBitVector::constant(126, 0) || imm[2*i+1][2*i]) << 5;
       result = (b[127][0] >> amt)[31][0] || result;
     }
     if (dst.size() == 256) {
       for (size_t i = 0; i < 4; ++i) {
-        auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 5);
+        // auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 5);
+        auto amt = (SymBitVector::constant(126, 0) || imm[2*i+1][2*i]) << 5;
         result = (b[255][128] >> amt)[31][0] || result;
       }
     }
@@ -1351,10 +1474,16 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"pshuflw"},
   [this] (Operand dst, Operand src, Operand i, SymBitVector a, SymBitVector b, SymBitVector imm, SymState &ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(imm.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
+    */
     SymBitVector result;
     for (size_t i = 0; i < 4; ++i) {
-      auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 4);
+      // auto amt = SymBitVector::constant(128, ((constant & (0x3 << 2*i)) >> 2*i) << 4);
+      auto amt = (SymBitVector::constant(b.width() - 2, 0) || imm[2*i+1][2*i]) << 4;
       result = (b >> amt)[15][0] || result;
     }
     result = b[127][64] || result;
@@ -1363,16 +1492,23 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"vpshuflw"},
   [this] (Operand dst, Operand src, Operand i, SymBitVector a, SymBitVector b, SymBitVector imm, SymState &ss) {
+    /*
+    if(!dynamic_cast<const SymBitVectorConstant*>(imm.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
+    */
     SymBitVector result;
     for (size_t i = 0; i < 4; ++i) {
-      auto amt = SymBitVector::constant(dst.size(), ((constant & (0x3 << 2*i)) >> 2*i) << 4);
+      // auto amt = SymBitVector::constant(dst.size(), ((constant & (0x3 << 2*i)) >> 2*i) << 4);
+      auto amt = (SymBitVector::constant(b.width() - 2, 0) || imm[2*i+1][2*i]) << 4;
       result = (b >> amt)[15][0] || result;
     }
     result = b[127][64] || result;
     if (dst.size() == 256) {
       for (size_t i = 0; i < 4; ++i) {
-        auto amt = SymBitVector::constant(dst.size(), ((constant & (0x3 << 2*i)) >> 2*i) << 4);
+        // auto amt = SymBitVector::constant(dst.size(), ((constant & (0x3 << 2*i)) >> 2*i) << 4);
+        auto amt = (SymBitVector::constant(b.width() - 2, 0) || imm[2*i+1][2*i]) << 4;
         result = (b >> amt)[143][128] || result;
       }
       result = b[255][192] || result;
@@ -3124,8 +3260,12 @@ void SimpleHandler::add_all() {
     ss.set(eflags_af, SymBool::_false());
   });
 
+  /*
   add_opcode_str({"pshuflw"},
   [this] (Operand dst, Operand src, Operand i, SymBitVector a, SymBitVector b, SymBitVector imm, SymState &ss) {
+    if(!dynamic_cast<const SymBitVectorConstant*>(imm.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
     SymBitVector result;
     for (size_t i = 0; i < 4; ++i) {
@@ -3138,6 +3278,9 @@ void SimpleHandler::add_all() {
 
   add_opcode_str({"vpshuflw"},
   [this] (Operand dst, Operand src, Operand i, SymBitVector a, SymBitVector b, SymBitVector imm, SymState &ss) {
+    if(!dynamic_cast<const SymBitVectorConstant*>(imm.ptr)) {
+      assert(false);
+    }
     uint64_t constant = (static_cast<const SymBitVectorConstant*>(imm.ptr))->constant_;
     SymBitVector result;
     for (size_t i = 0; i < 4; ++i) {
@@ -3154,6 +3297,7 @@ void SimpleHandler::add_all() {
     }
     ss.set(dst, result, true);
   });
+  */
 
   add_opcode_str({"pushq"},
   [this] (Operand dst, SymBitVector a, SymState& ss) {
