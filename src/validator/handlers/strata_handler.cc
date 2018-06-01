@@ -722,6 +722,7 @@ Handler::SupportLevel StrataHandler::get_support(const x64asm::Instruction& inst
   }
 
   // check for imm8 support
+  // CODEX
   /*
   if (specgen_is_imm8(opcode)) {
     stringstream ss;
