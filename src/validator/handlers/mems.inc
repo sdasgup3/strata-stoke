@@ -65,7 +65,7 @@ xorq_m64_imm32
 xorq_m64_imm8
 xorq_m64_r64
 xorq_r64_m64
-*/   
+*/
 
 || opcode == ADC_M8_IMM8
 || opcode == ADC_M32_IMM8
