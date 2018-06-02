@@ -72,7 +72,11 @@ INC_FOLDERS=\
 INC=$(addprefix -I./, $(INC_FOLDERS))
 
 DEPS=\
-	src/ext/x64asm/lib/libx64asm.a
+	src/ext/x64asm/lib/libx64asm.a \
+	src/validator/handlers/not_generalized_stratified_imms.inc \
+	src/validator/handlers/generalized_stratified_imms.inc \
+        src/validator/handlers/regs.inc
+
 
 LIB=\
 	src/ext/x64asm/lib/libx64asm.a\
