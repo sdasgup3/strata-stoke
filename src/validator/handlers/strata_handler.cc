@@ -622,6 +622,7 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == VFMADD213SD_XMM_XMM_M64
       || opcode == VFNMADD213SD_XMM_XMM_M64
       || opcode == VFMSUB213SS_XMM_XMM_M32    // <-- END
+#include "mems.inc" // <-- Start & End     
 #include "not_generalized_stratified_imms.inc" // <-- Start & End     
 #include "generalized_stratified_imms.inc" // <-- Start & End     
 #include "regs.inc" // <-- Start & End     
