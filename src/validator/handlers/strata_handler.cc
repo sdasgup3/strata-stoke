@@ -622,6 +622,7 @@ bool StrataHandler::is_supported(const x64asm::Opcode& opcode) {
       || opcode == VFMADD213SD_XMM_XMM_M64
       || opcode == VFNMADD213SD_XMM_XMM_M64
       || opcode == VFMSUB213SS_XMM_XMM_M32    // <-- END
+#include "mems.inc" // <-- Start & End     
 #include "not_generalized_stratified_imms.inc" // <-- Start & End     
 #include "generalized_stratified_imms.inc" // <-- Start & End     
 #include "regs.inc" // <-- Start & End     
@@ -665,7 +666,7 @@ SupportReason StrataHandler::support_reason(const x64asm::Opcode& opcode) {
 
   if (found) {
     if (specgen_is_base(alt)) {
-      // std::cout << "Base Instruction!!\n";
+      // std::cout << "Base Instruction!!" << reason <<  "!!" << alt << "\n";
       return reason;
     }
     if (is_supported(alt)) return reason;
