@@ -5,14 +5,14 @@ are modelled using non-strata handlers.
 Still, Strata handler owns them because of the logic:
 if I is generalized using G {
  if(G a base instruction) return strata handler
- else return handler_of(G) 
+ else return handler_of(G)
 }
 
 After the non strata handler model the semantics, the strata handler can't keep
 the symbolic Imp that we need to port the rules to K
 Hence moving them to non-strata handler; which faithful handle the
-extension of imm using sign-ext 
-*/   
+extension of imm using sign-ext
+*/
 || opcode == ADC_AL_IMM8
 || opcode == ADC_AX_IMM16
 || opcode == ADC_EAX_IMM32
