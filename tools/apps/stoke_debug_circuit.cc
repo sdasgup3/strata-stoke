@@ -411,7 +411,7 @@ int main(int argc, char** argv) {
           }
         }
         cout << " was updated to" << endl;
-        cout << "    ";
+        cout << "    Value ";
         print(loc.value);
         cout << " (" << loc.size << " bytes)." << endl;
       }
