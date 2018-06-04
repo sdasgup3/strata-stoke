@@ -361,6 +361,10 @@ int main(int argc, char** argv) {
       for (auto loc : reads) {
         cout << "  Value ";
         print(loc.value);
+        cout << " (" << loc.size << " bytes)" << endl;
+        cout << "    was read at address ";
+        print(loc.address);
+        cout << "." << endl;
 
         // Check if all the mem access are from same address and of same size
         if (mem_fetch_from_same_address) {
@@ -370,18 +374,14 @@ int main(int argc, char** argv) {
             firstInstance = false;
           } else {
             if (loc.size != sZ) {
-              std::cout << "info: Loc Size Mismatch\n\n";
+              std::cout << "\ninfo: Loc Size Mismatch\n\n";
             }
             stringstream ss;
             if (!is_eq(sA, loc.address, ss)) {
-              std::cout << "info: Loc Address Mismatch\n\n";
+              std::cout << "\ninfo: Loc Address Mismatch\n\n";
             }
           }
         }
-        cout << " (" << loc.size << " bytes)" << endl;
-        cout << "    was read at address ";
-        print(loc.address);
-        cout << "." << endl;
       }
     }
 
@@ -397,6 +397,10 @@ int main(int argc, char** argv) {
       for (auto loc : writes) {
         cout << "  Address ";
         print(loc.address);
+        cout << " was updated to" << endl;
+        cout << "    Value ";
+        print(loc.value);
+        cout << " (" << loc.size << " bytes)." << endl;
 
         // Check if all the mem access are from same address and of same size
         if (mem_fetch_from_same_address) {
@@ -405,15 +409,11 @@ int main(int argc, char** argv) {
             sA = loc.address;
             firstInstance = false;
           } else {
-            assert(loc.size == sZ && "Loc Size Mismatch");
+            assert(loc.size == sZ && "\ninfo: Loc Size Mismatch");
             stringstream ss;
-            assert(is_eq(sA, loc.address, ss) && "Loc Address Mismatch");
+            assert(is_eq(sA, loc.address, ss) && "\ninfo: Loc Address Mismatch");
           }
         }
-        cout << " was updated to" << endl;
-        cout << "    Value ";
-        print(loc.value);
-        cout << " (" << loc.size << " bytes)." << endl;
       }
     }
     if (printed) cout << endl;
