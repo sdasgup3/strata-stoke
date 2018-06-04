@@ -222,7 +222,7 @@ public:
 
 
       //DSAND: +-( a_lhs || a_rhs, b  ) and b == 0 and a_lhs == 0 (means a is
-      // NOT NaN)
+      // NOT -0)
       if ((f.name == "sub_single" || f.name == "sub_double" || f.name == "add_single" || f.name == "add_double") && is_zero(b)) {
         if (a->type() == SymBitVector::CONCAT) {
           auto concat = (SymBitVectorConcat*)(a);
@@ -236,7 +236,7 @@ public:
       }
 
       //DSAND: +(a,  b_lhs || b_rhs) and a == 0 and b_lhs == 0 (means b is
-      // NOT NaN)
+      // NOT -0)
       if ((f.name == "add_single" || f.name == "add_double") && is_zero(a)) {
         if (b->type() == SymBitVector::CONCAT) {
           auto concat = (SymBitVectorConcat*)(b);
