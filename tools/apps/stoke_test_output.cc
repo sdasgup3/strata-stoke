@@ -74,11 +74,11 @@ int main(int argc, char** argv) {
   TestSetGadget test_set(seed);
   TestOutputGadget test_output(seed);
 
-  if(test_set.size() != test_output.size()) {
+  if (test_set.size() != test_output.size()) {
     assert(false && "Size Mismatch1");
   }
 
-  if(test_output.size() == 0) {
+  if (test_output.size() == 0) {
     assert(false && "No Output!");
   }
 
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
     reference_out_.push_back(*i);
   }
 
-  if(reference_out_.size() != test_output.size()) {
+  if (reference_out_.size() != test_output.size()) {
     assert(false && "Size Mismatch2");
   }
 
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     auto & cs_output = test_output[i];
 
 
-    if(cs_sandbox_out != cs_output) {
+    if (cs_sandbox_out != cs_output) {
       cout << "Sandbox Run:\n" << cs_sandbox_out << endl;
       cout << "K Run:\n" << cs_output << endl;
     }
