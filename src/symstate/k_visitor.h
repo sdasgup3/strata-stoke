@@ -84,7 +84,7 @@ public:
       os_ << ")";
       break;
     case SymBitVector::SHIFT_LEFT:
-      os_ << "shlMInt( ";
+      os_ << "shiftLeftMInt( ";
       (*this)(bv->a_);
       os_ << ", uvalueMInt(";
       (*this)(bv->b_);
@@ -112,7 +112,7 @@ public:
       os_ << ")";
       break;
     case SymBitVector::SIGN_SHIFT_RIGHT:
-      os_ << "ashrMInt( ";
+      os_ << "aShiftRightMInt( ";
       (*this)(bv->a_);
       os_ << ", uvalueMInt(";
       (*this)(bv->b_);

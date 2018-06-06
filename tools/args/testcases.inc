@@ -44,6 +44,12 @@ cpputil::FileArg<CpuStates, CpuStatesReader, CpuStatesWriter>& testcases_arg =
   .usage("<path/to/file>")
   .description("Testcases");
 
+cpputil::FileArg<CpuStates, CpuStatesReader, CpuStatesWriter>& testoutput_arg =
+  cpputil::FileArg<CpuStates, CpuStatesReader,
+  CpuStatesWriter>::create("testouts")
+  .usage("<path/to/file>")
+  .description("Testcase Outputs");
+
 cpputil::FlagArg& shuffle_tc_arg =
   cpputil::FlagArg::create("shuffle_testcases")
   .description("Shuffle testcase ordering");

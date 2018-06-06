@@ -189,10 +189,14 @@ int main(int argc, char** argv) {
   Code code;
   if (code_arg.has_been_provided()) {
     code = code_arg.value();
+    //for (auto it : code) {
+    //  cout <<  it.get_opcode() << endl;
+    //}
   }
 
   if (opc_arg.has_been_provided()) {
     auto instr = get_instruction_from_string(opc_arg);
+    //cout << instr.get_opcode() << endl;
     code.push_back(instr);
   }
 
