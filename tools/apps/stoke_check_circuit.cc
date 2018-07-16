@@ -123,10 +123,10 @@ int main(int argc, char** argv) {
     // At times simplification is requires as the sym to z3 transformer might crash.
     SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
 
-    // cout <<  "\n\n" << *reg << ":\n";
+     cout <<  "\n\n" << *reg << ":\n";
     // SImplified
-    // cout << SymSimplify().simplify(a) << "\n";
-    // cout << SymSimplify().simplify(b) << "\n\n\n";
+     cout << SymSimplify().simplify(a) << "\n";
+     cout << SymSimplify().simplify(b) << "\n\n\n";
 
     // Not simplified
     // cout << a << "\n";
