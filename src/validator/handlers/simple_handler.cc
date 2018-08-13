@@ -305,29 +305,73 @@ void SimpleHandler::add_all() {
 
     SymBitVector numerator;
     if (n == 8) {
-      SymFunction f_quot("idiv_quotient_int8", 8, {16, 8});
-      SymFunction f_rem("idiv_remainder_int8", 8, {16, 8});
+      //SymFunction f_quot("idiv_quotient_int8", 8, {16, 8});
+      //SymFunction f_rem("idiv_remainder_int8", 8, {16, 8});
+      //numerator = ss[Constants::ax()];
+      //ss.set(Constants::al(), f_quot(numerator, a));
+      //ss.set(Constants::ah(), f_rem(numerator, a));
       numerator = ss[Constants::ax()];
-      ss.set(Constants::al(), f_quot(numerator, a));
-      ss.set(Constants::ah(), f_rem(numerator, a));
+      auto extend_a = a.extend(16);
+      auto zeroCheck = (extend_a == SymBitVector::constant(16, 0));
+      auto range = numerator.s_div(extend_a).s_gt(SymBitVector::constant(16,127)) |  
+          numerator.s_div(extend_a).s_lt(SymBitVector::constant(16,-128));
+
+      auto rangeCheckQ = range.ite(ss[Constants::al()], numerator.s_div(extend_a)[7][0]);
+      auto rangeCheckR = range.ite(ss[Constants::ah()], numerator.s_mod(extend_a)[7][0]);
+
+      ss.set(Constants::al(), zeroCheck.ite(ss[Constants::al()], rangeCheckQ));
+      ss.set(Constants::ah(), zeroCheck.ite(ss[Constants::ah()], rangeCheckR));
     } else if (n == 16) {
-      SymFunction f_quot("idiv_quotient_int16", 16, {32, 16});
-      SymFunction f_rem("idiv_remainder_int16", 16, {32, 16});
+      //SymFunction f_quot("idiv_quotient_int16", 16, {32, 16});
+      //SymFunction f_rem("idiv_remainder_int16", 16, {32, 16});
+      //numerator = ss[Constants::dx()] || ss[Constants::ax()];
+      //ss.set(Constants::dx(), f_rem(numerator, a));
+      //ss.set(Constants::ax(), f_quot(numerator, a));
       numerator = ss[Constants::dx()] || ss[Constants::ax()];
-      ss.set(Constants::dx(), f_rem(numerator, a));
-      ss.set(Constants::ax(), f_quot(numerator, a));
+      auto extend_a = a.extend(32);
+      auto zeroCheck = (extend_a == SymBitVector::constant(32, 0));
+      auto range = numerator.s_div(extend_a).s_gt(SymBitVector::constant(32,32767)) |  
+          numerator.s_div(extend_a).s_lt(SymBitVector::constant(32,-32768));
+
+      auto rangeCheckQ = range.ite(ss[Constants::ax()], numerator.s_div(extend_a)[15][0]);
+      auto rangeCheckR = range.ite(ss[Constants::dx()], numerator.s_mod(extend_a)[15][0]);
+
+      ss.set(Constants::ax(), zeroCheck.ite(ss[Constants::ax()], rangeCheckQ));
+      ss.set(Constants::dx(), zeroCheck.ite(ss[Constants::dx()], rangeCheckR));
     } else if (n == 32) {
-      SymFunction f_quot("idiv_quotient_int32", 32, {64, 32});
-      SymFunction f_rem("idiv_remainder_int32", 32, {64, 32});
+      //SymFunction f_quot("idiv_quotient_int32", 32, {64, 32});
+      //SymFunction f_rem("idiv_remainder_int32", 32, {64, 32});
+      //numerator = ss[Constants::edx()] || ss[Constants::eax()];
+      //ss.set(Constants::edx(), f_rem(numerator, a));
+      //ss.set(Constants::eax(), f_quot(numerator, a));
       numerator = ss[Constants::edx()] || ss[Constants::eax()];
-      ss.set(Constants::edx(), f_rem(numerator, a));
-      ss.set(Constants::eax(), f_quot(numerator, a));
+      auto extend_a = a.extend(64);
+      auto zeroCheck = (extend_a == SymBitVector::constant(64, 0));
+      auto range = numerator.s_div(extend_a).s_gt(SymBitVector::constant(64,2147483647)) |  
+          numerator.s_div(extend_a).s_lt(SymBitVector::constant(64,-2147483648));
+
+      auto rangeCheckQ = range.ite(ss[Constants::rax()], SymBitVector::constant(32, 0) || (numerator.s_div(extend_a)[31][0]));
+      auto rangeCheckR = range.ite(ss[Constants::rdx()], SymBitVector::constant(32, 0) || (numerator.s_mod(extend_a)[31][0]));
+
+      ss.set(Constants::rax(), zeroCheck.ite(ss[Constants::rax()], rangeCheckQ));
+      ss.set(Constants::rdx(), zeroCheck.ite(ss[Constants::rdx()], rangeCheckR));
     } else if (n == 64) {
-      SymFunction f_quot("idiv_quotient_int64", 64, {128, 64});
-      SymFunction f_rem("idiv_remainder_int64", 64, {128, 64});
+      //SymFunction f_quot("idiv_quotient_int64", 64, {128, 64});
+      //SymFunction f_rem("idiv_remainder_int64", 64, {128, 64});
+      //numerator = ss[Constants::rdx()] || ss[Constants::rax()];
+      //ss.set(Constants::rdx(), f_rem(numerator, a));
+      //ss.set(Constants::rax(), f_quot(numerator, a));
       numerator = ss[Constants::rdx()] || ss[Constants::rax()];
-      ss.set(Constants::rdx(), f_rem(numerator, a));
-      ss.set(Constants::rax(), f_quot(numerator, a));
+      auto extend_a = a.extend(128);
+      auto zeroCheck = (extend_a == SymBitVector::constant(128, 0));
+      auto range = numerator.s_div(extend_a).s_gt(SymBitVector::constant(128,9223372036854775807)) |  
+          numerator.s_div(extend_a).s_lt(SymBitVector::constant(128,-9223372036854775808));
+
+      auto rangeCheckQ = range.ite(ss[Constants::rax()], numerator.s_div(extend_a)[63][0]);
+      auto rangeCheckR = range.ite(ss[Constants::rdx()], numerator.s_mod(extend_a)[63][0]);
+
+      ss.set(Constants::rax(), zeroCheck.ite(ss[Constants::rax()], rangeCheckQ));
+      ss.set(Constants::rdx(), zeroCheck.ite(ss[Constants::rdx()], rangeCheckR));
     } else {
       assert(false);
     }
@@ -346,32 +390,76 @@ void SimpleHandler::add_all() {
 
     SymBitVector numerator;
     if (n == 8) {
-      SymFunction f_quot("div_quotient_int8", 8, {16, 8});
-      SymFunction f_rem("div_remainder_int8", 8, {16, 8});
+      //SymFunction f_quot("div_quotient_int8", 8, {16, 8});
+      //SymFunction f_rem("div_remainder_int8", 8, {16, 8});
+      //numerator = ss[Constants::ax()];
+      //ss.set(Constants::al(), f_quot(numerator, a));
+      //ss.set(Constants::ah(), f_rem(numerator, a));
       numerator = ss[Constants::ax()];
-      ss.set(Constants::al(), f_quot(numerator, a));
-      ss.set(Constants::ah(), f_rem(numerator, a));
+      auto extend_a = SymBitVector::constant(8, 0) || a;
+      auto zeroCheck = (extend_a == SymBitVector::constant(16, 0));
+      auto rangeCheckQ = ((numerator / extend_a) > SymBitVector::constant(16,255)).ite(ss[Constants::al()], 
+          (numerator / extend_a)[7][0]);
+      auto rangeCheckR = ((numerator / extend_a) > SymBitVector::constant(16,255)).ite(ss[Constants::ah()], 
+         (numerator % extend_a)[7][0]);
+
+      ss.set(Constants::al(), zeroCheck.ite(ss[Constants::al()], rangeCheckQ));
+      ss.set(Constants::ah(), zeroCheck.ite(ss[Constants::ah()], rangeCheckR));
+
     } else if (n == 16) {
-      SymFunction f_quot("div_quotient_int16", 16, {32, 16});
-      SymFunction f_rem("div_remainder_int16", 16, {32, 16});
+      //SymFunction f_quot("div_quotient_int16", 16, {32, 16});
+      //SymFunction f_rem("div_remainder_int16", 16, {32, 16});
+      //numerator = ss[Constants::dx()] || ss[Constants::ax()];
+      //ss.set(Constants::dx(), f_rem(numerator, a));
+      //ss.set(Constants::ax(), f_quot(numerator, a));
       numerator = ss[Constants::dx()] || ss[Constants::ax()];
-      ss.set(Constants::dx(), f_rem(numerator, a));
-      ss.set(Constants::ax(), f_quot(numerator, a));
+      auto extend_a = SymBitVector::constant(16, 0) || a;
+      auto zeroCheck = (extend_a == SymBitVector::constant(32, 0));
+      auto rangeCheckQ = ((numerator / extend_a) > SymBitVector::constant(32,65535)).ite(ss[Constants::ax()], 
+          (numerator / extend_a)[15][0]);
+      auto rangeCheckR = ((numerator / extend_a) > SymBitVector::constant(32,65535)).ite(ss[Constants::dx()], 
+         (numerator % extend_a)[15][0]);
+
+      ss.set(Constants::ax(), zeroCheck.ite(ss[Constants::ax()], rangeCheckQ));
+      ss.set(Constants::dx(), zeroCheck.ite(ss[Constants::dx()], rangeCheckR));
     } else if (n == 32) {
-      SymFunction f_quot("div_quotient_int32", 32, {64, 32});
-      SymFunction f_rem("div_remainder_int32", 32, {64, 32});
+      //SymFunction f_quot("div_quotient_int32", 32, {64, 32});
+      //SymFunction f_rem("div_remainder_int32", 32, {64, 32});
+      //numerator = ss[Constants::edx()] || ss[Constants::eax()];
+      //ss.set(Constants::edx(), f_rem(numerator, a));
+      //ss.set(Constants::eax(), f_quot(numerator, a));
       numerator = ss[Constants::edx()] || ss[Constants::eax()];
-      ss.set(Constants::edx(), f_rem(numerator, a));
-      ss.set(Constants::eax(), f_quot(numerator, a));
+      auto extend_a = SymBitVector::constant(32, 0) || a;
+      auto zeroCheck = (extend_a == SymBitVector::constant(64, 0));
+      auto rangeCheckQ = ((numerator / extend_a) > SymBitVector::constant(64,4294967295)).ite(ss[Constants::rax()], 
+          SymBitVector::constant(32, 0) || ((numerator / extend_a)[31][0]));
+      auto rangeCheckR = ((numerator / extend_a) > SymBitVector::constant(64,4294967295)).ite(ss[Constants::rdx()], 
+         SymBitVector::constant(32, 0) || ((numerator % extend_a)[31][0]));
+
+      ss.set(Constants::rax(), zeroCheck.ite(ss[Constants::rax()], rangeCheckQ));
+      ss.set(Constants::rdx(), zeroCheck.ite(ss[Constants::rdx()], rangeCheckR));
     } else if (n == 64) {
-      SymFunction f_quot("div_quotient_int64", 64, {128, 64});
-      SymFunction f_rem("div_remainder_int64", 64, {128, 64});
+      //SymFunction f_quot("div_quotient_int64", 64, {128, 64});
+      //SymFunction f_rem("div_remainder_int64", 64, {128, 64});
+      //numerator = ss[Constants::rdx()] || ss[Constants::rax()];
+      //ss.set(Constants::rdx(), f_rem(numerator, a));
+      //ss.set(Constants::rax(), f_quot(numerator, a));
       numerator = ss[Constants::rdx()] || ss[Constants::rax()];
-      ss.set(Constants::rdx(), f_rem(numerator, a));
-      ss.set(Constants::rax(), f_quot(numerator, a));
+      auto extend_a = SymBitVector::constant(64, 0) || a;
+      auto zeroCheck = (extend_a == SymBitVector::constant(128, 0));
+      auto rangeCheckQ = ((numerator / extend_a) > SymBitVector::constant(128,18446744073709551615)).ite(ss[Constants::rax()], 
+          (numerator / extend_a)[63][0]);
+      auto rangeCheckR = ((numerator / extend_a) > SymBitVector::constant(128,18446744073709551615)).ite(ss[Constants::rdx()], 
+         (numerator % extend_a)[63][0]);
+
+      ss.set(Constants::rax(), zeroCheck.ite(ss[Constants::rax()], rangeCheckQ));
+      ss.set(Constants::rdx(), zeroCheck.ite(ss[Constants::rdx()], rangeCheckR));
+
     } else {
       assert(false);
     }
+
+
 
     ss.set(eflags_zf, SymBool::tmp_var());
     ss.set(eflags_af, SymBool::tmp_var());

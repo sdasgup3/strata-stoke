@@ -135,8 +135,8 @@ Cost CorrectnessCost::sum_correctness(const Cfg& cfg, const Cost max) {
 Cost CorrectnessCost::evaluate_error(const CpuState& t, const CpuState& r, const RegSet& defs) const {
   // Only assess a signal penalty if target and rewrite disagree
   // DSAND
-   std::cout << t << "\n\n";
-   std::cout << r << "\n";
+  std::cout << t << "\n\n";
+  std::cout << r << "\n";
   if (t.code != r.code) {
     return sig_penalty_;
   }

@@ -96,13 +96,18 @@ int main(int argc, char** argv) {
   // Collect the run results
   cout << "Collect Results\n";
   std::vector<CpuState> reference_out_;
-  for (auto i = sb.result_begin(), ie = sb.result_end(); i != ie; ++i) {
+
+  auto k = sb.input_begin();
+  auto ke = sb.input_end();
+  for (auto i = sb.result_begin(), ie = sb.result_end(); i != ie && k != ke; ++i, ++k) {
     CpuState ss = *i;
     if (ss.code != stoke::ErrorCode::NORMAL) {
       cout<< "Sandbox did not finish normally: " << opcode << " " <<  (int)ss.code << std::endl;
       exit(4);
+      //reference_out_.push_back(*k); // for dov/idiv we can push the input value as the result. Also their semantics is also written so that on error state the output value is same as input value
+    } else {
+      reference_out_.push_back(*i);
     }
-    reference_out_.push_back(*i);
   }
 
   // Build the sym formula of the circuit
@@ -122,11 +127,12 @@ int main(int argc, char** argv) {
     // SymBool eq = a == b;
     // At times simplification is requires as the sym to z3 transformer might crash.
     SymBool eq = SymSimplify().simplify(a) == SymSimplify().simplify(b);
+    //cout << eq << "\n";
 
-     cout <<  "\n\n" << *reg << ":\n";
+    //cout <<  "\n\n" << *reg << ":\n";
     // SImplified
-     cout << SymSimplify().simplify(a) << "\n";
-     cout << SymSimplify().simplify(b) << "\n\n\n";
+    //cout << SymSimplify().simplify(a) << "\n";
+    //cout << SymSimplify().simplify(b) << "\n\n\n";
 
     // Not simplified
     // cout << a << "\n";
@@ -143,15 +149,15 @@ int main(int argc, char** argv) {
     cout << solver.getZ3Formula(b) << "\n";
     */
 
-    //bool res = solver.is_sat({ !eq });
-    bool res = solver.is_sat({ eq });
+    bool res = solver.is_sat({ !eq });
+    //bool res = solver.is_sat({ eq });
     if (solver.has_error()) {
       explanation << "  solver encountered error: " << solver.get_error() << endl;
       return false;
     }
 
-    //if (res) {
-    if (!res) {
+    if (res) {
+    //if (!res) {
       cout << cs << "\n";
       cout << "\n\n";
 
@@ -240,7 +246,7 @@ int main(int argc, char** argv) {
     }
 
 
-    // Test for maybe undefs
+    /* Test for maybe undefs
     auto eq_undef = true;
     stringstream ss_undef;
     ss_undef << "[Undef Test] Sandbox and validator do not agree for '" << instr
@@ -265,6 +271,7 @@ int main(int argc, char** argv) {
     if (!eq or !eq_undef) {
       return 1;
     }
+    */
 
 
     i++;
