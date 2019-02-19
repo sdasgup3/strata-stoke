@@ -214,6 +214,7 @@ BIN=\
 	bin/stoke_check_circuit \
 	bin/stoke_test_output \
         bin/stoke_check_circuit_with_unsat_check \
+        bin/stoke_check_circuit_with_sat_check \
 	bin/stoke_support_list \
 	bin/stoke_debug_cfg \
 	bin/stoke_debug_circuit \
