@@ -3089,7 +3089,7 @@ void SimpleHandler::add_all() {
         result = cond.ite(SymBitVector::constant(8, 0), byte) || result;
       }
     }
-    ss.set(dst, result, true);
+    ss.set(dst, result, false);
   });
 
   // End Borrowed from master Stoke

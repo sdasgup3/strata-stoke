@@ -348,26 +348,6 @@ std::map<x64asm::Type, int> operands_idx_ = {
 
 x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val, bool samereg) {
   // std::cout << "Type: " << t << "\n";
-  /*
-  if (t == x64asm::Type::M_8) {
-    return x64asm::M8(x64asm::Constants::rax());
-  }
-  if (t == x64asm::Type::M_16) {
-    return x64asm::M16(x64asm::Constants::rax());
-  }
-  if (t == x64asm::Type::M_32) {
-    return x64asm::M32(x64asm::Constants::rax());
-  }
-  if (t == x64asm::Type::M_64) {
-    return x64asm::M64(x64asm::Constants::rax());
-  }
-  if (t == x64asm::Type::M_128) {
-    return x64asm::M128(x64asm::Constants::rax());
-  }
-  if (t == x64asm::Type::M_256) {
-    return x64asm::M256(x64asm::Constants::rax());
-  }
-  */
   if (t == x64asm::Type::IMM_8) {
     return x64asm::Imm8(imm8_val);
   }
@@ -446,7 +426,7 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val, bool samereg)
       operands_idx_[x64asm::Type::M_8] = 0;
     operands_idx_[x64asm::Type::M_8] += 1;
 
-    if (operands_idx_.find(x64asm::Type::M_8) == operands_idx_.end())
+    if (operands_idx_.find(x64asm::Type::M_16) == operands_idx_.end())
       operands_idx_[x64asm::Type::M_16] = 0;
     operands_idx_[x64asm::Type::M_16] += 1;
 
@@ -530,8 +510,7 @@ x64asm::Operand get_next_operand(x64asm::Type t, uint8_t imm8_val, bool samereg)
   return operands_[t][operands_idx_[t] - 1];
 }
 
-x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool
-                                    samereg) {
+x64asm::Instruction get_instruction(x64asm::Opcode opc, uint8_t imm8_val, bool samereg) {
   operands_idx_ = {};
   x64asm::Instruction instr(opc);
   // std::cout << instr << std::endl;
@@ -771,8 +750,7 @@ x64asm::Instruction get_random_instruction(x64asm::Opcode opc, default_random_en
   return get_random_instruction_helper(opc, gen, 200);
 }
 
-x64asm::Instruction get_instruction_from_string(std::string xopcode, bool
-    samereg) {
+x64asm::Instruction get_instruction_from_string(std::string xopcode, bool samereg) {
   // parse opcode
   // we use opc_8 to indicate that we want to use 8 as the imm8 argument
   smatch result;

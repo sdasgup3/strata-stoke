@@ -177,6 +177,7 @@ public:
   /** Replace symbolic values with variables and add constraints.*/
   void simplify();
 
+  /** Avoid concretizing the immediate operand and keep it symbolic */
   void set_keep_imm_symbolic() {
     keep_imm_symbolic = true;
   }
